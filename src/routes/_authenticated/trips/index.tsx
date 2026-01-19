@@ -3,7 +3,7 @@ import { useQuery } from 'convex/react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { api } from '../../../../convex/_generated/api';
-import { Button, Card, CardContent, Badge, AnimatedPage, SkeletonTripCard } from '../../../components/ui';
+import { Button, Card, CardContent, Badge, AnimatedPage, SkeletonTripCard, EmptyState } from '../../../components/ui';
 import { staggerContainer, staggerItem } from '../../../lib/animations';
 import { Plane, Plus, MapPin, Calendar, CheckCircle, Clock, ArrowRight } from 'lucide-react';
 import { CreateTripModal } from '../../../components/trips';
@@ -108,38 +108,30 @@ const TripsPage = () => {
       {trips.length === 0 ? (
         <Card>
           <CardContent>
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
-                {activeTab === 'planning' ? (
-                  <Clock className="text-secondary" size={40} />
-                ) : activeTab === 'active' ? (
-                  <MapPin className="text-secondary" size={40} />
-                ) : activeTab === 'completed' ? (
-                  <CheckCircle className="text-secondary" size={40} />
-                ) : (
-                  <Plane className="text-secondary" size={40} />
-                )}
-              </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                {activeTab === 'planning'
+            <EmptyState
+              illustration="trips"
+              title={
+                activeTab === 'planning'
                   ? 'No trips in planning'
                   : activeTab === 'active'
                     ? 'No active trips'
                     : activeTab === 'completed'
                       ? 'No completed trips'
-                      : 'No trips yet'}
-              </h3>
-              <p className="text-muted mb-6 max-w-sm">
-                {activeTab === 'all'
+                      : 'No trips yet'
+              }
+              description={
+                activeTab === 'all'
                   ? 'Start planning your next adventure with detailed itineraries'
-                  : 'Trips will appear here as you create and progress through them'}
-              </p>
-              {activeTab === 'all' && (
-                <Button leftIcon={<Plus size={18} />} onClick={() => setShowCreateModal(true)}>
-                  Plan Your First Trip
-                </Button>
-              )}
-            </div>
+                  : 'Trips will appear here as you create and progress through them'
+              }
+              action={
+                activeTab === 'all' ? (
+                  <Button leftIcon={<Plus size={18} />} onClick={() => setShowCreateModal(true)}>
+                    Plan Your First Trip
+                  </Button>
+                ) : undefined
+              }
+            />
           </CardContent>
         </Card>
       ) : (

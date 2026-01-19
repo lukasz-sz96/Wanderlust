@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
 import { PlaceCard, SortablePlaceList, AddPlaceModal } from '../../../components/places';
-import { Button, Card, CardContent, AnimatedPage, SkeletonPlaceCard, SkeletonStats } from '../../../components/ui';
+import { Button, Card, CardContent, AnimatedPage, SkeletonPlaceCard, EmptyState } from '../../../components/ui';
 import { staggerContainer, staggerItem } from '../../../lib/animations';
 import { MapPin, Plus, Heart, CheckCircle, List, Grid } from 'lucide-react';
 
@@ -128,32 +128,28 @@ const PlacesPage = () => {
       {bucketListItems.length === 0 ? (
         <Card>
           <CardContent>
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-20 h-20 rounded-full bg-primary-light/20 flex items-center justify-center mb-4">
-                {activeTab === 'want_to_visit' ? (
-                  <Heart className="text-primary" size={40} />
-                ) : activeTab === 'visited' ? (
-                  <CheckCircle className="text-secondary" size={40} />
-                ) : (
-                  <MapPin className="text-primary" size={40} />
-                )}
-              </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                {activeTab === 'want_to_visit'
+            <EmptyState
+              illustration="places"
+              title={
+                activeTab === 'want_to_visit'
                   ? 'No places on your wishlist'
                   : activeTab === 'visited'
                     ? 'No visited places yet'
-                    : 'No places yet'}
-              </h3>
-              <p className="text-muted mb-6 max-w-sm">
-                {activeTab === 'want_to_visit'
+                    : 'No places yet'
+              }
+              description={
+                activeTab === 'want_to_visit'
                   ? 'Add places you dream of visiting to your wishlist'
                   : activeTab === 'visited'
                     ? 'Mark places as visited to track your travels'
-                    : 'Start building your bucket list by adding places you want to visit'}
-              </p>
-              <Button leftIcon={<Plus size={18} />} onClick={() => setShowAddModal(true)}>Add Your First Place</Button>
-            </div>
+                    : 'Start building your bucket list by adding places you want to visit'
+              }
+              action={
+                <Button leftIcon={<Plus size={18} />} onClick={() => setShowAddModal(true)}>
+                  Add Your First Place
+                </Button>
+              }
+            />
           </CardContent>
         </Card>
       ) : viewMode === 'list' ? (

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
 import { motion } from 'framer-motion';
 import { api } from '../../../../convex/_generated/api';
-import { Button, Card, CardContent, Badge, AnimatedPage, SkeletonJournalEntry, SkeletonStats } from '../../../components/ui';
+import { Button, Card, CardContent, Badge, AnimatedPage, SkeletonJournalEntry, EmptyState } from '../../../components/ui';
 import { staggerContainer, staggerItem } from '../../../lib/animations';
 import {
   BookOpen,
@@ -148,18 +148,16 @@ const JournalPage = () => {
       {entries.length === 0 ? (
         <Card>
           <CardContent>
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-20 h-20 rounded-full bg-accent/20 flex items-center justify-center mb-4">
-                <BookOpen className="text-accent" size={40} />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">No journal entries</h3>
-              <p className="text-muted mb-6 max-w-sm">
-                Capture your travel experiences with photos and stories
-              </p>
-              <Link to="/journal/new">
-                <Button leftIcon={<Plus size={18} />}>Write Your First Entry</Button>
-              </Link>
-            </div>
+            <EmptyState
+              illustration="journal"
+              title="No journal entries"
+              description="Capture your travel experiences with photos and stories"
+              action={
+                <Link to="/journal/new">
+                  <Button leftIcon={<Plus size={18} />}>Write Your First Entry</Button>
+                </Link>
+              }
+            />
           </CardContent>
         </Card>
       ) : (
