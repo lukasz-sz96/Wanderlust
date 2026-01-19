@@ -235,41 +235,53 @@ export const searchByBoundingBox = async (
 
 export const searchByName = async (
   name: string,
-  lat?: number,
-  lon?: number,
-  radiusMeters: number = 50000
 ): Promise<SearchResult[]> => {
-  const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 
-  let query: string;
-  if (lat && lon) {
-    query = buildQuery('around', { lat, lon, radius: radiusMeters, name: escapedName });
-  } else {
-    query = `
-      [out:json][timeout:25];
-      (
-        node["name"~"${escapedName}",i]["tourism"];
-        node["name"~"${escapedName}",i]["historic"];
-        node["name"~"${escapedName}",i]["leisure"~"park|garden|beach"];
-        way["name"~"${escapedName}",i]["tourism"];
-        way["name"~"${escapedName}",i]["historic"];
-      );
-      out center 30;
-    `;
-  }
-
-  const response = await fetch(OVERPASS_API_URL, {
-    method: 'POST',
-    body: `data=${encodeURIComponent(query)}`,
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
+  const params = new URLSearchParams({
+    q: name,
+    format: 'jsonv2',
+    addressdetails: '1',
+    limit: '15',
   });
 
-  if (!response.ok) {
-    throw new Error(`Overpass API error: ${response.status}`);
-  }
+  try {
+    const response = await fetch(`${NOMINATIM_URL}?${params.toString()}`, {
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
 
-  const data = await response.json();
-  return parseResults(data);
+    if (!response.ok) {
+      console.error('Nominatim API error:', response.status, await response.text());
+      throw new Error(`Nominatim API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Nominatim results:', data);
+
+    return data.map((item: any) => {
+      const address = item.address || {};
+      const category = item.type?.replace(/_/g, ' ') || item.category || 'Place';
+
+      return {
+        id: `osm-${item.osm_type}-${item.osm_id}`,
+        name: item.name || item.display_name.split(',')[0],
+        latitude: parseFloat(item.lat),
+        longitude: parseFloat(item.lon),
+        category: category.charAt(0).toUpperCase() + category.slice(1),
+        city: address.city || address.town || address.village || address.municipality || address.state,
+        country: address.country,
+        tags: [item.category, item.type].filter(Boolean),
+        metadata: {
+          osmId: String(item.osm_id),
+          osmType: item.osm_type,
+          displayName: item.display_name,
+        },
+      };
+    });
+  } catch (error) {
+    console.error('Search error:', error);
+    throw error;
+  }
 };

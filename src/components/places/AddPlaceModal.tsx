@@ -3,7 +3,7 @@ import { useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Button, Card, CardContent, Input, Textarea } from '../ui';
 import { X, MapPin, Search, Plus, Loader2 } from 'lucide-react';
-import { searchByName, type OverpassPlace } from '../../lib/api/overpass';
+import { searchByName, type SearchResult } from '../../lib/api/overpass';
 
 interface AddPlaceModalProps {
   isOpen: boolean;
@@ -15,9 +15,9 @@ type Step = 'search' | 'create' | 'confirm';
 export const AddPlaceModal = ({ isOpen, onClose }: AddPlaceModalProps) => {
   const [step, setStep] = useState<Step>('search');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<OverpassPlace[]>([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [selectedPlace, setSelectedPlace] = useState<OverpassPlace | null>(null);
+  const [selectedPlace, setSelectedPlace] = useState<SearchResult | null>(null);
   const [status, setStatus] = useState<'want_to_visit' | 'visited'>('want_to_visit');
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,22 +33,26 @@ export const AddPlaceModal = ({ isOpen, onClose }: AddPlaceModalProps) => {
   const createPlace = useMutation(api.places.create);
   const addToBucketList = useMutation(api.bucketList.add);
 
+  const [searchError, setSearchError] = useState<string | null>(null);
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
 
     setIsSearching(true);
+    setSearchError(null);
     try {
       const results = await searchByName(searchQuery);
       setSearchResults(results);
     } catch (error) {
       console.error('Search failed:', error);
+      setSearchError('Search failed. Please try again.');
       setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handleSelectPlace = (place: OverpassPlace) => {
+  const handleSelectPlace = (place: SearchResult) => {
     setSelectedPlace(place);
     setStep('confirm');
   };
@@ -94,8 +98,8 @@ export const AddPlaceModal = ({ isOpen, onClose }: AddPlaceModalProps) => {
     try {
       const placeId = await createPlace({
         name: selectedPlace.name,
-        latitude: selectedPlace.lat,
-        longitude: selectedPlace.lon,
+        latitude: selectedPlace.latitude,
+        longitude: selectedPlace.longitude,
         city: selectedPlace.city,
         country: selectedPlace.country,
         category: selectedPlace.category,
@@ -124,6 +128,7 @@ export const AddPlaceModal = ({ isOpen, onClose }: AddPlaceModalProps) => {
     setSelectedPlace(null);
     setStatus('want_to_visit');
     setNotes('');
+    setSearchError(null);
     setManualName('');
     setManualCity('');
     setManualCountry('');
@@ -202,7 +207,13 @@ export const AddPlaceModal = ({ isOpen, onClose }: AddPlaceModalProps) => {
                 </div>
               )}
 
-              {searchQuery && searchResults.length === 0 && !isSearching && (
+              {searchError && (
+                <p className="text-sm text-error text-center py-4">
+                  {searchError}
+                </p>
+              )}
+
+              {searchQuery && searchResults.length === 0 && !isSearching && !searchError && (
                 <p className="text-sm text-muted text-center py-4">
                   No places found. Try a different search or create a new place.
                 </p>
