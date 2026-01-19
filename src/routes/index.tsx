@@ -1,164 +1,152 @@
-import { Link, createFileRoute } from '@tanstack/react-router';
-import { Authenticated, Unauthenticated, useMutation } from 'convex/react';
-import { useAuth } from '@workos/authkit-tanstack-react-start/client';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { getAuth, getSignInUrl, getSignUpUrl } from '@workos/authkit-tanstack-react-start';
-import { convexQuery } from '@convex-dev/react-query';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { api } from '../../convex/_generated/api';
-import type { User } from '@workos/authkit-tanstack-react-start';
+import { MapPin, Plane, BookOpen, Star, ArrowRight } from 'lucide-react';
+import { Button, Card } from '../components/ui';
 
 export const Route = createFileRoute('/')({
-  component: Home,
+  component: LandingPage,
   loader: async () => {
     const { user } = await getAuth();
+
+    if (user) {
+      throw redirect({ to: '/dashboard' });
+    }
+
     const signInUrl = await getSignInUrl();
     const signUpUrl = await getSignUpUrl();
 
-    return { user, signInUrl, signUpUrl };
+    return { signInUrl, signUpUrl };
   },
 });
 
-function Home() {
-  const { user, signInUrl, signUpUrl } = Route.useLoaderData();
-  return <HomeContent user={user} signInUrl={signInUrl} signUpUrl={signUpUrl} />;
-}
-
-function HomeContent({ user, signInUrl, signUpUrl }: { user: User | null; signInUrl: string; signUpUrl: string }) {
-  return (
-    <>
-      <header className="sticky top-0 z-10 bg-background p-4 border-b-2 border-slate-200 dark:border-slate-800 flex flex-row justify-between items-center">
-        Convex + TanStack Start + WorkOS
-        {user && <UserMenu user={user} />}
-      </header>
-      <main className="p-8 flex flex-col gap-8">
-        <h1 className="text-4xl font-bold text-center">Convex + TanStack Start + WorkOS</h1>
-        <Authenticated>
-          <Content />
-        </Authenticated>
-        <Unauthenticated>
-          <SignInForm signInUrl={signInUrl} signUpUrl={signUpUrl} />
-        </Unauthenticated>
-      </main>
-    </>
-  );
-}
-
-function SignInForm({ signInUrl, signUpUrl }: { signInUrl: string; signUpUrl: string }) {
-  return (
-    <div className="flex flex-col gap-8 w-96 mx-auto">
-      <p>Log in to see the numbers</p>
-      <a href={signInUrl}>
-        <button className="bg-foreground text-background px-4 py-2 rounded-md">Sign in</button>
-      </a>
-      <a href={signUpUrl}>
-        <button className="bg-foreground text-background px-4 py-2 rounded-md">Sign up</button>
-      </a>
-    </div>
-  );
-}
-
-function Content() {
-  const {
-    data: { viewer, numbers },
-  } = useSuspenseQuery(
-    convexQuery(api.myFunctions.listNumbers, {
-      count: 10,
-    }),
-  );
-  const addNumber = useMutation(api.myFunctions.addNumber);
+const LandingPage = () => {
+  const { signInUrl, signUpUrl } = Route.useLoaderData();
 
   return (
-    <div className="flex flex-col gap-8 max-w-lg mx-auto">
-      <p>Welcome {viewer}!</p>
-      <p>
-        Click the button below and open this page in another window - this data is persisted in the Convex cloud
-        database!
-      </p>
-      <p>
-        <button
-          className="bg-foreground text-background text-sm px-4 py-2 rounded-md"
-          onClick={() => {
-            void addNumber({ value: Math.floor(Math.random() * 10) });
-          }}
-        >
-          Add a random number
-        </button>
-      </p>
-      <p>Numbers: {numbers.length === 0 ? 'Click the button!' : numbers.join(', ')}</p>
-      <p>
-        Edit{' '}
-        <code className="text-sm font-bold font-mono bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded-md">
-          convex/myFunctions.ts
-        </code>{' '}
-        to change your backend
-      </p>
-      <p>
-        Edit{' '}
-        <code className="text-sm font-bold font-mono bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded-md">
-          src/routes/index.tsx
-        </code>{' '}
-        to change your frontend
-      </p>
-      <p>
-        See{' '}
-        <Link to="/authenticated" className="underline hover:no-underline">
-          /authenticated
-        </Link>{' '}
-        for an example of a page only available to authenticated users.
-      </p>
-      <div className="flex flex-col">
-        <p className="text-lg font-bold">Useful resources:</p>
-        <div className="flex gap-2">
-          <div className="flex flex-col gap-2 w-1/2">
-            <ResourceCard
-              title="Convex docs"
-              description="Read comprehensive documentation for all Convex features."
-              href="https://docs.convex.dev/home"
-            />
-            <ResourceCard
-              title="Stack articles"
-              description="Learn about best practices, use cases, and more from a growing collection of articles, videos, and walkthroughs."
-              href="https://stack.convex.dev"
-            />
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border-light">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+              <MapPin className="text-white" size={22} />
+            </div>
+            <span className="text-xl font-bold text-foreground">Wanderlust</span>
           </div>
-          <div className="flex flex-col gap-2 w-1/2">
-            <ResourceCard
-              title="Templates"
-              description="Browse our collection of templates to get started quickly."
-              href="https://www.convex.dev/templates"
-            />
-            <ResourceCard
-              title="Discord"
-              description="Join our developer community to ask questions, trade tips & tricks, and show off your projects."
-              href="https://www.convex.dev/community"
-            />
+          <div className="flex items-center gap-3">
+            <a href={signInUrl}>
+              <Button variant="ghost">Sign In</Button>
+            </a>
+            <a href={signUpUrl}>
+              <Button variant="primary">Get Started</Button>
+            </a>
           </div>
         </div>
+      </header>
+
+      <main>
+        <section className="py-20 px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+              Your travel dreams,{' '}
+              <span className="text-primary">beautifully organized</span>
+            </h1>
+            <p className="text-xl text-muted mb-10 max-w-2xl mx-auto">
+              Plan trips, track your bucket list, write travel journals, and discover
+              new destinations — all in one cozy place.
+            </p>
+            <div className="flex items-center justify-center gap-4">
+              <a href={signUpUrl}>
+                <Button variant="primary" size="lg" rightIcon={<ArrowRight size={20} />}>
+                  Start Planning
+                </Button>
+              </a>
+              <a href={signInUrl}>
+                <Button variant="outline" size="lg">
+                  Sign In
+                </Button>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 px-6 bg-surface">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-foreground text-center mb-12">
+              Everything you need for your adventures
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <FeatureCard
+                icon={<MapPin className="text-primary" size={28} />}
+                title="Bucket List"
+                description="Save places you dream of visiting and track the ones you've explored"
+              />
+              <FeatureCard
+                icon={<Plane className="text-secondary" size={28} />}
+                title="Trip Planning"
+                description="Create detailed itineraries with day-by-day activities and maps"
+              />
+              <FeatureCard
+                icon={<BookOpen className="text-accent" size={28} />}
+                title="Travel Journal"
+                description="Document your experiences with rich text entries and photos"
+              />
+              <FeatureCard
+                icon={<Star className="text-warning" size={28} />}
+                title="AI Discovery"
+                description="Get personalized recommendations for your next adventure"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="py-20 px-6">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-3xl font-bold text-foreground mb-6">
+              Ready to start your journey?
+            </h2>
+            <p className="text-lg text-muted mb-8">
+              Join travelers who use Wanderlust to plan their perfect trips.
+            </p>
+            <a href={signUpUrl}>
+              <Button variant="primary" size="lg" rightIcon={<ArrowRight size={20} />}>
+                Create Free Account
+              </Button>
+            </a>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-border-light py-8 px-6">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <MapPin className="text-white" size={16} />
+            </div>
+            <span className="font-semibold text-foreground">Wanderlust</span>
+          </div>
+          <p className="text-sm text-muted">Your cozy travel companion</p>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+const FeatureCard = ({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) => (
+  <Card hoverable className="text-center">
+    <div className="p-6">
+      <div className="w-14 h-14 rounded-xl bg-border-light flex items-center justify-center mx-auto mb-4">
+        {icon}
       </div>
+      <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
+      <p className="text-sm text-muted">{description}</p>
     </div>
-  );
-}
-
-function ResourceCard({ title, description, href }: { title: string; description: string; href: string }) {
-  return (
-    <div className="flex flex-col gap-2 bg-slate-200 dark:bg-slate-800 p-4 rounded-md h-28 overflow-auto">
-      <a href={href} className="text-sm underline hover:no-underline">
-        {title}
-      </a>
-      <p className="text-xs">{description}</p>
-    </div>
-  );
-}
-
-function UserMenu({ user }: { user: User }) {
-  const { signOut } = useAuth();
-
-  return (
-    <div className="flex items-center gap-2">
-      <span className="text-sm">{user.email}</span>
-      <button onClick={() => signOut()} className="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600">
-        Sign out
-      </button>
-    </div>
-  );
-}
+  </Card>
+);
