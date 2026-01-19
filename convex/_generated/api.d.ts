@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as ai from "../ai.js";
 import type * as bucketList from "../bucketList.js";
 import type * as itinerary from "../itinerary.js";
 import type * as journal from "../journal.js";
@@ -23,6 +24,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  ai: typeof ai;
   bucketList: typeof bucketList;
   itinerary: typeof itinerary;
   journal: typeof journal;
