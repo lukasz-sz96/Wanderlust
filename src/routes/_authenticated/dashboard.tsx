@@ -3,9 +3,11 @@ import { useQuery } from 'convex/react';
 import { useState } from 'react';
 import { api } from '../../../convex/_generated/api';
 import { useCurrentUser } from '../../lib/hooks/useUserSync';
+import { useOnboarding } from '../../lib/hooks/useOnboarding';
 import { MapView } from '../../components/maps';
 import { Card, Badge, Button } from '../../components/ui';
 import { AddPlaceModal } from '../../components/places';
+import { OnboardingModal } from '../../components/onboarding';
 import {
   MapPin,
   Plane,
@@ -26,6 +28,7 @@ const DashboardPage = () => {
   const user = useCurrentUser();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const { showOnboarding, completeOnboarding } = useOnboarding();
 
   const bucketListItems = useQuery(api.bucketList.list, {});
   const stats = useQuery(api.bucketList.getStats, {});
@@ -237,6 +240,7 @@ const DashboardPage = () => {
       </div>
 
       <AddPlaceModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} />
+      <OnboardingModal isOpen={showOnboarding} onComplete={completeOnboarding} />
     </div>
   );
 };

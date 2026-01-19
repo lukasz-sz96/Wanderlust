@@ -3,6 +3,7 @@ import { useMutation } from 'convex/react';
 import { useState } from 'react';
 import { api } from '../../../convex/_generated/api';
 import { useCurrentUser } from '../../lib/hooks/useUserSync';
+import { useOnboarding } from '../../lib/hooks/useOnboarding';
 import {
   Card,
   CardHeader,
@@ -12,6 +13,7 @@ import {
   Input,
   Avatar,
 } from '../../components/ui';
+import { RefreshCw } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated/settings')({
   component: SettingsPage,
@@ -21,6 +23,7 @@ const SettingsPage = () => {
   const user = useCurrentUser();
   const updateProfile = useMutation(api.users.updateProfile);
   const updatePreferences = useMutation(api.users.updatePreferences);
+  const { resetOnboarding } = useOnboarding();
 
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [temperatureUnit, setTemperatureUnit] = useState<'celsius' | 'fahrenheit'>(
@@ -114,6 +117,27 @@ const SettingsPage = () => {
             <Button onClick={handleSavePreferences} isLoading={saving}>
               Save Preferences
             </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>App</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-sm font-medium text-foreground mb-1">Onboarding Tour</p>
+              <p className="text-sm text-muted mb-3">
+                View the welcome tour again to learn about Wanderlust features.
+              </p>
+              <Button
+                variant="ghost"
+                leftIcon={<RefreshCw size={16} />}
+                onClick={resetOnboarding}
+              >
+                Restart Onboarding
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
