@@ -3,6 +3,8 @@ import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
 import { MapView } from '../../../components/maps';
+import { MarkVisitedModal } from '../../../components/places';
+import { WeatherWidget, WeatherSnapshotBadge } from '../../../components/weather';
 import {
   Card,
   CardContent,
@@ -15,11 +17,15 @@ import {
   ArrowLeft,
   MapPin,
   Heart,
+  HeartOff,
   Star,
   Edit,
   Trash2,
-  ExternalLink,
   Navigation,
+  CheckCircle,
+  Calendar,
+  Cloud,
+  Loader2,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -30,8 +36,43 @@ export const Route = createFileRoute('/_authenticated/places/$placeId')({
 const PlaceDetailPage = () => {
   const { placeId } = Route.useParams();
   const place = useQuery(api.places.get, { placeId: placeId as Id<'places'> });
+  const bucketListItem = useQuery(api.bucketList.getByPlace, {
+    placeId: placeId as Id<'places'>,
+  });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showMarkVisitedModal, setShowMarkVisitedModal] = useState(false);
+  const [isAddingToBucketList, setIsAddingToBucketList] = useState(false);
+  const [isRemovingFromBucketList, setIsRemovingFromBucketList] = useState(false);
   const deletePlace = useMutation(api.places.remove);
+  const addToBucketList = useMutation(api.bucketList.add);
+  const removeFromBucketList = useMutation(api.bucketList.remove);
+
+  const handleAddToBucketList = async () => {
+    if (!place) return;
+    setIsAddingToBucketList(true);
+    try {
+      await addToBucketList({
+        placeId: place._id,
+        status: 'want_to_visit',
+      });
+    } catch (error) {
+      console.error('Failed to add to bucket list:', error);
+    } finally {
+      setIsAddingToBucketList(false);
+    }
+  };
+
+  const handleRemoveFromBucketList = async () => {
+    if (!bucketListItem) return;
+    setIsRemovingFromBucketList(true);
+    try {
+      await removeFromBucketList({ itemId: bucketListItem._id });
+    } catch (error) {
+      console.error('Failed to remove from bucket list:', error);
+    } finally {
+      setIsRemovingFromBucketList(false);
+    }
+  };
 
   if (place === undefined) {
     return <PageLoading message="Loading place..." />;
@@ -137,9 +178,35 @@ const PlaceDetailPage = () => {
                   <h1 className="text-2xl font-bold text-foreground">
                     {place.name}
                   </h1>
-                  <IconButton variant="ghost" size="sm" label="Add to bucket list">
-                    <Heart size={20} />
-                  </IconButton>
+                  {bucketListItem ? (
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
+                      label="Remove from bucket list"
+                      onClick={handleRemoveFromBucketList}
+                      disabled={isRemovingFromBucketList}
+                    >
+                      {isRemovingFromBucketList ? (
+                        <Loader2 size={20} className="animate-spin" />
+                      ) : (
+                        <Heart size={20} className="text-primary fill-primary" />
+                      )}
+                    </IconButton>
+                  ) : (
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
+                      label="Add to bucket list"
+                      onClick={handleAddToBucketList}
+                      disabled={isAddingToBucketList}
+                    >
+                      {isAddingToBucketList ? (
+                        <Loader2 size={20} className="animate-spin" />
+                      ) : (
+                        <Heart size={20} />
+                      )}
+                    </IconButton>
+                  )}
                 </div>
 
                 {place.category && (
@@ -156,6 +223,46 @@ const PlaceDetailPage = () => {
                 )}
               </div>
 
+              {bucketListItem && (
+                <div className="p-3 rounded-xl bg-border-light/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge
+                      variant={bucketListItem.status === 'visited' ? 'success' : 'primary'}
+                      dot
+                    >
+                      {bucketListItem.status === 'visited' ? 'Visited' : 'Want to visit'}
+                    </Badge>
+                    {bucketListItem.rating && (
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            size={14}
+                            className={
+                              star <= bucketListItem.rating!
+                                ? 'text-warning fill-warning'
+                                : 'text-muted'
+                            }
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {bucketListItem.status === 'visited' && bucketListItem.visitedDate && (
+                    <p className="text-sm text-muted flex items-center gap-1 mb-2">
+                      <Calendar size={14} />
+                      Visited on {new Date(bucketListItem.visitedDate).toLocaleDateString()}
+                    </p>
+                  )}
+                  {bucketListItem.weatherSnapshot && (
+                    <div className="flex items-center gap-2">
+                      <Cloud size={14} className="text-info" />
+                      <WeatherSnapshotBadge weather={bucketListItem.weatherSnapshot} />
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant="primary"
@@ -165,6 +272,16 @@ const PlaceDetailPage = () => {
                 >
                   Directions
                 </Button>
+                {bucketListItem && bucketListItem.status !== 'visited' && (
+                  <Button
+                    variant="secondary"
+                    leftIcon={<CheckCircle size={16} />}
+                    onClick={() => setShowMarkVisitedModal(true)}
+                    className="flex-1"
+                  >
+                    Mark Visited
+                  </Button>
+                )}
               </div>
 
               <div className="pt-4 border-t border-border-light flex gap-2">
@@ -198,6 +315,13 @@ const PlaceDetailPage = () => {
             </Card>
           )}
 
+          <WeatherWidget
+            latitude={place.latitude}
+            longitude={place.longitude}
+            compact={false}
+            showForecast={true}
+          />
+
           <Card>
             <CardContent>
               <h3 className="font-semibold text-foreground mb-3">Coordinates</h3>
@@ -208,6 +332,17 @@ const PlaceDetailPage = () => {
           </Card>
         </div>
       </div>
+
+      {bucketListItem && (
+        <MarkVisitedModal
+          isOpen={showMarkVisitedModal}
+          onClose={() => setShowMarkVisitedModal(false)}
+          bucketListItemId={bucketListItem._id}
+          placeName={place.name}
+          latitude={place.latitude}
+          longitude={place.longitude}
+        />
+      )}
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

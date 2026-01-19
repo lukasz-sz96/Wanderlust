@@ -27,7 +27,9 @@ import {
   Upload,
   X,
   Loader2,
+  Cloud,
 } from 'lucide-react';
+import { formatTemperature } from '../../../lib/api/weather';
 
 export const Route = createFileRoute('/_authenticated/journal/$entryId')({
   component: JournalEntryPage,
@@ -196,12 +198,23 @@ const JournalEntryPage = () => {
             </div>
           </div>
 
-          {entry.mood && (
-            <div className="flex items-center gap-2 text-lg">
-              {getMoodIcon(entry.mood)}
-              <span className="text-foreground">{getMoodLabel(entry.mood)}</span>
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-4">
+            {entry.mood && (
+              <div className="flex items-center gap-2">
+                {getMoodIcon(entry.mood)}
+                <span className="text-foreground">{getMoodLabel(entry.mood)}</span>
+              </div>
+            )}
+            {entry.weatherSnapshot && (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-info/10">
+                <span className="text-xl">{entry.weatherSnapshot.icon}</span>
+                <span className="font-medium text-foreground">
+                  {formatTemperature(entry.weatherSnapshot.temperature)}
+                </span>
+                <span className="text-sm text-muted">{entry.weatherSnapshot.condition}</span>
+              </div>
+            )}
+          </div>
 
           <div className="flex flex-wrap gap-2">
             {entry.trip && (

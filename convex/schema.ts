@@ -59,7 +59,15 @@ export default defineSchema({
     priority: v.number(),
     notes: v.optional(v.string()),
     visitedAt: v.optional(v.number()),
+    visitedDate: v.optional(v.string()),
     rating: v.optional(v.number()),
+    weatherSnapshot: v.optional(
+      v.object({
+        temperature: v.number(),
+        condition: v.string(),
+        icon: v.string(),
+      })
+    ),
     createdAt: v.number(),
   })
     .index('by_user', ['userId'])

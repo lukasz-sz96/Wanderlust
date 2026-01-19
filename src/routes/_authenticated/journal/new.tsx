@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useMutation, useQuery } from 'convex/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
 import {
@@ -22,8 +22,10 @@ import {
   Meh,
   Frown,
   Loader2,
+  Cloud,
 } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { fetchHistoricalWeather, formatTemperature, type HistoricalWeather } from '../../../lib/api/weather';
 
 export const Route = createFileRoute('/_authenticated/journal/new')({
   component: NewJournalEntryPage,
@@ -40,10 +42,41 @@ const NewJournalEntryPage = () => {
   const [tripId, setTripId] = useState<Id<'trips'> | undefined>();
   const [placeId, setPlaceId] = useState<Id<'places'> | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [weather, setWeather] = useState<HistoricalWeather | null>(null);
+  const [isLoadingWeather, setIsLoadingWeather] = useState(false);
 
   const trips = useQuery(api.trips.list, {});
   const bucketList = useQuery(api.bucketList.list, {});
   const createEntry = useMutation(api.journal.create);
+
+  const selectedPlace = bucketList?.find((item) => item.place?._id === placeId)?.place;
+
+  useEffect(() => {
+    if (!placeId || !entryDate || !selectedPlace) {
+      setWeather(null);
+      return;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    if (entryDate > today) {
+      setWeather(null);
+      return;
+    }
+
+    const loadWeather = async () => {
+      setIsLoadingWeather(true);
+      const data = await fetchHistoricalWeather(
+        selectedPlace.latitude,
+        selectedPlace.longitude,
+        entryDate
+      );
+      setWeather(data);
+      setIsLoadingWeather(false);
+    };
+
+    const debounceTimer = setTimeout(loadWeather, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [placeId, entryDate, selectedPlace]);
 
   if (trips === undefined || bucketList === undefined) {
     return <PageLoading message="Loading..." />;
@@ -62,6 +95,13 @@ const NewJournalEntryPage = () => {
         mood,
         tripId,
         placeId,
+        weatherSnapshot: weather
+          ? {
+              temperature: weather.temperature,
+              condition: weather.condition,
+              icon: weather.icon,
+            }
+          : undefined,
       });
 
       navigate({ to: '/journal/$entryId', params: { entryId } });
@@ -184,6 +224,37 @@ const NewJournalEntryPage = () => {
                 </select>
               </div>
             </div>
+
+            {placeId && (
+              <div className="p-4 rounded-xl bg-info/5 border border-info/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <Cloud size={16} className="text-info" />
+                  <span className="text-sm font-medium text-foreground">Weather on that day</span>
+                </div>
+                {isLoadingWeather ? (
+                  <div className="flex items-center gap-2 text-muted">
+                    <Loader2 size={16} className="animate-spin" />
+                    <span className="text-sm">Fetching weather data...</span>
+                  </div>
+                ) : weather ? (
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">{weather.icon}</span>
+                    <div>
+                      <p className="font-semibold text-foreground">
+                        {formatTemperature(weather.temperature)}
+                      </p>
+                      <p className="text-sm text-muted">{weather.condition}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted">
+                    {entryDate > new Date().toISOString().split('T')[0]
+                      ? 'Cannot get weather for future dates'
+                      : 'Weather data not available for this location/date'}
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="flex justify-end gap-3 pt-4 border-t border-border-light">
               <Link to="/journal">

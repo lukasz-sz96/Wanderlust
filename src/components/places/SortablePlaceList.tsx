@@ -17,8 +17,9 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Link } from '@tanstack/react-router';
-import { GripVertical, MapPin, Star } from 'lucide-react';
+import { GripVertical, MapPin, Star, Cloud } from 'lucide-react';
 import { Card, Badge } from '../ui';
+import { formatTemperature } from '../../lib/api/weather';
 import type { Id } from '../../../convex/_generated/dataModel';
 
 interface BucketListItem {
@@ -26,6 +27,12 @@ interface BucketListItem {
   status: 'want_to_visit' | 'visited' | 'skipped';
   priority: number;
   rating?: number;
+  visitedDate?: string;
+  weatherSnapshot?: {
+    temperature: number;
+    condition: string;
+    icon: string;
+  };
   place: {
     _id: Id<'places'>;
     name: string;
@@ -159,6 +166,14 @@ const SortablePlaceItem = ({
               <Badge variant="default" className="hidden sm:inline-flex">
                 {item.place.category}
               </Badge>
+            )}
+            {item.status === 'visited' && item.weatherSnapshot && (
+              <div className="hidden md:flex items-center gap-1 px-2 py-1 rounded-full bg-info/10 text-sm">
+                <span>{item.weatherSnapshot.icon}</span>
+                <span className="font-medium text-foreground">
+                  {formatTemperature(item.weatherSnapshot.temperature)}
+                </span>
+              </div>
             )}
             {item.status === 'visited' && item.rating && (
               <div className="flex items-center gap-1 text-warning">

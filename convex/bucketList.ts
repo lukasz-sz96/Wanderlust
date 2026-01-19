@@ -66,6 +66,14 @@ export const updateStatus = mutation({
     itemId: v.id('bucketListItems'),
     status: statusValidator,
     rating: v.optional(v.number()),
+    visitedDate: v.optional(v.string()),
+    weatherSnapshot: v.optional(
+      v.object({
+        temperature: v.number(),
+        condition: v.string(),
+        icon: v.string(),
+      })
+    ),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -88,14 +96,26 @@ export const updateStatus = mutation({
       throw new Error('Not authorized');
     }
 
-    const updates: { status: typeof args.status; visitedAt?: number; rating?: number } = {
+    const updates: {
+      status: typeof args.status;
+      visitedAt?: number;
+      visitedDate?: string;
+      rating?: number;
+      weatherSnapshot?: { temperature: number; condition: string; icon: string };
+    } = {
       status: args.status,
     };
 
     if (args.status === 'visited') {
       updates.visitedAt = Date.now();
+      if (args.visitedDate) {
+        updates.visitedDate = args.visitedDate;
+      }
       if (args.rating !== undefined) {
         updates.rating = args.rating;
+      }
+      if (args.weatherSnapshot) {
+        updates.weatherSnapshot = args.weatherSnapshot;
       }
     }
 
@@ -214,7 +234,15 @@ export const list = query({
       priority: v.number(),
       notes: v.optional(v.string()),
       visitedAt: v.optional(v.number()),
+      visitedDate: v.optional(v.string()),
       rating: v.optional(v.number()),
+      weatherSnapshot: v.optional(
+        v.object({
+          temperature: v.number(),
+          condition: v.string(),
+          icon: v.string(),
+        })
+      ),
       createdAt: v.number(),
       place: v.union(
         v.object({
@@ -302,7 +330,15 @@ export const getByPlace = query({
       priority: v.number(),
       notes: v.optional(v.string()),
       visitedAt: v.optional(v.number()),
+      visitedDate: v.optional(v.string()),
       rating: v.optional(v.number()),
+      weatherSnapshot: v.optional(
+        v.object({
+          temperature: v.number(),
+          condition: v.string(),
+          icon: v.string(),
+        })
+      ),
       createdAt: v.number(),
     }),
     v.null()
