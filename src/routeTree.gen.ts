@@ -17,6 +17,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedTripsIndexRouteImport } from './routes/_authenticated/trips/index'
 import { Route as AuthenticatedPlacesIndexRouteImport } from './routes/_authenticated/places/index'
 import { Route as AuthenticatedJournalIndexRouteImport } from './routes/_authenticated/journal/index'
+import { Route as AuthenticatedTripsTripIdRouteImport } from './routes/_authenticated/trips/$tripId'
 import { Route as AuthenticatedPlacesDiscoverRouteImport } from './routes/_authenticated/places/discover'
 import { Route as AuthenticatedPlacesPlaceIdRouteImport } from './routes/_authenticated/places/$placeId'
 
@@ -61,6 +62,12 @@ const AuthenticatedJournalIndexRoute =
     path: '/journal/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedTripsTripIdRoute =
+  AuthenticatedTripsTripIdRouteImport.update({
+    id: '/trips/$tripId',
+    path: '/trips/$tripId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedPlacesDiscoverRoute =
   AuthenticatedPlacesDiscoverRouteImport.update({
     id: '/places/discover',
@@ -81,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/places/$placeId': typeof AuthenticatedPlacesPlaceIdRoute
   '/places/discover': typeof AuthenticatedPlacesDiscoverRoute
+  '/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
   '/journal/': typeof AuthenticatedJournalIndexRoute
   '/places/': typeof AuthenticatedPlacesIndexRoute
   '/trips/': typeof AuthenticatedTripsIndexRoute
@@ -92,6 +100,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/places/$placeId': typeof AuthenticatedPlacesPlaceIdRoute
   '/places/discover': typeof AuthenticatedPlacesDiscoverRoute
+  '/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
   '/journal': typeof AuthenticatedJournalIndexRoute
   '/places': typeof AuthenticatedPlacesIndexRoute
   '/trips': typeof AuthenticatedTripsIndexRoute
@@ -105,6 +114,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/places/$placeId': typeof AuthenticatedPlacesPlaceIdRoute
   '/_authenticated/places/discover': typeof AuthenticatedPlacesDiscoverRoute
+  '/_authenticated/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
   '/_authenticated/journal/': typeof AuthenticatedJournalIndexRoute
   '/_authenticated/places/': typeof AuthenticatedPlacesIndexRoute
   '/_authenticated/trips/': typeof AuthenticatedTripsIndexRoute
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/places/$placeId'
     | '/places/discover'
+    | '/trips/$tripId'
     | '/journal/'
     | '/places/'
     | '/trips/'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/places/$placeId'
     | '/places/discover'
+    | '/trips/$tripId'
     | '/journal'
     | '/places'
     | '/trips'
@@ -141,6 +153,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/places/$placeId'
     | '/_authenticated/places/discover'
+    | '/_authenticated/trips/$tripId'
     | '/_authenticated/journal/'
     | '/_authenticated/places/'
     | '/_authenticated/trips/'
@@ -210,6 +223,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJournalIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/trips/$tripId': {
+      id: '/_authenticated/trips/$tripId'
+      path: '/trips/$tripId'
+      fullPath: '/trips/$tripId'
+      preLoaderRoute: typeof AuthenticatedTripsTripIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/places/discover': {
       id: '/_authenticated/places/discover'
       path: '/places/discover'
@@ -232,6 +252,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedPlacesPlaceIdRoute: typeof AuthenticatedPlacesPlaceIdRoute
   AuthenticatedPlacesDiscoverRoute: typeof AuthenticatedPlacesDiscoverRoute
+  AuthenticatedTripsTripIdRoute: typeof AuthenticatedTripsTripIdRoute
   AuthenticatedJournalIndexRoute: typeof AuthenticatedJournalIndexRoute
   AuthenticatedPlacesIndexRoute: typeof AuthenticatedPlacesIndexRoute
   AuthenticatedTripsIndexRoute: typeof AuthenticatedTripsIndexRoute
@@ -242,6 +263,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedPlacesPlaceIdRoute: AuthenticatedPlacesPlaceIdRoute,
   AuthenticatedPlacesDiscoverRoute: AuthenticatedPlacesDiscoverRoute,
+  AuthenticatedTripsTripIdRoute: AuthenticatedTripsTripIdRoute,
   AuthenticatedJournalIndexRoute: AuthenticatedJournalIndexRoute,
   AuthenticatedPlacesIndexRoute: AuthenticatedPlacesIndexRoute,
   AuthenticatedTripsIndexRoute: AuthenticatedTripsIndexRoute,

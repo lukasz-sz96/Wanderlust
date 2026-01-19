@@ -9,7 +9,9 @@
  */
 
 import type * as bucketList from "../bucketList.js";
+import type * as itinerary from "../itinerary.js";
 import type * as places from "../places.js";
+import type * as trips from "../trips.js";
 import type * as users from "../users.js";
 
 import type {
@@ -20,7 +22,9 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   bucketList: typeof bucketList;
+  itinerary: typeof itinerary;
   places: typeof places;
+  trips: typeof trips;
   users: typeof users;
 }>;
 
