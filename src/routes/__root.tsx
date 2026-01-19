@@ -1,6 +1,7 @@
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { getAuth } from '@workos/authkit-tanstack-react-start';
+import { AlertTriangle, Home, Compass } from 'lucide-react';
 import appCssUrl from '../app.css?url';
 import type { QueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -32,7 +33,7 @@ export const Route = createRootRouteWithContext<{
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'Convex + TanStack Start + WorkOS AuthKit',
+        title: 'Wanderlust - Travel Planning',
       },
     ],
     links: [
@@ -41,12 +42,11 @@ export const Route = createRootRouteWithContext<{
     ],
   }),
   component: RootComponent,
-  notFoundComponent: () => <div>Not Found</div>,
+  notFoundComponent: NotFoundPage,
+  errorComponent: ErrorPage,
   beforeLoad: async (ctx) => {
     const { userId, token } = await fetchWorkosAuth();
 
-    // During SSR only (the only time serverHttpClient exists),
-    // set the Clerk auth token to make HTTP queries with.
     if (token) {
       ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
     }
@@ -55,24 +55,65 @@ export const Route = createRootRouteWithContext<{
   },
 });
 
-function RootComponent() {
-  return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
-  );
-}
+const RootComponent = () => (
+  <RootDocument>
+    <Outlet />
+  </RootDocument>
+);
 
-function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
+const RootDocument = ({ children }: Readonly<{ children: ReactNode }>) => (
+  <html lang="en">
+    <head>
+      <HeadContent />
+    </head>
+    <body>
+      {children}
+      <Scripts />
+    </body>
+  </html>
+);
+
+const NotFoundPage = () => (
+  <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="text-center">
+      <div className="w-20 h-20 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-6">
+        <Compass className="text-accent-hover" size={40} />
+      </div>
+      <h1 className="text-4xl font-bold text-foreground mb-2">404</h1>
+      <p className="text-xl text-muted mb-6">Page not found</p>
+      <p className="text-muted mb-8 max-w-md">
+        Looks like you've wandered off the map. Let's get you back on track.
+      </p>
+      <a
+        href="/"
+        className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors"
+      >
+        <Home size={18} />
+        Go Home
+      </a>
+    </div>
+  </div>
+);
+
+const ErrorPage = ({ error }: { error: Error }) => (
+  <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="text-center">
+      <div className="w-20 h-20 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-6">
+        <AlertTriangle className="text-error" size={40} />
+      </div>
+      <h1 className="text-2xl font-bold text-foreground mb-2">
+        Something went wrong
+      </h1>
+      <p className="text-muted mb-6 max-w-md">
+        {error.message || 'An unexpected error occurred'}
+      </p>
+      <a
+        href="/"
+        className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors"
+      >
+        <Home size={18} />
+        Go Home
+      </a>
+    </div>
+  </div>
+);

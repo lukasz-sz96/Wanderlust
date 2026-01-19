@@ -6,3 +6,5 @@ export { Badge } from './Badge';
 export { Avatar, AvatarGroup } from './Avatar';
 export { IconButton } from './IconButton';
 export { Spinner, LoadingOverlay, LoadingCard } from './Spinner';
+export { ErrorBoundary } from './ErrorBoundary';
+export { PageLoading, FullPageLoading } from './PageLoading';

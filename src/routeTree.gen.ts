@@ -12,7 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as CallbackRouteImport } from './routes/callback'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedAuthenticatedRouteImport } from './routes/_authenticated/authenticated'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedTripsIndexRouteImport } from './routes/_authenticated/trips/index'
+import { Route as AuthenticatedPlacesIndexRouteImport } from './routes/_authenticated/places/index'
+import { Route as AuthenticatedJournalIndexRouteImport } from './routes/_authenticated/journal/index'
+import { Route as AuthenticatedPlacesDiscoverRouteImport } from './routes/_authenticated/places/discover'
 
 const CallbackRoute = CallbackRouteImport.update({
   id: '/callback',
@@ -28,41 +33,104 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAuthenticatedRoute =
-  AuthenticatedAuthenticatedRouteImport.update({
-    id: '/authenticated',
-    path: '/authenticated',
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTripsIndexRoute = AuthenticatedTripsIndexRouteImport.update({
+  id: '/trips/',
+  path: '/trips/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPlacesIndexRoute =
+  AuthenticatedPlacesIndexRouteImport.update({
+    id: '/places/',
+    path: '/places/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedJournalIndexRoute =
+  AuthenticatedJournalIndexRouteImport.update({
+    id: '/journal/',
+    path: '/journal/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPlacesDiscoverRoute =
+  AuthenticatedPlacesDiscoverRouteImport.update({
+    id: '/places/discover',
+    path: '/places/discover',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/callback': typeof CallbackRoute
-  '/authenticated': typeof AuthenticatedAuthenticatedRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/places/discover': typeof AuthenticatedPlacesDiscoverRoute
+  '/journal/': typeof AuthenticatedJournalIndexRoute
+  '/places/': typeof AuthenticatedPlacesIndexRoute
+  '/trips/': typeof AuthenticatedTripsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/callback': typeof CallbackRoute
-  '/authenticated': typeof AuthenticatedAuthenticatedRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/places/discover': typeof AuthenticatedPlacesDiscoverRoute
+  '/journal': typeof AuthenticatedJournalIndexRoute
+  '/places': typeof AuthenticatedPlacesIndexRoute
+  '/trips': typeof AuthenticatedTripsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/callback': typeof CallbackRoute
-  '/_authenticated/authenticated': typeof AuthenticatedAuthenticatedRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/places/discover': typeof AuthenticatedPlacesDiscoverRoute
+  '/_authenticated/journal/': typeof AuthenticatedJournalIndexRoute
+  '/_authenticated/places/': typeof AuthenticatedPlacesIndexRoute
+  '/_authenticated/trips/': typeof AuthenticatedTripsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/callback' | '/authenticated'
+  fullPaths:
+    | '/'
+    | '/callback'
+    | '/dashboard'
+    | '/settings'
+    | '/places/discover'
+    | '/journal/'
+    | '/places/'
+    | '/trips/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/callback' | '/authenticated'
+  to:
+    | '/'
+    | '/callback'
+    | '/dashboard'
+    | '/settings'
+    | '/places/discover'
+    | '/journal'
+    | '/places'
+    | '/trips'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/callback'
-    | '/_authenticated/authenticated'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/settings'
+    | '/_authenticated/places/discover'
+    | '/_authenticated/journal/'
+    | '/_authenticated/places/'
+    | '/_authenticated/trips/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -94,22 +162,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/authenticated': {
-      id: '/_authenticated/authenticated'
-      path: '/authenticated'
-      fullPath: '/authenticated'
-      preLoaderRoute: typeof AuthenticatedAuthenticatedRouteImport
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trips/': {
+      id: '/_authenticated/trips/'
+      path: '/trips'
+      fullPath: '/trips/'
+      preLoaderRoute: typeof AuthenticatedTripsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/places/': {
+      id: '/_authenticated/places/'
+      path: '/places'
+      fullPath: '/places/'
+      preLoaderRoute: typeof AuthenticatedPlacesIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/journal/': {
+      id: '/_authenticated/journal/'
+      path: '/journal'
+      fullPath: '/journal/'
+      preLoaderRoute: typeof AuthenticatedJournalIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/places/discover': {
+      id: '/_authenticated/places/discover'
+      path: '/places/discover'
+      fullPath: '/places/discover'
+      preLoaderRoute: typeof AuthenticatedPlacesDiscoverRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAuthenticatedRoute: typeof AuthenticatedAuthenticatedRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedPlacesDiscoverRoute: typeof AuthenticatedPlacesDiscoverRoute
+  AuthenticatedJournalIndexRoute: typeof AuthenticatedJournalIndexRoute
+  AuthenticatedPlacesIndexRoute: typeof AuthenticatedPlacesIndexRoute
+  AuthenticatedTripsIndexRoute: typeof AuthenticatedTripsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAuthenticatedRoute: AuthenticatedAuthenticatedRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedPlacesDiscoverRoute: AuthenticatedPlacesDiscoverRoute,
+  AuthenticatedJournalIndexRoute: AuthenticatedJournalIndexRoute,
+  AuthenticatedPlacesIndexRoute: AuthenticatedPlacesIndexRoute,
+  AuthenticatedTripsIndexRoute: AuthenticatedTripsIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

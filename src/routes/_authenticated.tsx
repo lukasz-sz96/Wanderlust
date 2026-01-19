@@ -1,6 +1,7 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 import { getAuth, getSignInUrl } from '@workos/authkit-tanstack-react-start';
 import { useUserSync } from '../lib/hooks/useUserSync';
+import { AppShell } from '../components/layout';
 
 export const Route = createFileRoute('/_authenticated')({
   loader: async ({ location }) => {
@@ -14,9 +15,12 @@ export const Route = createFileRoute('/_authenticated')({
   component: AuthenticatedLayout,
 });
 
-function AuthenticatedLayout() {
-  // Sync WorkOS user to Convex database
+const AuthenticatedLayout = () => {
   useUserSync();
 
-  return <Outlet />;
-}
+  return (
+    <AppShell>
+      <Outlet />
+    </AppShell>
+  );
+};
