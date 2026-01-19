@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
 import { PlaceCard, SortablePlaceList, AddPlaceModal } from '../../../components/places';
-import { Button, Card, CardContent, PageLoading, AnimatedPage } from '../../../components/ui';
+import { Button, Card, CardContent, AnimatedPage, SkeletonPlaceCard, SkeletonStats } from '../../../components/ui';
 import { staggerContainer, staggerItem } from '../../../lib/animations';
 import { MapPin, Plus, Heart, CheckCircle, List, Grid } from 'lucide-react';
 
@@ -30,7 +30,21 @@ const PlacesPage = () => {
   const stats = useQuery(api.bucketList.getStats);
 
   if (bucketListItems === undefined || stats === undefined) {
-    return <PageLoading message="Loading places..." />;
+    return (
+      <div className="p-6 max-w-6xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Places</h1>
+            <p className="text-muted">Your bucket list of places to visit</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <SkeletonPlaceCard key={i} />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   const tabs = [

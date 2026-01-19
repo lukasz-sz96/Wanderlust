@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
 import { motion } from 'framer-motion';
 import { api } from '../../../../convex/_generated/api';
-import { Button, Card, CardContent, Badge, PageLoading, AnimatedPage } from '../../../components/ui';
+import { Button, Card, CardContent, Badge, AnimatedPage, SkeletonJournalEntry, SkeletonStats } from '../../../components/ui';
 import { staggerContainer, staggerItem } from '../../../lib/animations';
 import {
   BookOpen,
@@ -26,7 +26,21 @@ const JournalPage = () => {
   const stats = useQuery(api.journal.getStats);
 
   if (entries === undefined || stats === undefined) {
-    return <PageLoading message="Loading journal..." />;
+    return (
+      <div className="p-6 max-w-4xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Journal</h1>
+            <p className="text-muted">Document your travel memories</p>
+          </div>
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <SkeletonJournalEntry key={i} />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   const getMoodIcon = (mood?: string) => {

@@ -11,3 +11,15 @@ export { PageLoading, FullPageLoading } from './PageLoading';
 export { AnimatedList, AnimatedListItem } from './AnimatedList';
 export { AnimatedPage } from './AnimatedPage';
 export { AnimatedModal } from './AnimatedModal';
+export {
+  Skeleton,
+  SkeletonText,
+  SkeletonAvatar,
+  SkeletonCard,
+  SkeletonPlaceCard,
+  SkeletonTripCard,
+  SkeletonJournalEntry,
+  SkeletonListItem,
+  SkeletonStats,
+  SkeletonMap,
+} from './Skeleton';
