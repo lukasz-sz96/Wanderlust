@@ -97,7 +97,34 @@ Provide 3-5 recommendations. Focus on unique, memorable places that match the us
     }
 
     try {
-      const parsed = JSON.parse(content);
+      // Extract JSON from response - AI sometimes includes intro text before the JSON
+      let jsonContent = content;
+      const arrayStart = content.indexOf('[');
+      const objectStart = content.indexOf('{');
+
+      if (arrayStart !== -1 && (objectStart === -1 || arrayStart < objectStart)) {
+        // Response starts with array
+        jsonContent = content.slice(arrayStart);
+        // Find the matching closing bracket
+        let depth = 0;
+        let endIndex = 0;
+        for (let i = 0; i < jsonContent.length; i++) {
+          if (jsonContent[i] === '[') depth++;
+          if (jsonContent[i] === ']') depth--;
+          if (depth === 0) {
+            endIndex = i + 1;
+            break;
+          }
+        }
+        if (endIndex > 0) {
+          jsonContent = jsonContent.slice(0, endIndex);
+        }
+      } else if (objectStart !== -1) {
+        // Response starts with object
+        jsonContent = content.slice(objectStart);
+      }
+
+      const parsed = JSON.parse(jsonContent);
       const recommendations = parsed.recommendations || parsed.places || parsed;
 
       if (!Array.isArray(recommendations)) {

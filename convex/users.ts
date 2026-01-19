@@ -1,14 +1,14 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { Doc, Id } from './_generated/dataModel';
+import { Doc } from './_generated/dataModel';
 
 /**
- * Get or create a user based on their WorkOS identity.
+ * Get or create a user based on their auth identity.
  * Called on login to ensure the user exists in our database.
  */
 export const getOrCreateUser = mutation({
   args: {
-    workosUserId: v.string(),
+    authUserId: v.string(),
     email: v.string(),
     displayName: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
@@ -18,7 +18,7 @@ export const getOrCreateUser = mutation({
     // Check if user already exists
     const existingUser = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', args.workosUserId))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', args.authUserId))
       .unique();
 
     if (existingUser) {
@@ -46,7 +46,7 @@ export const getOrCreateUser = mutation({
     // Create new user
     const now = Date.now();
     const userId = await ctx.db.insert('users', {
-      workosUserId: args.workosUserId,
+      authUserId: args.authUserId,
       email: args.email,
       displayName: args.displayName,
       avatarUrl: args.avatarUrl,
@@ -67,7 +67,7 @@ export const getCurrentUser = query({
     v.object({
       _id: v.id('users'),
       _creationTime: v.number(),
-      workosUserId: v.string(),
+      authUserId: v.string(),
       email: v.string(),
       displayName: v.optional(v.string()),
       avatarUrl: v.optional(v.string()),
@@ -92,7 +92,7 @@ export const getCurrentUser = query({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     return user;
@@ -108,7 +108,7 @@ export const getUser = query({
     v.object({
       _id: v.id('users'),
       _creationTime: v.number(),
-      workosUserId: v.string(),
+      authUserId: v.string(),
       email: v.string(),
       displayName: v.optional(v.string()),
       avatarUrl: v.optional(v.string()),
@@ -149,7 +149,7 @@ export const updatePreferences = mutation({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -193,7 +193,7 @@ export const updateProfile = mutation({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -219,8 +219,8 @@ export async function requireUser(ctx: {
   db: {
     query: (table: 'users') => {
       withIndex: (
-        name: 'by_workos_id',
-        fn: (q: { eq: (field: 'workosUserId', value: string) => unknown }) => unknown
+        name: 'by_auth_id',
+        fn: (q: { eq: (field: 'authUserId', value: string) => unknown }) => unknown
       ) => { unique: () => Promise<Doc<'users'> | null> };
     };
   };
@@ -232,7 +232,7 @@ export async function requireUser(ctx: {
 
   const user = await ctx.db
     .query('users')
-    .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+    .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
     .unique();
 
   if (!user) {

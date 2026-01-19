@@ -28,7 +28,7 @@ export const add = mutation({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -91,7 +91,7 @@ export const update = mutation({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -135,7 +135,7 @@ export const remove = mutation({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -169,7 +169,7 @@ export const reorder = mutation({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -237,7 +237,7 @@ export const listByTrip = query({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -324,7 +324,7 @@ export const listByDay = query({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {

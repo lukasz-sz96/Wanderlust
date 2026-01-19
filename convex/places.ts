@@ -34,7 +34,7 @@ export const create = mutation({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -91,7 +91,7 @@ export const update = mutation({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user || place.userId !== user._id) {
@@ -129,7 +129,7 @@ export const remove = mutation({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user || place.userId !== user._id) {
@@ -222,7 +222,7 @@ export const list = query({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -283,7 +283,7 @@ export const search = query({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -317,7 +317,7 @@ export const getCategories = query({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {

@@ -3,7 +3,7 @@ import { v } from 'convex/values';
 
 export default defineSchema({
   users: defineTable({
-    workosUserId: v.string(),
+    authUserId: v.string(),
     email: v.string(),
     displayName: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
@@ -18,7 +18,7 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   })
-    .index('by_workos_id', ['workosUserId'])
+    .index('by_auth_id', ['authUserId'])
     .index('by_email', ['email']),
 
   places: defineTable({

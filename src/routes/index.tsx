@@ -1,27 +1,20 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
-import { getAuth, getSignInUrl, getSignUpUrl } from '@workos/authkit-tanstack-react-start';
+import { createFileRoute, redirect, Link } from '@tanstack/react-router';
+import { getToken } from '../lib/auth-server';
 import { MapPin, Plane, BookOpen, Star, ArrowRight } from 'lucide-react';
 import { Button, Card } from '../components/ui';
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
-  loader: async () => {
-    const { user } = await getAuth();
+  beforeLoad: async () => {
+    const token = await getToken();
 
-    if (user) {
+    if (token) {
       throw redirect({ to: '/dashboard' });
     }
-
-    const signInUrl = await getSignInUrl();
-    const signUpUrl = await getSignUpUrl();
-
-    return { signInUrl, signUpUrl };
   },
 });
 
 const LandingPage = () => {
-  const { signInUrl, signUpUrl } = Route.useLoaderData();
-
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border-light">
@@ -33,12 +26,12 @@ const LandingPage = () => {
             <span className="text-xl font-bold text-foreground">Wanderlust</span>
           </div>
           <div className="flex items-center gap-3">
-            <a href={signInUrl}>
+            <Link to="/login">
               <Button variant="ghost">Sign In</Button>
-            </a>
-            <a href={signUpUrl}>
+            </Link>
+            <Link to="/signup">
               <Button variant="primary">Get Started</Button>
-            </a>
+            </Link>
           </div>
         </div>
       </header>
@@ -55,16 +48,16 @@ const LandingPage = () => {
               new destinations — all in one cozy place.
             </p>
             <div className="flex items-center justify-center gap-4">
-              <a href={signUpUrl}>
+              <Link to="/signup">
                 <Button variant="primary" size="lg" rightIcon={<ArrowRight size={20} />}>
                   Start Planning
                 </Button>
-              </a>
-              <a href={signInUrl}>
+              </Link>
+              <Link to="/login">
                 <Button variant="outline" size="lg">
                   Sign In
                 </Button>
-              </a>
+              </Link>
             </div>
           </div>
         </section>
@@ -107,11 +100,11 @@ const LandingPage = () => {
             <p className="text-lg text-muted mb-8">
               Join travelers who use Wanderlust to plan their perfect trips.
             </p>
-            <a href={signUpUrl}>
+            <Link to="/signup">
               <Button variant="primary" size="lg" rightIcon={<ArrowRight size={20} />}>
                 Create Free Account
               </Button>
-            </a>
+            </Link>
           </div>
         </section>
       </main>

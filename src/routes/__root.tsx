@@ -1,21 +1,16 @@
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
-import { getAuth } from '@workos/authkit-tanstack-react-start';
 import { AlertTriangle, Home, Compass } from 'lucide-react';
 import appCssUrl from '../app.css?url';
+import { getToken } from '../lib/auth-server';
 import type { QueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import type { ConvexReactClient } from 'convex/react';
 import type { ConvexQueryClient } from '@convex-dev/react-query';
 
-const fetchWorkosAuth = createServerFn({ method: 'GET' }).handler(async () => {
-  const auth = await getAuth();
-  const { user } = auth;
-
-  return {
-    userId: user?.id ?? null,
-    token: user ? auth.accessToken : null,
-  };
+const fetchAuth = createServerFn({ method: 'GET' }).handler(async () => {
+  const token = await getToken();
+  return { token };
 });
 
 const RootDocument = ({ children }: Readonly<{ children: ReactNode }>) => (
@@ -108,12 +103,14 @@ export const Route = createRootRouteWithContext<{
   notFoundComponent: NotFoundPage,
   errorComponent: ErrorPage,
   beforeLoad: async (ctx) => {
-    const { userId, token } = await fetchWorkosAuth();
+    const { token } = await fetchAuth();
 
+    // During SSR only (the only time serverHttpClient exists),
+    // set the auth token to make HTTP queries with.
     if (token) {
       ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
     }
 
-    return { userId, token };
+    return { token, isAuthenticated: !!token };
   },
 });

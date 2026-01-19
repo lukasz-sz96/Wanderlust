@@ -9,7 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as CallbackRouteImport } from './routes/callback'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -17,15 +18,21 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedTripsIndexRouteImport } from './routes/_authenticated/trips/index'
 import { Route as AuthenticatedPlacesIndexRouteImport } from './routes/_authenticated/places/index'
 import { Route as AuthenticatedJournalIndexRouteImport } from './routes/_authenticated/journal/index'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthenticatedTripsTripIdRouteImport } from './routes/_authenticated/trips/$tripId'
 import { Route as AuthenticatedPlacesDiscoverRouteImport } from './routes/_authenticated/places/discover'
 import { Route as AuthenticatedPlacesPlaceIdRouteImport } from './routes/_authenticated/places/$placeId'
 import { Route as AuthenticatedJournalNewRouteImport } from './routes/_authenticated/journal/new'
 import { Route as AuthenticatedJournalEntryIdRouteImport } from './routes/_authenticated/journal/$entryId'
 
-const CallbackRoute = CallbackRouteImport.update({
-  id: '/callback',
-  path: '/callback',
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -64,6 +71,11 @@ const AuthenticatedJournalIndexRoute =
     path: '/journal/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedTripsTripIdRoute =
   AuthenticatedTripsTripIdRouteImport.update({
     id: '/trips/$tripId',
@@ -96,7 +108,8 @@ const AuthenticatedJournalEntryIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/callback': typeof CallbackRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
@@ -104,13 +117,15 @@ export interface FileRoutesByFullPath {
   '/places/$placeId': typeof AuthenticatedPlacesPlaceIdRoute
   '/places/discover': typeof AuthenticatedPlacesDiscoverRoute
   '/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/journal/': typeof AuthenticatedJournalIndexRoute
   '/places/': typeof AuthenticatedPlacesIndexRoute
   '/trips/': typeof AuthenticatedTripsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/callback': typeof CallbackRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
@@ -118,6 +133,7 @@ export interface FileRoutesByTo {
   '/places/$placeId': typeof AuthenticatedPlacesPlaceIdRoute
   '/places/discover': typeof AuthenticatedPlacesDiscoverRoute
   '/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/journal': typeof AuthenticatedJournalIndexRoute
   '/places': typeof AuthenticatedPlacesIndexRoute
   '/trips': typeof AuthenticatedTripsIndexRoute
@@ -126,7 +142,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/callback': typeof CallbackRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
@@ -134,6 +151,7 @@ export interface FileRoutesById {
   '/_authenticated/places/$placeId': typeof AuthenticatedPlacesPlaceIdRoute
   '/_authenticated/places/discover': typeof AuthenticatedPlacesDiscoverRoute
   '/_authenticated/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authenticated/journal/': typeof AuthenticatedJournalIndexRoute
   '/_authenticated/places/': typeof AuthenticatedPlacesIndexRoute
   '/_authenticated/trips/': typeof AuthenticatedTripsIndexRoute
@@ -142,7 +160,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/callback'
+    | '/login'
+    | '/signup'
     | '/dashboard'
     | '/settings'
     | '/journal/$entryId'
@@ -150,13 +169,15 @@ export interface FileRouteTypes {
     | '/places/$placeId'
     | '/places/discover'
     | '/trips/$tripId'
+    | '/api/auth/$'
     | '/journal/'
     | '/places/'
     | '/trips/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/callback'
+    | '/login'
+    | '/signup'
     | '/dashboard'
     | '/settings'
     | '/journal/$entryId'
@@ -164,6 +185,7 @@ export interface FileRouteTypes {
     | '/places/$placeId'
     | '/places/discover'
     | '/trips/$tripId'
+    | '/api/auth/$'
     | '/journal'
     | '/places'
     | '/trips'
@@ -171,7 +193,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/callback'
+    | '/login'
+    | '/signup'
     | '/_authenticated/dashboard'
     | '/_authenticated/settings'
     | '/_authenticated/journal/$entryId'
@@ -179,6 +202,7 @@ export interface FileRouteTypes {
     | '/_authenticated/places/$placeId'
     | '/_authenticated/places/discover'
     | '/_authenticated/trips/$tripId'
+    | '/api/auth/$'
     | '/_authenticated/journal/'
     | '/_authenticated/places/'
     | '/_authenticated/trips/'
@@ -187,16 +211,25 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  CallbackRoute: typeof CallbackRoute
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/callback': {
-      id: '/callback'
-      path: '/callback'
-      fullPath: '/callback'
-      preLoaderRoute: typeof CallbackRouteImport
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -247,6 +280,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/journal/'
       preLoaderRoute: typeof AuthenticatedJournalIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/trips/$tripId': {
       id: '/_authenticated/trips/$tripId'
@@ -319,7 +359,9 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  CallbackRoute: CallbackRoute,
+  LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

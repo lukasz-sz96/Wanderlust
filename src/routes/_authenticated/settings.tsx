@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useMutation } from 'convex/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../../../convex/_generated/api';
 import { useCurrentUser } from '../../lib/hooks/useUserSync';
 import { useOnboarding } from '../../lib/hooks/useOnboarding';
@@ -12,6 +12,7 @@ import {
   Button,
   Input,
   Avatar,
+  useToast,
 } from '../../components/ui';
 import { RefreshCw } from 'lucide-react';
 
@@ -24,17 +25,27 @@ const SettingsPage = () => {
   const updateProfile = useMutation(api.users.updateProfile);
   const updatePreferences = useMutation(api.users.updatePreferences);
   const { resetOnboarding } = useOnboarding();
+  const toast = useToast();
 
-  const [displayName, setDisplayName] = useState(user?.displayName || '');
-  const [temperatureUnit, setTemperatureUnit] = useState<'celsius' | 'fahrenheit'>(
-    user?.preferences?.temperatureUnit || 'celsius'
-  );
+  const [displayName, setDisplayName] = useState('');
+  const [temperatureUnit, setTemperatureUnit] = useState<'celsius' | 'fahrenheit'>('celsius');
   const [saving, setSaving] = useState(false);
+
+  // Update state when user data loads
+  useEffect(() => {
+    if (user) {
+      setDisplayName(user.displayName || '');
+      setTemperatureUnit(user.preferences?.temperatureUnit || 'celsius');
+    }
+  }, [user]);
 
   const handleSaveProfile = async () => {
     setSaving(true);
     try {
       await updateProfile({ displayName: displayName || undefined });
+      toast.success('Profile updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update profile. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -44,6 +55,9 @@ const SettingsPage = () => {
     setSaving(true);
     try {
       await updatePreferences({ temperatureUnit });
+      toast.success('Preferences saved!');
+    } catch (error) {
+      toast.error('Failed to save preferences. Please try again.');
     } finally {
       setSaving(false);
     }

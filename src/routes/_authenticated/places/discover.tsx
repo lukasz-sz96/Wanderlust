@@ -8,6 +8,7 @@ import {
   CardContent,
   Input,
   Badge,
+  useToast,
 } from '../../../components/ui';
 import {
   Compass,
@@ -58,6 +59,7 @@ const DiscoverPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSurpriseLoading, setIsSurpriseLoading] = useState(false);
   const [addingPlace, setAddingPlace] = useState<string | null>(null);
+  const toast = useToast();
 
   const getRecommendations = useAction(api.ai.generatePlaceRecommendations);
   const getSurprise = useAction(api.ai.surpriseMe);
@@ -92,8 +94,12 @@ const DiscoverPage = () => {
         preferences: selectedCategories.length > 0 ? { categories: selectedCategories } : undefined,
       });
       setRecommendations(results);
+      if (results.length === 0) {
+        toast.info('No recommendations found. Try a different search.');
+      }
     } catch (error) {
       console.error('Failed to get recommendations:', error);
+      toast.error('Failed to get recommendations. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -107,6 +113,7 @@ const DiscoverPage = () => {
       setSurprise(result);
     } catch (error) {
       console.error('Failed to get surprise:', error);
+      toast.error('Failed to get surprise destination. Please try again.');
     } finally {
       setIsSurpriseLoading(false);
     }
@@ -130,8 +137,11 @@ const DiscoverPage = () => {
         placeId,
         status: 'want_to_visit',
       });
+
+      toast.success(`${rec.name} added to your bucket list!`);
     } catch (error) {
       console.error('Failed to add place:', error);
+      toast.error('Failed to add place. Please try again.');
     } finally {
       setAddingPlace(null);
     }
@@ -156,8 +166,11 @@ const DiscoverPage = () => {
         placeId,
         status: 'want_to_visit',
       });
+
+      toast.success(`${surprise.destination} added to your bucket list!`);
     } catch (error) {
       console.error('Failed to add place:', error);
+      toast.error('Failed to add place. Please try again.');
     } finally {
       setAddingPlace(null);
     }

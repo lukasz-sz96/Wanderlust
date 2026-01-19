@@ -24,3 +24,4 @@ export {
   SkeletonStats,
   SkeletonMap,
 } from './Skeleton';
+export { ToastProvider, useToast } from './Toast';

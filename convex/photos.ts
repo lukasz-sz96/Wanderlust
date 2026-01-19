@@ -36,7 +36,7 @@ export const create = mutation({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -81,7 +81,7 @@ export const updateCaption = mutation({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user || photo.userId !== user._id) {
@@ -112,7 +112,7 @@ export const remove = mutation({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user || photo.userId !== user._id) {
@@ -157,7 +157,7 @@ export const listByJournalEntry = query({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -216,7 +216,7 @@ export const listByTrip = query({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {
@@ -273,7 +273,7 @@ export const listAll = query({
 
     const user = await ctx.db
       .query('users')
-      .withIndex('by_workos_id', (q) => q.eq('workosUserId', identity.subject))
+      .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
       .unique();
 
     if (!user) {

@@ -11,7 +11,7 @@ import {
   Compass,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useAuth } from '@workos/authkit-tanstack-react-start/client';
+import { authClient } from '../../lib/auth-client';
 import { Avatar } from '../ui/Avatar';
 import { IconButton } from '../ui/IconButton';
 
@@ -35,7 +35,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) {
-  const { user, signOut } = useAuth();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
   const [currentPath, setCurrentPath] = useState('/dashboard');
 
   useEffect(() => {
@@ -46,7 +47,13 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
   }, []);
 
   const handleSignOut = async () => {
-    await signOut({ returnTo: '/' });
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          window.location.href = '/';
+        },
+      },
+    });
   };
 
   return (
@@ -91,7 +98,17 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
 
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
-          const isActive = currentPath === item.href || currentPath.startsWith(item.href + '/');
+          // Check for exact match first, then check if path starts with href
+          // but exclude cases where a more specific nav item exists
+          const isExactMatch = currentPath === item.href;
+          const isParentMatch = currentPath.startsWith(item.href + '/');
+          // Don't highlight parent if there's a more specific nav item that matches
+          const hasMoreSpecificMatch = navItems.some(
+            (other) => other.href !== item.href &&
+            other.href.startsWith(item.href + '/') &&
+            (currentPath === other.href || currentPath.startsWith(other.href + '/'))
+          );
+          const isActive = isExactMatch || (isParentMatch && !hasMoreSpecificMatch);
           return (
             <Link
               key={item.href}
@@ -145,8 +162,8 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
           ${collapsed ? 'justify-center' : ''}
         `}>
           <Avatar
-            src={user?.profilePictureUrl || undefined}
-            alt={user?.firstName || user?.email || 'User'}
+            src={user?.image || undefined}
+            alt={user?.name || user?.email || 'User'}
             size="sm"
           />
           <AnimatePresence mode="wait">
@@ -158,7 +175,7 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
                 className="flex-1 min-w-0"
               >
                 <p className="text-sm font-medium text-foreground truncate">
-                  {user?.firstName || 'User'}
+                  {user?.name || 'User'}
                 </p>
                 <p className="text-xs text-muted truncate">{user?.email}</p>
               </motion.div>
