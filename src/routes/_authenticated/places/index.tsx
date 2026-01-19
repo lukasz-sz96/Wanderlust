@@ -1,19 +1,23 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useQuery } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import { useState } from 'react';
 import { api } from '../../../../convex/_generated/api';
-import { PlaceCard } from '../../../components/places';
+import type { Id } from '../../../../convex/_generated/dataModel';
+import { PlaceCard, SortablePlaceList } from '../../../components/places';
 import { Button, Card, CardContent, PageLoading } from '../../../components/ui';
-import { MapPin, Plus, Heart, CheckCircle, XCircle } from 'lucide-react';
+import { MapPin, Plus, Heart, CheckCircle, List, Grid } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated/places/')({
   component: PlacesPage,
 });
 
 type TabType = 'all' | 'want_to_visit' | 'visited';
+type ViewMode = 'grid' | 'list';
 
 const PlacesPage = () => {
   const [activeTab, setActiveTab] = useState<TabType>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const reorderItems = useMutation(api.bucketList.reorder);
 
   const bucketListItems = useQuery(
     api.bucketList.list,
@@ -32,6 +36,10 @@ const PlacesPage = () => {
     { id: 'visited' as TabType, label: 'Visited', count: stats.visited, icon: CheckCircle },
   ];
 
+  const handleReorder = (itemIds: Id<'bucketListItems'>[]) => {
+    reorderItems({ itemIds });
+  };
+
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -39,7 +47,33 @@ const PlacesPage = () => {
           <h1 className="text-3xl font-bold text-foreground mb-2">Places</h1>
           <p className="text-muted">Your bucket list of places to visit</p>
         </div>
-        <Button leftIcon={<Plus size={18} />}>Add Place</Button>
+        <div className="flex items-center gap-2">
+          <div className="flex bg-surface border border-border rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-primary text-white'
+                  : 'text-muted hover:text-foreground'
+              }`}
+              aria-label="Grid view"
+            >
+              <Grid size={18} />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-primary text-white'
+                  : 'text-muted hover:text-foreground'
+              }`}
+              aria-label="List view"
+            >
+              <List size={18} />
+            </button>
+          </div>
+          <Button leftIcon={<Plus size={18} />}>Add Place</Button>
+        </div>
       </div>
 
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
@@ -105,6 +139,8 @@ const PlacesPage = () => {
             </div>
           </CardContent>
         </Card>
+      ) : viewMode === 'list' ? (
+        <SortablePlaceList items={bucketListItems} onReorder={handleReorder} />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {bucketListItems.map((item) =>
