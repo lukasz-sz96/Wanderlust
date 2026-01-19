@@ -1,4 +1,4 @@
-import { Link, useRouterState } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home,
@@ -10,7 +10,7 @@ import {
   ChevronLeft,
   Compass,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@workos/authkit-tanstack-react-start/client';
 import { Avatar } from '../ui/Avatar';
 import { IconButton } from '../ui/IconButton';
@@ -36,8 +36,14 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) {
   const { user, signOut } = useAuth();
-  const routerState = useRouterState();
-  const currentPath = routerState.location.pathname;
+  const [currentPath, setCurrentPath] = useState('/dashboard');
+
+  useEffect(() => {
+    setCurrentPath(window.location.pathname);
+    const handlePopState = () => setCurrentPath(window.location.pathname);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut({ returnTo: '/' });
@@ -90,6 +96,7 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
             <Link
               key={item.href}
               to={item.href}
+              onClick={() => setCurrentPath(item.href)}
               className={`
                 flex items-center gap-3 px-3 py-2.5 rounded-lg
                 transition-colors duration-150
@@ -121,6 +128,7 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
       <div className="p-3 border-t border-border-light space-y-1">
         <Link
           to="/settings"
+          onClick={() => setCurrentPath('/settings')}
           className={`
             flex items-center gap-3 px-3 py-2.5 rounded-lg
             transition-colors duration-150 text-muted
