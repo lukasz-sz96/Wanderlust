@@ -3,7 +3,7 @@ import { useQuery, useMutation } from 'convex/react';
 import { useState } from 'react';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
-import { PlaceCard, SortablePlaceList } from '../../../components/places';
+import { PlaceCard, SortablePlaceList, AddPlaceModal } from '../../../components/places';
 import { Button, Card, CardContent, PageLoading } from '../../../components/ui';
 import { MapPin, Plus, Heart, CheckCircle, List, Grid } from 'lucide-react';
 
@@ -17,6 +17,7 @@ type ViewMode = 'grid' | 'list';
 const PlacesPage = () => {
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [showAddModal, setShowAddModal] = useState(false);
   const reorderItems = useMutation(api.bucketList.reorder);
 
   const bucketListItems = useQuery(
@@ -72,7 +73,7 @@ const PlacesPage = () => {
               <List size={18} />
             </button>
           </div>
-          <Button leftIcon={<Plus size={18} />}>Add Place</Button>
+          <Button leftIcon={<Plus size={18} />} onClick={() => setShowAddModal(true)}>Add Place</Button>
         </div>
       </div>
 
@@ -135,7 +136,7 @@ const PlacesPage = () => {
                     ? 'Mark places as visited to track your travels'
                     : 'Start building your bucket list by adding places you want to visit'}
               </p>
-              <Button leftIcon={<Plus size={18} />}>Add Your First Place</Button>
+              <Button leftIcon={<Plus size={18} />} onClick={() => setShowAddModal(true)}>Add Your First Place</Button>
             </div>
           </CardContent>
         </Card>
@@ -187,6 +188,8 @@ const PlacesPage = () => {
           />
         </div>
       )}
+
+      <AddPlaceModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} />
     </div>
   );
 };
