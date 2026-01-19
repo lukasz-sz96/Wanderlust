@@ -8,3 +8,6 @@ export { IconButton } from './IconButton';
 export { Spinner, LoadingOverlay, LoadingCard } from './Spinner';
 export { ErrorBoundary } from './ErrorBoundary';
 export { PageLoading, FullPageLoading } from './PageLoading';
+export { AnimatedList, AnimatedListItem } from './AnimatedList';
+export { AnimatedPage } from './AnimatedPage';
+export { AnimatedModal } from './AnimatedModal';

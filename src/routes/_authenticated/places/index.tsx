@@ -1,10 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery, useMutation } from 'convex/react';
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
 import { PlaceCard, SortablePlaceList, AddPlaceModal } from '../../../components/places';
-import { Button, Card, CardContent, PageLoading } from '../../../components/ui';
+import { Button, Card, CardContent, PageLoading, AnimatedPage } from '../../../components/ui';
+import { staggerContainer, staggerItem } from '../../../lib/animations';
 import { MapPin, Plus, Heart, CheckCircle, List, Grid } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated/places/')({
@@ -42,7 +44,7 @@ const PlacesPage = () => {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <AnimatedPage className="p-6 max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-2">Places</h1>
@@ -143,25 +145,33 @@ const PlacesPage = () => {
       ) : viewMode === 'list' ? (
         <SortablePlaceList items={bucketListItems} onReorder={handleReorder} />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {bucketListItems.map((item) =>
-            item.place ? (
-              <PlaceCard
-                key={item._id}
-                id={item.place._id}
-                name={item.place.name}
-                category={item.place.category}
-                city={item.place.city}
-                country={item.place.country}
-                latitude={item.place.latitude}
-                longitude={item.place.longitude}
-                description={item.place.description}
-                status={item.status}
-                rating={item.rating}
-              />
-            ) : null
-          )}
-        </div>
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <AnimatePresence mode="popLayout">
+            {bucketListItems.map((item) =>
+              item.place ? (
+                <motion.div key={item._id} variants={staggerItem} layout>
+                  <PlaceCard
+                    id={item.place._id}
+                    name={item.place.name}
+                    category={item.place.category}
+                    city={item.place.city}
+                    country={item.place.country}
+                    latitude={item.place.latitude}
+                    longitude={item.place.longitude}
+                    description={item.place.description}
+                    status={item.status}
+                    rating={item.rating}
+                  />
+                </motion.div>
+              ) : null
+            )}
+          </AnimatePresence>
+        </motion.div>
       )}
 
       {stats.visited > 0 && (
@@ -190,7 +200,7 @@ const PlacesPage = () => {
       )}
 
       <AddPlaceModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} />
-    </div>
+    </AnimatedPage>
   );
 };
 

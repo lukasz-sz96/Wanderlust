@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
+import { motion } from 'framer-motion';
 import { api } from '../../../../convex/_generated/api';
-import { Button, Card, CardContent, Badge, PageLoading } from '../../../components/ui';
+import { Button, Card, CardContent, Badge, PageLoading, AnimatedPage } from '../../../components/ui';
+import { staggerContainer, staggerItem } from '../../../lib/animations';
 import {
   BookOpen,
   Plus,
@@ -84,7 +86,7 @@ const JournalPage = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <AnimatedPage className="p-6 max-w-4xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-2">Journal</h1>
@@ -96,26 +98,37 @@ const JournalPage = () => {
       </div>
 
       {stats.total > 0 && (
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <Card>
-            <CardContent className="text-center py-4">
-              <p className="text-2xl font-bold text-foreground">{stats.total}</p>
-              <p className="text-sm text-muted">Total Entries</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="text-center py-4">
-              <p className="text-2xl font-bold text-foreground">{stats.thisMonth}</p>
-              <p className="text-sm text-muted">This Month</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="text-center py-4">
-              <p className="text-2xl font-bold text-foreground">{stats.withPhotos}</p>
-              <p className="text-sm text-muted">With Photos</p>
-            </CardContent>
-          </Card>
-        </div>
+        <motion.div
+          className="grid grid-cols-3 gap-4 mb-6"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div variants={staggerItem}>
+            <Card>
+              <CardContent className="text-center py-4">
+                <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-sm text-muted">Total Entries</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div variants={staggerItem}>
+            <Card>
+              <CardContent className="text-center py-4">
+                <p className="text-2xl font-bold text-foreground">{stats.thisMonth}</p>
+                <p className="text-sm text-muted">This Month</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div variants={staggerItem}>
+            <Card>
+              <CardContent className="text-center py-4">
+                <p className="text-2xl font-bold text-foreground">{stats.withPhotos}</p>
+                <p className="text-sm text-muted">With Photos</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.div>
       )}
 
       {entries.length === 0 ? (
@@ -136,67 +149,74 @@ const JournalPage = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <motion.div
+          className="space-y-4"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
           {entries.map((entry) => (
-            <Link key={entry._id} to="/journal/$entryId" params={{ entryId: entry._id }}>
-              <Card hoverable>
-                <CardContent>
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-                      <BookOpen className="text-accent" size={24} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="font-semibold text-foreground text-lg">
-                          {entry.title || 'Untitled Entry'}
-                        </h3>
-                        {entry.mood && (
-                          <div className="flex items-center gap-1">
-                            {getMoodIcon(entry.mood)}
-                            <span className="text-sm text-muted">{getMoodLabel(entry.mood)}</span>
-                          </div>
-                        )}
+            <motion.div key={entry._id} variants={staggerItem}>
+              <Link to="/journal/$entryId" params={{ entryId: entry._id }}>
+                <Card hoverable>
+                  <CardContent>
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                        <BookOpen className="text-accent" size={24} />
                       </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h3 className="font-semibold text-foreground text-lg">
+                            {entry.title || 'Untitled Entry'}
+                          </h3>
+                          {entry.mood && (
+                            <div className="flex items-center gap-1">
+                              {getMoodIcon(entry.mood)}
+                              <span className="text-sm text-muted">{getMoodLabel(entry.mood)}</span>
+                            </div>
+                          )}
+                        </div>
 
-                      <p className="text-sm text-muted flex items-center gap-1 mb-2">
-                        <Calendar size={14} />
-                        {formatDate(entry.entryDate)}
-                      </p>
-
-                      {getContentPreview(entry.content) && (
-                        <p className="text-muted text-sm line-clamp-2 mb-3">
-                          {getContentPreview(entry.content)}...
+                        <p className="text-sm text-muted flex items-center gap-1 mb-2">
+                          <Calendar size={14} />
+                          {formatDate(entry.entryDate)}
                         </p>
-                      )}
 
-                      <div className="flex flex-wrap items-center gap-2">
-                        {entry.trip && (
-                          <Badge variant="default" className="flex items-center gap-1">
-                            <Plane size={12} />
-                            {entry.trip.title}
-                          </Badge>
+                        {getContentPreview(entry.content) && (
+                          <p className="text-muted text-sm line-clamp-2 mb-3">
+                            {getContentPreview(entry.content)}...
+                          </p>
                         )}
-                        {entry.place && (
-                          <Badge variant="default" className="flex items-center gap-1">
-                            <MapPin size={12} />
-                            {entry.place.name}
-                          </Badge>
-                        )}
-                        {entry.photoCount > 0 && (
-                          <Badge variant="default" className="flex items-center gap-1">
-                            <Image size={12} />
-                            {entry.photoCount} {entry.photoCount === 1 ? 'photo' : 'photos'}
-                          </Badge>
-                        )}
+
+                        <div className="flex flex-wrap items-center gap-2">
+                          {entry.trip && (
+                            <Badge variant="default" className="flex items-center gap-1">
+                              <Plane size={12} />
+                              {entry.trip.title}
+                            </Badge>
+                          )}
+                          {entry.place && (
+                            <Badge variant="default" className="flex items-center gap-1">
+                              <MapPin size={12} />
+                              {entry.place.name}
+                            </Badge>
+                          )}
+                          {entry.photoCount > 0 && (
+                            <Badge variant="default" className="flex items-center gap-1">
+                              <Image size={12} />
+                              {entry.photoCount} {entry.photoCount === 1 ? 'photo' : 'photos'}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+                  </CardContent>
+                </Card>
+              </Link>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
-    </div>
+    </AnimatedPage>
   );
 };

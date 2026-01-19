@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { api } from '../../../../convex/_generated/api';
-import { Button, Card, CardContent, Badge, PageLoading } from '../../../components/ui';
+import { Button, Card, CardContent, Badge, PageLoading, AnimatedPage } from '../../../components/ui';
+import { staggerContainer, staggerItem } from '../../../lib/animations';
 import { Plane, Plus, MapPin, Calendar, CheckCircle, Clock, ArrowRight } from 'lucide-react';
 import { CreateTripModal } from '../../../components/trips';
 
@@ -46,7 +48,7 @@ const TripsPage = () => {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <AnimatedPage className="p-6 max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-2">Trips</h1>
@@ -127,83 +129,90 @@ const TripsPage = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
           {trips.map((trip) => (
-            <Link key={trip._id} to="/trips/$tripId" params={{ tripId: trip._id }}>
-              <Card hoverable className="h-full">
-                <div className="p-0">
-                  {trip.coverImageUrl ? (
-                    <div className="h-40 bg-border-light rounded-t-xl overflow-hidden">
-                      <img
-                        src={trip.coverImageUrl}
-                        alt={trip.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="h-40 bg-gradient-to-br from-secondary/20 to-secondary/5 rounded-t-xl flex items-center justify-center">
-                      <Plane className="text-secondary/40" size={48} />
-                    </div>
-                  )}
-                  <div className="p-4">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="font-semibold text-foreground text-lg line-clamp-1">
-                        {trip.title}
-                      </h3>
-                      <Badge
-                        variant={
-                          trip.status === 'completed'
-                            ? 'success'
+            <motion.div key={trip._id} variants={staggerItem}>
+              <Link to="/trips/$tripId" params={{ tripId: trip._id }}>
+                <Card hoverable className="h-full">
+                  <div className="p-0">
+                    {trip.coverImageUrl ? (
+                      <div className="h-40 bg-border-light rounded-t-xl overflow-hidden">
+                        <img
+                          src={trip.coverImageUrl}
+                          alt={trip.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-40 bg-gradient-to-br from-secondary/20 to-secondary/5 rounded-t-xl flex items-center justify-center">
+                        <Plane className="text-secondary/40" size={48} />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <h3 className="font-semibold text-foreground text-lg line-clamp-1">
+                          {trip.title}
+                        </h3>
+                        <Badge
+                          variant={
+                            trip.status === 'completed'
+                              ? 'success'
+                              : trip.status === 'active'
+                                ? 'primary'
+                                : 'default'
+                          }
+                        >
+                          {trip.status === 'planning'
+                            ? 'Planning'
                             : trip.status === 'active'
-                              ? 'primary'
-                              : 'default'
-                        }
-                      >
-                        {trip.status === 'planning'
-                          ? 'Planning'
-                          : trip.status === 'active'
-                            ? 'Active'
-                            : 'Completed'}
-                      </Badge>
-                    </div>
+                              ? 'Active'
+                              : 'Completed'}
+                        </Badge>
+                      </div>
 
-                    {trip.destination && (
-                      <p className="text-sm text-muted flex items-center gap-1 mb-2">
-                        <MapPin size={14} />
-                        {trip.destination.name}
-                      </p>
-                    )}
+                      {trip.destination && (
+                        <p className="text-sm text-muted flex items-center gap-1 mb-2">
+                          <MapPin size={14} />
+                          {trip.destination.name}
+                        </p>
+                      )}
 
-                    {(trip.startDate || trip.endDate) && (
-                      <p className="text-sm text-muted flex items-center gap-1 mb-3">
-                        <Calendar size={14} />
-                        {formatDateRange(trip.startDate, trip.endDate)}
-                      </p>
-                    )}
+                      {(trip.startDate || trip.endDate) && (
+                        <p className="text-sm text-muted flex items-center gap-1 mb-3">
+                          <Calendar size={14} />
+                          {formatDateRange(trip.startDate, trip.endDate)}
+                        </p>
+                      )}
 
-                    {trip.description && (
-                      <p className="text-sm text-muted line-clamp-2 mb-3">
-                        {trip.description}
-                      </p>
-                    )}
+                      {trip.description && (
+                        <p className="text-sm text-muted line-clamp-2 mb-3">
+                          {trip.description}
+                        </p>
+                      )}
 
-                    <div className="flex items-center justify-between pt-3 border-t border-border-light">
-                      <span className="text-sm text-muted">
-                        {trip.itemCount} {trip.itemCount === 1 ? 'activity' : 'activities'}
-                      </span>
-                      <span className="text-primary flex items-center gap-1 text-sm font-medium">
-                        View <ArrowRight size={14} />
-                      </span>
+                      <div className="flex items-center justify-between pt-3 border-t border-border-light">
+                        <span className="text-sm text-muted">
+                          {trip.itemCount} {trip.itemCount === 1 ? 'activity' : 'activities'}
+                        </span>
+                        <span className="text-primary flex items-center gap-1 text-sm font-medium">
+                          View <ArrowRight size={14} />
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            </Link>
+                </Card>
+              </Link>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
       <CreateTripModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />
-    </div>
+    </AnimatedPage>
   );
 };

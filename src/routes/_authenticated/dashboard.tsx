@@ -28,7 +28,7 @@ const DashboardPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
 
   const bucketListItems = useQuery(api.bucketList.list, {});
-  const stats = useQuery(api.bucketList.getStats);
+  const stats = useQuery(api.bucketList.getStats, {});
 
   const greeting = getGreeting();
   const displayName = user?.displayName?.split(' ')[0] || 'Traveler';
