@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useMutation } from 'convex/react';
-import { useNavigate } from '@tanstack/react-router';
 import { api } from '../../../convex/_generated/api';
 import { Button, Card, Input, Textarea } from '../ui';
 import { X, Plane, Loader2 } from 'lucide-react';
@@ -11,7 +10,6 @@ interface CreateTripModalProps {
 }
 
 export const CreateTripModal = ({ isOpen, onClose }: CreateTripModalProps) => {
-  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [destinationName, setDestinationName] = useState('');
@@ -42,7 +40,7 @@ export const CreateTripModal = ({ isOpen, onClose }: CreateTripModalProps) => {
       });
 
       handleClose();
-      navigate({ to: '/trips/$tripId', params: { tripId } });
+      window.location.href = `/trips/${tripId}`;
     } catch (error) {
       console.error('Failed to create trip:', error);
     } finally {
