@@ -275,11 +275,12 @@ export const list = query({
     }
 
     let items;
-    if (args.status) {
+    const status = args.status;
+    if (status) {
       items = await ctx.db
         .query('bucketListItems')
         .withIndex('by_user_and_status', (q) =>
-          q.eq('userId', user._id).eq('status', args.status)
+          q.eq('userId', user._id).eq('status', status)
         )
         .collect();
     } else {

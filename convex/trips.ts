@@ -249,11 +249,12 @@ export const list = query({
     }
 
     let trips;
-    if (args.status) {
+    const status = args.status;
+    if (status) {
       trips = await ctx.db
         .query('trips')
         .withIndex('by_user_and_status', (q) =>
-          q.eq('userId', user._id).eq('status', args.status)
+          q.eq('userId', user._id).eq('status', status)
         )
         .collect();
     } else {
