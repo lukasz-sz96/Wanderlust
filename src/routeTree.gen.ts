@@ -18,6 +18,7 @@ import { Route as AuthenticatedTripsIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPlacesIndexRouteImport } from './routes/_authenticated/places/index'
 import { Route as AuthenticatedJournalIndexRouteImport } from './routes/_authenticated/journal/index'
 import { Route as AuthenticatedPlacesDiscoverRouteImport } from './routes/_authenticated/places/discover'
+import { Route as AuthenticatedPlacesPlaceIdRouteImport } from './routes/_authenticated/places/$placeId'
 
 const CallbackRoute = CallbackRouteImport.update({
   id: '/callback',
@@ -66,12 +67,19 @@ const AuthenticatedPlacesDiscoverRoute =
     path: '/places/discover',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedPlacesPlaceIdRoute =
+  AuthenticatedPlacesPlaceIdRouteImport.update({
+    id: '/places/$placeId',
+    path: '/places/$placeId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/callback': typeof CallbackRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/places/$placeId': typeof AuthenticatedPlacesPlaceIdRoute
   '/places/discover': typeof AuthenticatedPlacesDiscoverRoute
   '/journal/': typeof AuthenticatedJournalIndexRoute
   '/places/': typeof AuthenticatedPlacesIndexRoute
@@ -82,6 +90,7 @@ export interface FileRoutesByTo {
   '/callback': typeof CallbackRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/places/$placeId': typeof AuthenticatedPlacesPlaceIdRoute
   '/places/discover': typeof AuthenticatedPlacesDiscoverRoute
   '/journal': typeof AuthenticatedJournalIndexRoute
   '/places': typeof AuthenticatedPlacesIndexRoute
@@ -94,6 +103,7 @@ export interface FileRoutesById {
   '/callback': typeof CallbackRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/places/$placeId': typeof AuthenticatedPlacesPlaceIdRoute
   '/_authenticated/places/discover': typeof AuthenticatedPlacesDiscoverRoute
   '/_authenticated/journal/': typeof AuthenticatedJournalIndexRoute
   '/_authenticated/places/': typeof AuthenticatedPlacesIndexRoute
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/callback'
     | '/dashboard'
     | '/settings'
+    | '/places/$placeId'
     | '/places/discover'
     | '/journal/'
     | '/places/'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/callback'
     | '/dashboard'
     | '/settings'
+    | '/places/$placeId'
     | '/places/discover'
     | '/journal'
     | '/places'
@@ -127,6 +139,7 @@ export interface FileRouteTypes {
     | '/callback'
     | '/_authenticated/dashboard'
     | '/_authenticated/settings'
+    | '/_authenticated/places/$placeId'
     | '/_authenticated/places/discover'
     | '/_authenticated/journal/'
     | '/_authenticated/places/'
@@ -204,12 +217,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlacesDiscoverRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/places/$placeId': {
+      id: '/_authenticated/places/$placeId'
+      path: '/places/$placeId'
+      fullPath: '/places/$placeId'
+      preLoaderRoute: typeof AuthenticatedPlacesPlaceIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedPlacesPlaceIdRoute: typeof AuthenticatedPlacesPlaceIdRoute
   AuthenticatedPlacesDiscoverRoute: typeof AuthenticatedPlacesDiscoverRoute
   AuthenticatedJournalIndexRoute: typeof AuthenticatedJournalIndexRoute
   AuthenticatedPlacesIndexRoute: typeof AuthenticatedPlacesIndexRoute
@@ -219,6 +240,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedPlacesPlaceIdRoute: AuthenticatedPlacesPlaceIdRoute,
   AuthenticatedPlacesDiscoverRoute: AuthenticatedPlacesDiscoverRoute,
   AuthenticatedJournalIndexRoute: AuthenticatedJournalIndexRoute,
   AuthenticatedPlacesIndexRoute: AuthenticatedPlacesIndexRoute,

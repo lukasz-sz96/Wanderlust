@@ -8,7 +8,8 @@
  * @module
  */
 
-import type * as myFunctions from "../myFunctions.js";
+import type * as bucketList from "../bucketList.js";
+import type * as places from "../places.js";
 import type * as users from "../users.js";
 
 import type {
@@ -18,7 +19,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  myFunctions: typeof myFunctions;
+  bucketList: typeof bucketList;
+  places: typeof places;
   users: typeof users;
 }>;
 

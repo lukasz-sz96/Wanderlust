@@ -1,36 +1,178 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { MapPin, Plus } from 'lucide-react';
-import { Button, Card, CardContent } from '../../../components/ui';
+import { useQuery } from 'convex/react';
+import { useState } from 'react';
+import { api } from '../../../../convex/_generated/api';
+import { PlaceCard } from '../../../components/places';
+import { Button, Card, CardContent, PageLoading } from '../../../components/ui';
+import { MapPin, Plus, Heart, CheckCircle, XCircle } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated/places/')({
   component: PlacesPage,
 });
 
-const PlacesPage = () => (
-  <div className="p-6 max-w-6xl mx-auto">
-    <div className="flex items-center justify-between mb-8">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Places</h1>
-        <p className="text-muted">Your bucket list of places to visit</p>
-      </div>
-      <Button leftIcon={<Plus size={18} />}>Add Place</Button>
-    </div>
+type TabType = 'all' | 'want_to_visit' | 'visited';
 
-    <Card>
-      <CardContent>
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-20 h-20 rounded-full bg-primary-light/20 flex items-center justify-center mb-4">
-            <MapPin className="text-primary" size={40} />
-          </div>
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            No places yet
-          </h3>
-          <p className="text-muted mb-6 max-w-sm">
-            Start building your bucket list by adding places you want to visit
-          </p>
-          <Button leftIcon={<Plus size={18} />}>Add Your First Place</Button>
+const PlacesPage = () => {
+  const [activeTab, setActiveTab] = useState<TabType>('all');
+
+  const bucketListItems = useQuery(
+    api.bucketList.list,
+    activeTab === 'all' ? {} : { status: activeTab }
+  );
+
+  const stats = useQuery(api.bucketList.getStats);
+
+  if (bucketListItems === undefined || stats === undefined) {
+    return <PageLoading message="Loading places..." />;
+  }
+
+  const tabs = [
+    { id: 'all' as TabType, label: 'All', count: stats.total, icon: MapPin },
+    { id: 'want_to_visit' as TabType, label: 'Want to Visit', count: stats.wantToVisit, icon: Heart },
+    { id: 'visited' as TabType, label: 'Visited', count: stats.visited, icon: CheckCircle },
+  ];
+
+  return (
+    <div className="p-6 max-w-6xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Places</h1>
+          <p className="text-muted">Your bucket list of places to visit</p>
         </div>
-      </CardContent>
-    </Card>
-  </div>
+        <Button leftIcon={<Plus size={18} />}>Add Place</Button>
+      </div>
+
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`
+                flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap
+                font-medium transition-colors duration-200
+                ${isActive
+                  ? 'bg-primary text-white'
+                  : 'bg-surface border border-border text-muted hover:text-foreground hover:border-muted'
+                }
+              `}
+            >
+              <Icon size={16} />
+              {tab.label}
+              <span
+                className={`
+                  text-xs px-2 py-0.5 rounded-full
+                  ${isActive ? 'bg-white/20' : 'bg-border-light'}
+                `}
+              >
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {bucketListItems.length === 0 ? (
+        <Card>
+          <CardContent>
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-20 h-20 rounded-full bg-primary-light/20 flex items-center justify-center mb-4">
+                {activeTab === 'want_to_visit' ? (
+                  <Heart className="text-primary" size={40} />
+                ) : activeTab === 'visited' ? (
+                  <CheckCircle className="text-secondary" size={40} />
+                ) : (
+                  <MapPin className="text-primary" size={40} />
+                )}
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                {activeTab === 'want_to_visit'
+                  ? 'No places on your wishlist'
+                  : activeTab === 'visited'
+                    ? 'No visited places yet'
+                    : 'No places yet'}
+              </h3>
+              <p className="text-muted mb-6 max-w-sm">
+                {activeTab === 'want_to_visit'
+                  ? 'Add places you dream of visiting to your wishlist'
+                  : activeTab === 'visited'
+                    ? 'Mark places as visited to track your travels'
+                    : 'Start building your bucket list by adding places you want to visit'}
+              </p>
+              <Button leftIcon={<Plus size={18} />}>Add Your First Place</Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {bucketListItems.map((item) =>
+            item.place ? (
+              <PlaceCard
+                key={item._id}
+                id={item.place._id}
+                name={item.place.name}
+                category={item.place.category}
+                city={item.place.city}
+                country={item.place.country}
+                latitude={item.place.latitude}
+                longitude={item.place.longitude}
+                description={item.place.description}
+                status={item.status}
+                rating={item.rating}
+              />
+            ) : null
+          )}
+        </div>
+      )}
+
+      {stats.visited > 0 && (
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatBox
+            label="Total Places"
+            value={stats.total}
+            icon={<MapPin className="text-primary" size={20} />}
+          />
+          <StatBox
+            label="Want to Visit"
+            value={stats.wantToVisit}
+            icon={<Heart className="text-primary" size={20} />}
+          />
+          <StatBox
+            label="Visited"
+            value={stats.visited}
+            icon={<CheckCircle className="text-secondary" size={20} />}
+          />
+          <StatBox
+            label="Countries"
+            value={stats.countries}
+            icon={<MapPin className="text-accent" size={20} />}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const StatBox = ({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+}) => (
+  <Card>
+    <CardContent className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-lg bg-border-light flex items-center justify-center">
+        {icon}
+      </div>
+      <div>
+        <p className="text-2xl font-bold text-foreground">{value}</p>
+        <p className="text-sm text-muted">{label}</p>
+      </div>
+    </CardContent>
+  </Card>
 );

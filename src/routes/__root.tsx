@@ -18,49 +18,6 @@ const fetchWorkosAuth = createServerFn({ method: 'GET' }).handler(async () => {
   };
 });
 
-export const Route = createRootRouteWithContext<{
-  queryClient: QueryClient;
-  convexClient: ConvexReactClient;
-  convexQueryClient: ConvexQueryClient;
-}>()({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'Wanderlust - Travel Planning',
-      },
-    ],
-    links: [
-      { rel: 'stylesheet', href: appCssUrl },
-      { rel: 'icon', href: '/convex.svg' },
-    ],
-  }),
-  component: RootComponent,
-  notFoundComponent: NotFoundPage,
-  errorComponent: ErrorPage,
-  beforeLoad: async (ctx) => {
-    const { userId, token } = await fetchWorkosAuth();
-
-    if (token) {
-      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
-    }
-
-    return { userId, token };
-  },
-});
-
-const RootComponent = () => (
-  <RootDocument>
-    <Outlet />
-  </RootDocument>
-);
-
 const RootDocument = ({ children }: Readonly<{ children: ReactNode }>) => (
   <html lang="en">
     <head>
@@ -71,6 +28,12 @@ const RootDocument = ({ children }: Readonly<{ children: ReactNode }>) => (
       <Scripts />
     </body>
   </html>
+);
+
+const RootComponent = () => (
+  <RootDocument>
+    <Outlet />
+  </RootDocument>
 );
 
 const NotFoundPage = () => (
@@ -117,3 +80,40 @@ const ErrorPage = ({ error }: { error: Error }) => (
     </div>
   </div>
 );
+
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+  convexClient: ConvexReactClient;
+  convexQueryClient: ConvexQueryClient;
+}>()({
+  head: () => ({
+    meta: [
+      {
+        charSet: 'utf-8',
+      },
+      {
+        name: 'viewport',
+        content: 'width=device-width, initial-scale=1',
+      },
+      {
+        title: 'Wanderlust - Travel Planning',
+      },
+    ],
+    links: [
+      { rel: 'stylesheet', href: appCssUrl },
+      { rel: 'icon', href: '/convex.svg' },
+    ],
+  }),
+  component: RootComponent,
+  notFoundComponent: NotFoundPage,
+  errorComponent: ErrorPage,
+  beforeLoad: async (ctx) => {
+    const { userId, token } = await fetchWorkosAuth();
+
+    if (token) {
+      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
+    }
+
+    return { userId, token };
+  },
+});
