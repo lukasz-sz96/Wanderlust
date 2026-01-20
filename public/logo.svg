@@ -1,0 +1,18 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="80" height="80" rx="18" fill="#E07A5F"/>
+  <g transform="translate(40, 40)">
+    <!-- Outer circle -->
+    <circle r="20" stroke="white" stroke-width="2" fill="none"/>
+    <!-- Compass needle - North (white) -->
+    <polygon points="0,-16 4,-4 0,-6 -4,-4" fill="white"/>
+    <!-- Compass needle - South (semi-transparent) -->
+    <polygon points="0,16 4,4 0,6 -4,4" fill="white" fill-opacity="0.5"/>
+    <!-- Center dot -->
+    <circle r="2" fill="white"/>
+    <!-- Direction markers -->
+    <line x1="0" y1="-20" x2="0" y2="-17" stroke="white" stroke-width="2"/>
+    <line x1="0" y1="20" x2="0" y2="17" stroke="white" stroke-width="2"/>
+    <line x1="-20" y1="0" x2="-17" y2="0" stroke="white" stroke-width="2"/>
+    <line x1="20" y1="0" x2="17" y2="0" stroke="white" stroke-width="2"/>
+  </g>
+</svg>
