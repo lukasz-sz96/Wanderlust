@@ -42,6 +42,5 @@ README.md
 CLAUDE.md
 *.md
 
-# Convex local files
+# Convex local files (keep _generated for build)
 .convex
-convex/_generated
