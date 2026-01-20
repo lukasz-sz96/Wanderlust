@@ -110,7 +110,7 @@ function ProPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className={isPro ? 'border-amber-200 bg-amber-50/50' : ''}>
+            <Card className={isPro ? 'border-amber-500/30 bg-amber-500/10' : ''}>
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
@@ -120,7 +120,7 @@ function ProPage() {
                     </p>
                   </div>
                   {isPro ? (
-                    <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-100 to-amber-50 text-amber-700 rounded-full border border-amber-200">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/20 to-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full border border-amber-500/30">
                       <Crown size={18} />
                       <span className="font-semibold">Pro Active</span>
                     </div>
@@ -148,7 +148,7 @@ function ProPage() {
                   <div className="p-4 font-semibold text-foreground text-center border-x border-border-light">
                     Free
                   </div>
-                  <div className="p-4 font-semibold text-amber-700 text-center bg-gradient-to-b from-amber-50 to-amber-100/50">
+                  <div className="p-4 font-semibold text-center bg-gradient-to-b from-amber-500/20 to-amber-500/10 text-amber-600 dark:text-amber-400">
                     <span className="flex items-center justify-center gap-1.5">
                       <Crown size={14} />
                       Pro
@@ -191,15 +191,15 @@ function ProPage() {
                         <span className="text-muted text-sm">{feature.free}</span>
                       )}
                     </div>
-                    <div className="p-4 flex items-center justify-center bg-amber-50/50">
+                    <div className="p-4 flex items-center justify-center bg-amber-500/10">
                       {typeof feature.pro === 'boolean' ? (
                         feature.pro ? (
-                          <Check size={18} className="text-amber-600" />
+                          <Check size={18} className="text-amber-500" />
                         ) : (
                           <span className="text-muted">—</span>
                         )
                       ) : (
-                        <span className="text-amber-700 font-medium text-sm">{feature.pro}</span>
+                        <span className="text-amber-600 dark:text-amber-400 font-medium text-sm">{feature.pro}</span>
                       )}
                     </div>
                   </motion.div>

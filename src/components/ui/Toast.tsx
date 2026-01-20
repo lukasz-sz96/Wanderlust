@@ -102,17 +102,24 @@ interface ToastItemProps {
 
 function ToastItem({ toast, onRemove }: ToastItemProps) {
   const icons = {
-    success: <CheckCircle className="text-green-500" size={20} />,
-    error: <XCircle className="text-red-500" size={20} />,
-    warning: <AlertCircle className="text-amber-500" size={20} />,
-    info: <Info className="text-blue-500" size={20} />,
+    success: <CheckCircle className="text-emerald-500" size={18} />,
+    error: <XCircle className="text-red-500" size={18} />,
+    warning: <AlertCircle className="text-amber-500" size={18} />,
+    info: <Info className="text-blue-500" size={18} />,
   };
 
   const backgrounds = {
-    success: 'bg-green-50 border-green-200',
-    error: 'bg-red-50 border-red-200',
-    warning: 'bg-amber-50 border-amber-200',
-    info: 'bg-blue-50 border-blue-200',
+    success: 'bg-surface border-emerald-500/30',
+    error: 'bg-surface border-red-500/30',
+    warning: 'bg-surface border-amber-500/30',
+    info: 'bg-surface border-blue-500/30',
+  };
+
+  const accents = {
+    success: 'bg-emerald-500',
+    error: 'bg-red-500',
+    warning: 'bg-amber-500',
+    info: 'bg-blue-500',
   };
 
   return (
@@ -122,15 +129,16 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, x: 100, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className={`flex items-start gap-3 p-4 rounded-xl border shadow-lg ${backgrounds[toast.type]}`}
+      className={`relative flex items-center gap-3 p-3 pr-10 rounded-xl border shadow-lg overflow-hidden ${backgrounds[toast.type]}`}
     >
-      <div className="flex-shrink-0">{icons[toast.type]}</div>
-      <p className="flex-1 text-sm font-medium text-foreground">{toast.message}</p>
+      <div className={`absolute left-0 top-0 bottom-0 w-1 ${accents[toast.type]}`} />
+      <div className="flex-shrink-0 ml-1">{icons[toast.type]}</div>
+      <p className="flex-1 text-sm font-medium text-foreground min-w-0">{toast.message}</p>
       <button
         onClick={() => onRemove(toast.id)}
-        className="flex-shrink-0 text-muted hover:text-foreground transition-colors"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-foreground transition-colors"
       >
-        <X size={16} />
+        <X size={14} />
       </button>
     </motion.div>
   );

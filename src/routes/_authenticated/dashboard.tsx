@@ -239,17 +239,6 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className={`
-          absolute z-30 top-4 bg-surface border border-border-light rounded-lg p-2
-          shadow-md hover:bg-border-light transition-all duration-300
-          ${sidebarOpen ? 'left-[19rem]' : 'left-4'}
-        `}
-      >
-        {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-      </button>
-
       <div className="flex-1 relative" ref={mapContainerRef}>
         <MapView
           latitude={defaultCenter.lat}
@@ -267,7 +256,15 @@ const DashboardPage = () => {
           containerRef={mapContainerRef}
         />
 
-        <div className="absolute top-4 left-4 z-10">
+        {/* Unified map controls bar */}
+        <div className="absolute top-4 left-4 z-30 flex items-center gap-2">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="flex items-center justify-center w-10 h-10 bg-surface/95 backdrop-blur-sm border border-border-light rounded-xl shadow-lg hover:bg-surface hover:scale-105 active:scale-95 transition-all"
+            aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+          >
+            {sidebarOpen ? <ChevronLeft size={18} className="text-foreground" /> : <ChevronRight size={18} className="text-foreground" />}
+          </button>
           <MapDiscoverToggle mode={mapMode} onChange={setMapMode} />
         </div>
 
