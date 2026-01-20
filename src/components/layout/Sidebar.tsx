@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, MapPin, Plane, BookOpen, Settings, LogOut, ChevronLeft, Compass, Rss, User, Crown, Shield } from 'lucide-react';
+import { Home, MapPin, Plane, BookOpen, Settings, LogOut, ChevronLeft, Compass, Rss, User, Crown, Shield, Users } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -21,6 +21,7 @@ const navItems: NavItem[] = [
   { label: 'Places', href: '/places', icon: <MapPin size={20} /> },
   { label: 'Trips', href: '/trips', icon: <Plane size={20} /> },
   { label: 'Journal', href: '/journal', icon: <BookOpen size={20} /> },
+  { label: 'Travelers', href: '/travelers', icon: <Users size={20} /> },
   { label: 'Discover', href: '/places/discover', icon: <Compass size={20} /> },
 ];
 

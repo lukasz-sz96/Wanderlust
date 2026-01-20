@@ -407,7 +407,7 @@ export const getStats = query({
     const visitedItems = items.filter((item) => item.status === 'visited');
     const countries = new Set<string>();
 
-    for (const item of visitedItems) {
+    for (const item of items) {
       const place = await ctx.db.get(item.placeId);
       if (place?.country) {
         countries.add(place.country);

@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
 import { Card, CardContent, Button, Badge, IconButton, PageLoading } from '../../../components/ui';
+import { PhotoUpload, PhotoGallery } from '../../../components/photos';
 import {
   ArrowLeft,
   BookOpen,
   Calendar,
   MapPin,
   Plane,
-  Edit,
   Trash2,
   Star,
   Smile,
@@ -18,9 +18,6 @@ import {
   Frown,
   Image,
   Upload,
-  X,
-  Loader2,
-  Cloud,
 } from 'lucide-react';
 import { formatTemperature } from '../../../lib/api/weather';
 
@@ -34,13 +31,9 @@ const JournalEntryPage = () => {
   const photos = useQuery(api.photos.listByJournalEntry, { journalEntryId: entryId as Id<'journalEntries'> });
 
   const deleteEntry = useMutation(api.journal.remove);
-  const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
-  const createPhoto = useMutation(api.photos.create);
-  const deletePhoto = useMutation(api.photos.remove);
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false);
 
   if (entry === undefined || photos === undefined) {
     return <PageLoading message="Loading entry..." />;
@@ -66,38 +59,6 @@ const JournalEntryPage = () => {
   const handleDelete = async () => {
     await deleteEntry({ entryId: entry._id });
     window.location.href = '/journal';
-  };
-
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    try {
-      const uploadUrl = await generateUploadUrl();
-      const response = await fetch(uploadUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': file.type },
-        body: file,
-      });
-      const { storageId } = await response.json();
-
-      await createPhoto({
-        storageId,
-        journalEntryId: entry._id,
-        tripId: entry.tripId,
-        placeId: entry.placeId,
-      });
-    } catch (error) {
-      console.error('Failed to upload photo:', error);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleDeletePhoto = async (photoId: Id<'photos'>) => {
-    await deletePhoto({ photoId });
-    setSelectedPhoto(null);
   };
 
   const getMoodIcon = (mood?: string) => {
@@ -231,88 +192,39 @@ const JournalEntryPage = () => {
                 <Image size={20} />
                 Photos ({photos.length})
               </h2>
-              <label className="cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                  disabled={isUploading}
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  leftIcon={isUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-                  disabled={isUploading}
-                  className="pointer-events-none"
-                >
-                  {isUploading ? 'Uploading...' : 'Add Photo'}
-                </Button>
-              </label>
+              <Button
+                variant="ghost"
+                size="sm"
+                leftIcon={<Upload size={14} />}
+                onClick={() => setShowPhotoUpload(!showPhotoUpload)}
+              >
+                {showPhotoUpload ? 'Hide Upload' : 'Add Photos'}
+              </Button>
             </div>
 
-            {photos.length === 0 ? (
+            {showPhotoUpload && (
+              <PhotoUpload
+                journalEntryId={entry._id}
+                tripId={entry.tripId}
+                placeId={entry.placeId}
+                className="mb-4"
+              />
+            )}
+
+            {photos.length === 0 && !showPhotoUpload ? (
               <div className="text-center py-8 border-2 border-dashed border-border-light rounded-xl">
                 <Image className="text-muted mx-auto mb-2" size={32} />
                 <p className="text-muted text-sm">No photos yet</p>
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                    disabled={isUploading}
-                  />
-                  <Button variant="ghost" size="sm" className="mt-2 pointer-events-none">
-                    Upload your first photo
-                  </Button>
-                </label>
+                <Button variant="ghost" size="sm" className="mt-2" onClick={() => setShowPhotoUpload(true)}>
+                  Upload your first photo
+                </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {photos.map((photo) => (
-                  <div
-                    key={photo._id}
-                    className="aspect-square rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-opacity relative group"
-                    onClick={() => setSelectedPhoto(photo.url)}
-                  >
-                    <img src={photo.url} alt={photo.caption || 'Photo'} className="w-full h-full object-cover" />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeletePhoto(photo._id);
-                      }}
-                      className="absolute top-2 right-2 p-1.5 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
+              <PhotoGallery photos={photos} editable />
             )}
           </div>
         </CardContent>
       </Card>
-
-      {selectedPhoto && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90"
-          onClick={() => setSelectedPhoto(null)}
-        >
-          <button
-            className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
-            onClick={() => setSelectedPhoto(null)}
-          >
-            <X size={24} />
-          </button>
-          <img
-            src={selectedPhoto}
-            alt="Full size"
-            className="max-w-full max-h-full object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

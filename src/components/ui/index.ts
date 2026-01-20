@@ -25,3 +25,4 @@ export {
   SkeletonMap,
 } from './Skeleton';
 export { ToastProvider, useToast } from './Toast';
+export { RichTextEditor } from './RichTextEditor';

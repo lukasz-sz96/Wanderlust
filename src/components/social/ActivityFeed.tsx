@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useQuery } from 'convex/react';
+import { Link } from '@tanstack/react-router';
 import { api } from '../../../convex/_generated/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ActivityCard } from './ActivityCard';
 import { Skeleton } from '../ui/Skeleton';
 import { Button } from '../ui/Button';
-import { Users, RefreshCw, ChevronDown } from 'lucide-react';
+import { Users, RefreshCw, ChevronDown, UserPlus } from 'lucide-react';
 
 interface ActivityFeedProps {
   className?: string;
@@ -13,6 +14,7 @@ interface ActivityFeedProps {
 
 type Activity = {
   _id: string;
+  userId: string;
   type: 'trip_created' | 'place_visited' | 'journal_posted' | 'place_added';
   referenceId: string;
   metadata?: {
@@ -24,10 +26,9 @@ type Activity = {
   };
   createdAt: number;
   user: {
-    _id: string;
     displayName?: string;
     avatarUrl?: string;
-    role: string;
+    role?: string;
   };
 };
 
@@ -84,9 +85,14 @@ export function ActivityFeed({ className = '' }: ActivityFeedProps) {
         <h3 className="text-lg font-semibold text-foreground mb-2">
           Your feed is empty
         </h3>
-        <p className="text-muted max-w-sm">
+        <p className="text-muted max-w-sm mb-4">
           Follow travelers to see their adventures here
         </p>
+        <Link to="/travelers">
+          <Button variant="primary" leftIcon={<UserPlus size={16} />}>
+            Find Travelers to Follow
+          </Button>
+        </Link>
       </motion.div>
     );
   }

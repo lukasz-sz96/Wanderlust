@@ -3,6 +3,7 @@ import { useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Button, Card, Input, Textarea } from '../ui';
 import { X, Plane, Loader2 } from 'lucide-react';
+import { geocodeLocation } from '../../lib/api/overpass';
 
 interface CreateTripModalProps {
   isOpen: boolean;
@@ -25,16 +26,21 @@ export const CreateTripModal = ({ isOpen, onClose }: CreateTripModalProps) => {
 
     setIsSubmitting(true);
     try {
+      let destination: { name: string; latitude: number; longitude: number } | undefined;
+
+      if (destinationName.trim()) {
+        const geocoded = await geocodeLocation(destinationName.trim());
+        destination = {
+          name: destinationName.trim(),
+          latitude: geocoded?.latitude ?? 0,
+          longitude: geocoded?.longitude ?? 0,
+        };
+      }
+
       const tripId = await createTrip({
         title: title.trim(),
         description: description.trim() || undefined,
-        destination: destinationName.trim()
-          ? {
-              name: destinationName.trim(),
-              latitude: 0,
-              longitude: 0,
-            }
-          : undefined,
+        destination,
         startDate: startDate || undefined,
         endDate: endDate || undefined,
       });

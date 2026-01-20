@@ -137,6 +137,9 @@ export const updatePreferences = mutation({
   args: {
     defaultMapStyle: v.optional(v.string()),
     temperatureUnit: v.optional(v.union(v.literal('celsius'), v.literal('fahrenheit'))),
+    distanceUnit: v.optional(v.union(v.literal('km'), v.literal('mi'))),
+    dateFormat: v.optional(v.union(v.literal('mdy'), v.literal('dmy'), v.literal('ymd'))),
+    profileVisibility: v.optional(v.union(v.literal('public'), v.literal('private'))),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -154,15 +157,14 @@ export const updatePreferences = mutation({
       throw new Error('User not found');
     }
 
-    const currentPreferences = user.preferences || {};
+    const currentPreferences = (user.preferences || {}) as Record<string, unknown>;
     const newPreferences = {
       ...currentPreferences,
-      ...(args.defaultMapStyle !== undefined && {
-        defaultMapStyle: args.defaultMapStyle,
-      }),
-      ...(args.temperatureUnit !== undefined && {
-        temperatureUnit: args.temperatureUnit,
-      }),
+      ...(args.defaultMapStyle !== undefined && { defaultMapStyle: args.defaultMapStyle }),
+      ...(args.temperatureUnit !== undefined && { temperatureUnit: args.temperatureUnit }),
+      ...(args.distanceUnit !== undefined && { distanceUnit: args.distanceUnit }),
+      ...(args.dateFormat !== undefined && { dateFormat: args.dateFormat }),
+      ...(args.profileVisibility !== undefined && { profileVisibility: args.profileVisibility }),
     };
 
     await ctx.db.patch(user._id, {
@@ -175,12 +177,14 @@ export const updatePreferences = mutation({
 });
 
 /**
- * Update user profile (display name and avatar).
+ * Update user profile (display name, avatar, bio, and home location).
  */
 export const updateProfile = mutation({
   args: {
     displayName: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
+    bio: v.optional(v.string()),
+    homeLocation: v.optional(v.string()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -201,6 +205,8 @@ export const updateProfile = mutation({
     await ctx.db.patch(user._id, {
       ...(args.displayName !== undefined && { displayName: args.displayName }),
       ...(args.avatarUrl !== undefined && { avatarUrl: args.avatarUrl }),
+      ...(args.bio !== undefined && { bio: args.bio }),
+      ...(args.homeLocation !== undefined && { homeLocation: args.homeLocation }),
       updatedAt: Date.now(),
     });
 

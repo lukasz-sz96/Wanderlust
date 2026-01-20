@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { Mail, Lock, MapPin, Loader2, Compass, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, MapPin, Loader2, Compass, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { Button, Input, Card, CardContent } from '../components/ui';
 import { authClient } from '../lib/auth-client';
 
@@ -13,6 +13,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -99,16 +100,35 @@ function LoginPage() {
                   autoComplete="email"
                 />
 
-                <Input
-                  label="Password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  leftIcon={<Lock size={18} />}
-                  required
-                  autoComplete="current-password"
-                />
+                <div className="relative">
+                  <Input
+                    label="Password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    leftIcon={<Lock size={18} />}
+                    required
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-9 text-muted hover:text-foreground transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+
+                <div className="flex justify-end">
+                  <Link
+                    to="/forgot-password"
+                    className="text-sm text-primary hover:text-primary-hover transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
 
                 <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoading}>
                   {isLoading ? (

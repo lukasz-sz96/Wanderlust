@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../../../convex/_generated/api';
 import { useCurrentUser } from '../../lib/hooks/useUserSync';
 import { useOnboarding } from '../../lib/hooks/useOnboarding';
-import { MapView } from '../../components/maps';
-import { Card, Badge, Button } from '../../components/ui';
+import { MapView, MapPlacePopup, type PlacePopupData, type MarkerClickEvent } from '../../components/maps';
+import { Card, Button } from '../../components/ui';
 import { AddPlaceModal } from '../../components/places';
 import { OnboardingModal } from '../../components/onboarding';
 import { MapPin, Plane, BookOpen, ChevronLeft, ChevronRight, Plus, Heart, CheckCircle, Star } from 'lucide-react';
@@ -19,23 +19,52 @@ const DashboardPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const { showOnboarding, completeOnboarding } = useOnboarding();
+  const [greeting, setGreeting] = useState('Hello');
+  const [selectedPlace, setSelectedPlace] = useState<PlacePopupData | null>(null);
+  const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | undefined>();
+
+  useEffect(() => {
+    setGreeting(getGreeting());
+  }, []);
 
   const bucketListItems = useQuery(api.bucketList.list, {});
   const stats = useQuery(api.bucketList.getStats, {});
 
-  const greeting = getGreeting();
   const displayName = user?.displayName?.split(' ')[0] || 'Traveler';
 
   const markers =
     bucketListItems
       ?.filter((item) => item.place)
       .map((item) => ({
-        id: item._id,
+        id: item.place!._id,
         latitude: item.place!.latitude,
         longitude: item.place!.longitude,
         label: item.place!.name,
         color: item.status === 'visited' ? '#81B29A' : '#E07A5F',
       })) ?? [];
+
+  const handleMarkerClick = (event: MarkerClickEvent) => {
+    const bucketItem = bucketListItems?.find((item) => item.place?._id === event.markerId);
+    if (bucketItem?.place) {
+      setSelectedPlace({
+        id: bucketItem.place._id,
+        name: bucketItem.place.name,
+        city: bucketItem.place.city,
+        country: bucketItem.place.country,
+        latitude: bucketItem.place.latitude,
+        longitude: bucketItem.place.longitude,
+        status: bucketItem.status,
+        rating: bucketItem.rating,
+        category: bucketItem.place.category,
+      });
+      setPopupPosition(event.position);
+    }
+  };
+
+  const handleClosePopup = () => {
+    setSelectedPlace(null);
+    setPopupPosition(undefined);
+  };
 
   const defaultCenter =
     markers.length > 0 ? { lat: markers[0].latitude, lng: markers[0].longitude } : { lat: 48.8566, lng: 2.3522 };
@@ -180,6 +209,13 @@ const DashboardPage = () => {
           zoom={markers.length > 0 ? 4 : 3}
           markers={markers}
           className="h-full"
+          onMarkerClick={handleMarkerClick}
+        />
+
+        <MapPlacePopup
+          place={selectedPlace}
+          onClose={handleClosePopup}
+          position={popupPosition}
         />
 
         {markers.length > 0 && (

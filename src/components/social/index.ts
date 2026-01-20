@@ -6,3 +6,4 @@ export { UserCard } from './UserCard';
 export { ActivityCard } from './ActivityCard';
 export { ActivityFeed } from './ActivityFeed';
 export { ShareTripModal } from './ShareTripModal';
+export { FollowersModal } from './FollowersModal';

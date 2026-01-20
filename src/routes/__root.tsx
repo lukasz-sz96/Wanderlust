@@ -13,12 +13,22 @@ const fetchAuth = createServerFn({ method: 'GET' }).handler(async () => {
   return { token };
 });
 
+const themeScript = `
+  (function() {
+    try {
+      var theme = localStorage.getItem('wanderlust-theme') || 'system';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+`;
+
 const RootDocument = ({ children }: Readonly<{ children: ReactNode }>) => (
-  <html lang="en">
+  <html lang="en" data-theme="system" suppressHydrationWarning>
     <head>
       <HeadContent />
+      <script dangerouslySetInnerHTML={{ __html: themeScript }} />
     </head>
-    <body>
+    <body suppressHydrationWarning>
       {children}
       <Scripts />
     </body>

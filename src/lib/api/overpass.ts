@@ -229,6 +229,55 @@ export const searchByBoundingBox = async (
   return parseResults(data);
 };
 
+export interface GeocodedLocation {
+  latitude: number;
+  longitude: number;
+  displayName: string;
+  city?: string;
+  country?: string;
+}
+
+export const geocodeLocation = async (query: string): Promise<GeocodedLocation | null> => {
+  const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
+
+  const params = new URLSearchParams({
+    q: query,
+    format: 'jsonv2',
+    addressdetails: '1',
+    limit: '1',
+  });
+
+  try {
+    const response = await fetch(`${NOMINATIM_URL}?${params.toString()}`, {
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    if (!data || data.length === 0) {
+      return null;
+    }
+
+    const item = data[0];
+    const address = item.address || {};
+
+    return {
+      latitude: parseFloat(item.lat),
+      longitude: parseFloat(item.lon),
+      displayName: item.display_name,
+      city: address.city || address.town || address.village || address.municipality || address.state,
+      country: address.country,
+    };
+  } catch {
+    return null;
+  }
+};
+
 export const searchByName = async (name: string): Promise<SearchResult[]> => {
   const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 

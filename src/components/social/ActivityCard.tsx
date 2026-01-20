@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
+import { Link } from '@tanstack/react-router';
 import { Avatar } from '../ui/Avatar';
 import { ProBadge } from './ProBadge';
 import { Id } from '../../../convex/_generated/dataModel';
-import { Plane, MapPin, BookOpen, MapPinPlus, Star, LucideIcon } from 'lucide-react';
+import { Plane, MapPin, BookOpen, MapPinPlus, Star, LucideIcon, ChevronRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 type ActivityType = 'trip_created' | 'place_visited' | 'journal_posted' | 'place_added';
@@ -10,6 +11,7 @@ type ActivityType = 'trip_created' | 'place_visited' | 'journal_posted' | 'place
 interface ActivityCardProps {
   activity: {
     _id: Id<'activityFeed'>;
+    userId: Id<'users'>;
     type: ActivityType;
     referenceId: string;
     metadata?: {
@@ -21,10 +23,9 @@ interface ActivityCardProps {
     };
     createdAt: number;
     user: {
-      _id: Id<'users'>;
       displayName?: string;
       avatarUrl?: string;
-      role: string;
+      role?: string;
     };
   };
   animate?: boolean;
@@ -65,10 +66,10 @@ const activityConfig: Record<ActivityType, ActivityConfig> = {
 };
 
 export function ActivityCard({ activity, animate = true }: ActivityCardProps) {
-  const { user, type, metadata, createdAt } = activity;
+  const { user, userId, type, metadata, createdAt, referenceId } = activity;
   const config = activityConfig[type];
   const Icon = config.icon;
-  const isPro = ['pro', 'moderator', 'admin'].includes(user.role);
+  const isPro = user.role ? ['pro', 'moderator', 'admin'].includes(user.role) : false;
 
   const getActivityText = () => {
     switch (type) {
@@ -85,6 +86,22 @@ export function ActivityCard({ activity, animate = true }: ActivityCardProps) {
     }
   };
 
+  const getActivityLink = (): string | null => {
+    switch (type) {
+      case 'trip_created':
+        return `/trips/${referenceId}`;
+      case 'place_visited':
+      case 'place_added':
+        return `/places/${referenceId}`;
+      case 'journal_posted':
+        return `/journal/${referenceId}`;
+      default:
+        return null;
+    }
+  };
+
+  const activityLink = getActivityLink();
+
   return (
     <motion.div
       initial={animate ? { opacity: 0, y: 10 } : undefined}
@@ -95,7 +112,7 @@ export function ActivityCard({ activity, animate = true }: ActivityCardProps) {
                  hover:shadow-md transition-all duration-200"
     >
       <div className="flex gap-3">
-        <a href={`/profile/${user._id}`} className="flex-shrink-0">
+        <Link to="/profile/$userId" params={{ userId }} className="flex-shrink-0">
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
             <Avatar
               src={user.avatarUrl}
@@ -103,17 +120,18 @@ export function ActivityCard({ activity, animate = true }: ActivityCardProps) {
               size="md"
             />
           </motion.div>
-        </a>
+        </Link>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <a
-                href={`/profile/${user._id}`}
+              <Link
+                to="/profile/$userId"
+                params={{ userId }}
                 className="font-medium text-foreground hover:text-primary transition-colors"
               >
                 {user.displayName || 'Traveler'}
-              </a>
+              </Link>
               {isPro && <ProBadge size="sm" />}
             </div>
             <span className="text-xs text-muted whitespace-nowrap">
@@ -121,13 +139,24 @@ export function ActivityCard({ activity, animate = true }: ActivityCardProps) {
             </span>
           </div>
 
-          <p className="mt-1.5 text-muted flex items-center flex-wrap gap-1">
+          <div className="mt-1.5 text-muted flex items-center flex-wrap gap-1">
             <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${config.bgColor}`}>
               <Icon size={12} className={config.color} />
             </span>
             <span>{config.verb}</span>
-            <span className="font-medium text-foreground">{getActivityText()}</span>
-          </p>
+            {activityLink ? (
+              <Link
+                to={activityLink}
+                className="font-medium text-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {getActivityText()}
+                <ChevronRight size={14} className="opacity-50" />
+              </Link>
+            ) : (
+              <span className="font-medium text-foreground">{getActivityText()}</span>
+            )}
+          </div>
 
           {type === 'place_visited' && metadata?.rating && (
             <motion.div

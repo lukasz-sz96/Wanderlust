@@ -736,3 +736,113 @@ export const searchUsers = query({
     }));
   },
 });
+
+// Get suggested users to follow (public profiles the user isn't following yet)
+export const getSuggestedUsers = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  returns: v.array(
+    v.object({
+      _id: v.id('users'),
+      displayName: v.optional(v.string()),
+      avatarUrl: v.optional(v.string()),
+      bio: v.optional(v.string()),
+      homeLocation: v.optional(v.string()),
+      role: v.optional(v.union(v.literal('free'), v.literal('pro'), v.literal('moderator'), v.literal('admin'))),
+      stats: v.object({
+        trips: v.number(),
+        places: v.number(),
+        followers: v.number(),
+      }),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    const currentUser = identity
+      ? await ctx.db
+          .query('users')
+          .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
+          .unique()
+      : null;
+    const limit = Math.min(args.limit || 20, 50);
+
+    // Get IDs of users the current user follows
+    const followingIds = new Set<string>();
+    if (currentUser) {
+      const follows = await ctx.db
+        .query('follows')
+        .withIndex('by_follower', (q) => q.eq('followerId', currentUser._id))
+        .collect();
+      for (const follow of follows) {
+        followingIds.add(follow.followingId);
+      }
+    }
+
+    // Fetch public users the current user isn't following
+    const allUsers = await ctx.db.query('users').take(200);
+
+    const publicUsers = allUsers.filter((user) => {
+      const visibility = user.profileVisibility || 'public';
+      if (visibility !== 'public') return false;
+      if (currentUser && user._id === currentUser._id) return false;
+      if (followingIds.has(user._id)) return false;
+      return true;
+    });
+
+    // Batch fetch stats for all public users
+    const userIds = publicUsers.map((u) => u._id);
+
+    const [tripsResults, placesResults, followersResults] = await Promise.all([
+      Promise.all(
+        userIds.map((userId) =>
+          ctx.db
+            .query('trips')
+            .withIndex('by_user', (q) => q.eq('userId', userId))
+            .collect()
+        )
+      ),
+      Promise.all(
+        userIds.map((userId) =>
+          ctx.db
+            .query('places')
+            .withIndex('by_user', (q) => q.eq('userId', userId))
+            .collect()
+        )
+      ),
+      Promise.all(
+        userIds.map((userId) =>
+          ctx.db
+            .query('follows')
+            .withIndex('by_following', (q) => q.eq('followingId', userId))
+            .collect()
+        )
+      ),
+    ]);
+
+    // Build users with stats and sort by activity
+    const usersWithStats = publicUsers.map((user, index) => ({
+      _id: user._id,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      homeLocation: user.homeLocation,
+      role: user.role,
+      stats: {
+        trips: tripsResults[index].length,
+        places: placesResults[index].length,
+        followers: followersResults[index].length,
+      },
+      score:
+        tripsResults[index].length * 3 +
+        placesResults[index].length * 2 +
+        followersResults[index].length * 5,
+    }));
+
+    // Sort by activity score (most active first)
+    usersWithStats.sort((a, b) => b.score - a.score);
+
+    // Return limited results without the score field
+    return usersWithStats.slice(0, limit).map(({ score, ...user }) => user);
+  },
+});

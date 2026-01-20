@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useMutation, useQuery } from 'convex/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
-import { Button, Card, CardContent, Input, Textarea, PageLoading } from '../../../components/ui';
-import { ArrowLeft, Save, Calendar, MapPin, Plane, Star, Smile, Meh, Frown, Loader2, Cloud } from 'lucide-react';
+import { Button, Card, CardContent, Input, PageLoading, RichTextEditor } from '../../../components/ui';
+import { ArrowLeft, Save, Calendar, MapPin, Plane, Star, Smile, Meh, Frown, Loader2, Cloud, Search, X } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { fetchHistoricalWeather, formatTemperature, type HistoricalWeather } from '../../../lib/api/weather';
 
@@ -14,23 +14,60 @@ export const Route = createFileRoute('/_authenticated/journal/new')({
 
 type Mood = 'amazing' | 'good' | 'neutral' | 'challenging';
 
+const getTodayDate = () => new Date().toISOString().split('T')[0];
+
 const NewJournalEntryPage = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [entryDate, setEntryDate] = useState(new Date().toISOString().split('T')[0]);
+  const [content, setContent] = useState<any>(null);
+  const [entryDate, setEntryDate] = useState('');
   const [mood, setMood] = useState<Mood | undefined>();
   const [tripId, setTripId] = useState<Id<'trips'> | undefined>();
   const [placeId, setPlaceId] = useState<Id<'places'> | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [weather, setWeather] = useState<HistoricalWeather | null>(null);
   const [isLoadingWeather, setIsLoadingWeather] = useState(false);
+  const [placeSearchTerm, setPlaceSearchTerm] = useState('');
+  const [showPlaceDropdown, setShowPlaceDropdown] = useState(false);
+  const placeDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (placeDropdownRef.current && !placeDropdownRef.current.contains(event.target as Node)) {
+        setShowPlaceDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const hasContent = () => {
+    if (!content) return false;
+    if (content.type === 'doc' && content.content) {
+      return content.content.some((node: any) => {
+        if (node.content) {
+          return node.content.some((child: any) => child.text?.trim());
+        }
+        return false;
+      });
+    }
+    return false;
+  };
+
+  useEffect(() => {
+    setEntryDate(getTodayDate());
+  }, []);
 
   const trips = useQuery(api.trips.list, {});
   const bucketList = useQuery(api.bucketList.list, {});
   const createEntry = useMutation(api.journal.create);
+  const placeSearchResults = useQuery(
+    api.places.search,
+    placeSearchTerm.length >= 2 ? { searchTerm: placeSearchTerm } : 'skip'
+  );
+  const allPlaces = useQuery(api.places.list, {});
 
-  const selectedPlace = bucketList?.find((item) => item.place?._id === placeId)?.place;
+  const selectedPlace = allPlaces?.find((place) => place._id === placeId);
 
   useEffect(() => {
     if (!placeId || !entryDate || !selectedPlace) {
@@ -61,13 +98,13 @@ const NewJournalEntryPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim()) return;
+    if (!hasContent()) return;
 
     setIsSubmitting(true);
     try {
       const entryId = await createEntry({
         title: title.trim() || undefined,
-        content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: content }] }] },
+        content,
         entryDate,
         mood,
         tripId,
@@ -150,13 +187,14 @@ const NewJournalEntryPage = () => {
               </div>
             </div>
 
-            <Textarea
-              label="What happened today?"
-              placeholder="Write about your experiences, thoughts, and memories..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={10}
-            />
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">What happened today?</label>
+              <RichTextEditor
+                content=""
+                onChange={setContent}
+                placeholder="Write about your experiences, thoughts, and memories..."
+              />
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -178,25 +216,97 @@ const NewJournalEntryPage = () => {
                 </select>
               </div>
 
-              <div>
+              <div className="relative" ref={placeDropdownRef}>
                 <label className="block text-sm font-medium text-foreground mb-2">
                   <MapPin size={14} className="inline mr-1" />
                   Link to Place (optional)
                 </label>
-                <select
-                  value={placeId || ''}
-                  onChange={(e) => setPlaceId(e.target.value ? (e.target.value as Id<'places'>) : undefined)}
-                  className="w-full px-3 py-2 rounded-lg border border-border-light bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="">No place</option>
-                  {bucketList.map((item) =>
-                    item.place ? (
-                      <option key={item.place._id} value={item.place._id}>
-                        {item.place.name}
-                      </option>
-                    ) : null,
-                  )}
-                </select>
+                {selectedPlace ? (
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border-light bg-surface">
+                    <MapPin size={16} className="text-primary" />
+                    <span className="flex-1 text-foreground">{selectedPlace.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => setPlaceId(undefined)}
+                      className="p-1 rounded hover:bg-border-light text-muted hover:text-foreground"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
+                      <input
+                        type="text"
+                        value={placeSearchTerm}
+                        onChange={(e) => {
+                          setPlaceSearchTerm(e.target.value);
+                          setShowPlaceDropdown(true);
+                        }}
+                        onFocus={() => setShowPlaceDropdown(true)}
+                        placeholder="Search places..."
+                        className="w-full pl-9 pr-3 py-2 rounded-lg border border-border-light bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+                    {showPlaceDropdown && (
+                      <div className="absolute z-10 w-full mt-1 max-h-48 overflow-y-auto rounded-lg border border-border-light bg-surface shadow-lg">
+                        {placeSearchTerm.length >= 2 ? (
+                          placeSearchResults === undefined ? (
+                            <div className="p-3 text-center text-muted">Searching...</div>
+                          ) : placeSearchResults.length === 0 ? (
+                            <div className="p-3 text-center text-muted">No places found</div>
+                          ) : (
+                            placeSearchResults.map((place) => (
+                              <button
+                                key={place._id}
+                                type="button"
+                                onClick={() => {
+                                  setPlaceId(place._id);
+                                  setPlaceSearchTerm('');
+                                  setShowPlaceDropdown(false);
+                                }}
+                                className="w-full text-left px-3 py-2 hover:bg-border-light transition-colors"
+                              >
+                                <p className="font-medium text-foreground">{place.name}</p>
+                                <p className="text-sm text-muted">
+                                  {[place.city, place.country].filter(Boolean).join(', ')}
+                                </p>
+                              </button>
+                            ))
+                          )
+                        ) : bucketList && bucketList.length > 0 ? (
+                          <>
+                            <div className="px-3 py-2 text-xs font-medium text-muted border-b border-border-light">
+                              Recent places
+                            </div>
+                            {bucketList.slice(0, 5).map((item) =>
+                              item.place ? (
+                                <button
+                                  key={item.place._id}
+                                  type="button"
+                                  onClick={() => {
+                                    setPlaceId(item.place!._id);
+                                    setPlaceSearchTerm('');
+                                    setShowPlaceDropdown(false);
+                                  }}
+                                  className="w-full text-left px-3 py-2 hover:bg-border-light transition-colors"
+                                >
+                                  <p className="font-medium text-foreground">{item.place.name}</p>
+                                  <p className="text-sm text-muted">
+                                    {[item.place.city, item.place.country].filter(Boolean).join(', ')}
+                                  </p>
+                                </button>
+                              ) : null,
+                            )}
+                          </>
+                        ) : (
+                          <div className="p-3 text-center text-muted">Type to search places</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -238,7 +348,7 @@ const NewJournalEntryPage = () => {
               <Button
                 type="submit"
                 variant="primary"
-                disabled={!content.trim() || isSubmitting}
+                disabled={!hasContent() || isSubmitting}
                 leftIcon={isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
               >
                 Save Entry

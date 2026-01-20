@@ -19,6 +19,11 @@ export interface MapMarker {
   color?: string;
 }
 
+export interface MarkerClickEvent {
+  markerId: string;
+  position: { x: number; y: number };
+}
+
 interface MapViewProps {
   latitude?: number;
   longitude?: number;
@@ -27,7 +32,7 @@ interface MapViewProps {
   style?: 'streets' | 'outdoors' | 'satellite';
   interactive?: boolean;
   showNavigation?: boolean;
-  onMarkerClick?: (markerId: string) => void;
+  onMarkerClick?: (event: MarkerClickEvent) => void;
   onMapClick?: (lat: number, lng: number) => void;
   className?: string;
 }
@@ -84,7 +89,14 @@ export const MapView = ({
             latitude={marker.latitude}
             longitude={marker.longitude}
             anchor="bottom"
-            onClick={() => onMarkerClick?.(marker.id)}
+            onClick={(e) => {
+              e.originalEvent.stopPropagation();
+              const rect = (e.originalEvent.target as HTMLElement).getBoundingClientRect();
+              onMarkerClick?.({
+                markerId: marker.id,
+                position: { x: rect.left + rect.width / 2, y: rect.top },
+              });
+            }}
           >
             <div className="cursor-pointer transform hover:scale-110 transition-transform" title={marker.label}>
               <div

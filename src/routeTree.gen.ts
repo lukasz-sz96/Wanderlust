@@ -10,10 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SharedShareCodeRouteImport } from './routes/shared/$shareCode'
+import { Route as AuthenticatedTravelersRouteImport } from './routes/_authenticated/travelers'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProRouteImport } from './routes/_authenticated/pro'
 import { Route as AuthenticatedFeedRouteImport } from './routes/_authenticated/feed'
@@ -36,9 +39,19 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -54,6 +67,11 @@ const SharedShareCodeRoute = SharedShareCodeRouteImport.update({
   id: '/shared/$shareCode',
   path: '/shared/$shareCode',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedTravelersRoute = AuthenticatedTravelersRouteImport.update({
+  id: '/travelers',
+  path: '/travelers',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
@@ -146,12 +164,15 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/feed': typeof AuthenticatedFeedRoute
   '/pro': typeof AuthenticatedProRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/travelers': typeof AuthenticatedTravelersRoute
   '/shared/$shareCode': typeof SharedShareCodeRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
@@ -168,12 +189,15 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/feed': typeof AuthenticatedFeedRoute
   '/pro': typeof AuthenticatedProRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/travelers': typeof AuthenticatedTravelersRoute
   '/shared/$shareCode': typeof SharedShareCodeRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
@@ -192,12 +216,15 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/feed': typeof AuthenticatedFeedRoute
   '/_authenticated/pro': typeof AuthenticatedProRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/travelers': typeof AuthenticatedTravelersRoute
   '/shared/$shareCode': typeof SharedShareCodeRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
@@ -216,12 +243,15 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/signup'
     | '/dashboard'
     | '/feed'
     | '/pro'
     | '/settings'
+    | '/travelers'
     | '/shared/$shareCode'
     | '/admin/users'
     | '/journal/$entryId'
@@ -238,12 +268,15 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/signup'
     | '/dashboard'
     | '/feed'
     | '/pro'
     | '/settings'
+    | '/travelers'
     | '/shared/$shareCode'
     | '/admin/users'
     | '/journal/$entryId'
@@ -261,12 +294,15 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/signup'
     | '/_authenticated/dashboard'
     | '/_authenticated/feed'
     | '/_authenticated/pro'
     | '/_authenticated/settings'
+    | '/_authenticated/travelers'
     | '/shared/$shareCode'
     | '/_authenticated/admin/users'
     | '/_authenticated/journal/$entryId'
@@ -285,7 +321,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   SharedShareCodeRoute: typeof SharedShareCodeRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -300,11 +338,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -327,6 +379,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/shared/$shareCode'
       preLoaderRoute: typeof SharedShareCodeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/travelers': {
+      id: '/_authenticated/travelers'
+      path: '/travelers'
+      fullPath: '/travelers'
+      preLoaderRoute: typeof AuthenticatedTravelersRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
@@ -448,6 +507,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedFeedRoute: typeof AuthenticatedFeedRoute
   AuthenticatedProRoute: typeof AuthenticatedProRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedTravelersRoute: typeof AuthenticatedTravelersRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedJournalEntryIdRoute: typeof AuthenticatedJournalEntryIdRoute
   AuthenticatedJournalNewRoute: typeof AuthenticatedJournalNewRoute
@@ -466,6 +526,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedFeedRoute: AuthenticatedFeedRoute,
   AuthenticatedProRoute: AuthenticatedProRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedTravelersRoute: AuthenticatedTravelersRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedJournalEntryIdRoute: AuthenticatedJournalEntryIdRoute,
   AuthenticatedJournalNewRoute: AuthenticatedJournalNewRoute,
@@ -486,7 +547,9 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   SharedShareCodeRoute: SharedShareCodeRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

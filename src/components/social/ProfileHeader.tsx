@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Calendar, Settings } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { ProBadge } from './ProBadge';
 import { FollowButton } from './FollowButton';
+import { FollowersModal } from './FollowersModal';
 import { Button } from '../ui/Button';
 import { Id } from '../../../convex/_generated/dataModel';
 import { Link } from '@tanstack/react-router';
@@ -34,12 +36,20 @@ export function ProfileHeader({
   isFollowing,
   onFollowChange,
 }: ProfileHeaderProps) {
+  const [showFollowersModal, setShowFollowersModal] = useState(false);
+  const [followersModalTab, setFollowersModalTab] = useState<'followers' | 'following'>('followers');
+
   const joinDate = new Date(user.createdAt).toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',
   });
 
   const isPro = ['pro', 'moderator', 'admin'].includes(user.role);
+
+  const openFollowersModal = (tab: 'followers' | 'following') => {
+    setFollowersModalTab(tab);
+    setShowFollowersModal(true);
+  };
 
   return (
     <motion.div
@@ -63,7 +73,7 @@ export function ProfileHeader({
         {/* Decorative pattern overlay */}
         {!user.coverPhotoUrl && (
           <div
-            className="absolute inset-0 opacity-10"
+            className="absolute inset-0 opacity-10 pointer-events-none"
             style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
             }}
@@ -140,13 +150,19 @@ export function ProfileHeader({
           </div>
 
           <div className="flex gap-5 mt-4">
-            <button className="group text-foreground hover:text-primary transition-colors">
+            <button
+              onClick={() => openFollowersModal('followers')}
+              className="group text-foreground hover:text-primary transition-colors"
+            >
               <strong className="font-semibold">{stats.followers.toLocaleString()}</strong>{' '}
               <span className="text-muted group-hover:text-primary/70 transition-colors">
                 followers
               </span>
             </button>
-            <button className="group text-foreground hover:text-primary transition-colors">
+            <button
+              onClick={() => openFollowersModal('following')}
+              className="group text-foreground hover:text-primary transition-colors"
+            >
               <strong className="font-semibold">{stats.following.toLocaleString()}</strong>{' '}
               <span className="text-muted group-hover:text-primary/70 transition-colors">
                 following
@@ -155,6 +171,13 @@ export function ProfileHeader({
           </div>
         </motion.div>
       </div>
+
+      <FollowersModal
+        userId={user._id}
+        initialTab={followersModalTab}
+        isOpen={showFollowersModal}
+        onClose={() => setShowFollowersModal(false)}
+      />
     </motion.div>
   );
 }

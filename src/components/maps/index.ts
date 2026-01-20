@@ -1,1 +1,2 @@
-export { MapView, type MapMarker } from './MapView';
+export { MapView, type MapMarker, type MarkerClickEvent } from './MapView';
+export { MapPlacePopup, type PlacePopupData } from './MapPlacePopup';

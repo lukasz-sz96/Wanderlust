@@ -5,22 +5,24 @@ import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
 import { MapView } from '../../../components/maps';
 import { Card, CardContent, Button, Badge, IconButton, PageLoading, Input } from '../../../components/ui';
+import { PhotoUpload, PhotoGallery } from '../../../components/photos';
 import {
   ArrowLeft,
   Plane,
   MapPin,
   Calendar,
   Plus,
-  Edit,
   Trash2,
   Clock,
   Utensils,
   Car,
   Home,
-  MoreHorizontal,
-  GripVertical,
   CheckCircle,
   Share2,
+  Image,
+  Upload,
+  Search,
+  X,
 } from 'lucide-react';
 import { ShareTripModal } from '../../../components/social/ShareTripModal';
 
@@ -33,6 +35,7 @@ const TripDetailPage = () => {
   const trip = useQuery(api.trips.get, { tripId: tripId as Id<'trips'> });
   const itineraryItems = useQuery(api.itinerary.listByTrip, { tripId: tripId as Id<'trips'> });
   const bucketListItems = useQuery(api.bucketList.list, { status: 'want_to_visit' });
+  const photos = useQuery(api.photos.listByTrip, { tripId: tripId as Id<'trips'> });
 
   const updateTrip = useMutation(api.trips.update);
   const deleteTrip = useMutation(api.trips.remove);
@@ -42,9 +45,16 @@ const TripDetailPage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAddPlace, setShowAddPlace] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [selectedDay, setSelectedDay] = useState(1);
+  const [placeSearchTerm, setPlaceSearchTerm] = useState('');
 
-  if (trip === undefined || itineraryItems === undefined) {
+  const searchResults = useQuery(
+    api.places.search,
+    placeSearchTerm.length >= 2 ? { searchTerm: placeSearchTerm } : 'skip'
+  );
+
+  if (trip === undefined || itineraryItems === undefined || photos === undefined) {
     return <PageLoading message="Loading trip..." />;
   }
 
@@ -283,6 +293,43 @@ const TripDetailPage = () => {
               </CardContent>
             </Card>
           </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                <Image size={20} />
+                Photos ({photos.length})
+              </h2>
+              <Button
+                size="sm"
+                variant="ghost"
+                leftIcon={<Upload size={14} />}
+                onClick={() => setShowPhotoUpload(!showPhotoUpload)}
+              >
+                {showPhotoUpload ? 'Hide Upload' : 'Add Photos'}
+              </Button>
+            </div>
+
+            {showPhotoUpload && <PhotoUpload tripId={trip._id} className="mb-4" />}
+
+            {photos.length === 0 && !showPhotoUpload ? (
+              <Card>
+                <CardContent className="text-center py-8">
+                  <Image className="text-muted mx-auto mb-2" size={32} />
+                  <p className="text-muted text-sm mb-3">No photos yet</p>
+                  <Button variant="ghost" size="sm" onClick={() => setShowPhotoUpload(true)}>
+                    Upload your first photo
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : photos.length > 0 ? (
+              <Card>
+                <CardContent>
+                  <PhotoGallery photos={photos} editable />
+                </CardContent>
+              </Card>
+            ) : null}
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -316,45 +363,103 @@ const TripDetailPage = () => {
                     {new Set(itineraryItems.map((i) => i.placeId)).size}
                   </span>
                 </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted">Photos</span>
+                  <span className="font-medium text-foreground">{photos.length}</span>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {showAddPlace && bucketListItems && (
+      {showAddPlace && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddPlace(false)} />
+          <div className="absolute inset-0 bg-black/50" onClick={() => { setShowAddPlace(false); setPlaceSearchTerm(''); }} />
           <Card className="relative z-10 w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-4 border-b border-border-light">
               <h2 className="text-lg font-semibold text-foreground">Add to Day {selectedDay}</h2>
               <button
-                onClick={() => setShowAddPlace(false)}
+                onClick={() => { setShowAddPlace(false); setPlaceSearchTerm(''); }}
                 className="p-2 text-muted hover:text-foreground rounded-lg hover:bg-border-light transition-colors"
               >
-                <Trash2 size={20} />
+                <X size={20} />
               </button>
             </div>
+            <div className="p-4 border-b border-border-light">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
+                <Input
+                  value={placeSearchTerm}
+                  onChange={(e) => setPlaceSearchTerm(e.target.value)}
+                  placeholder="Search all your places..."
+                  className="pl-10"
+                />
+              </div>
+            </div>
             <div className="flex-1 overflow-y-auto p-4">
-              {bucketListItems.length === 0 ? (
-                <p className="text-center text-muted py-8">No places in your bucket list. Add some places first!</p>
-              ) : (
-                <div className="space-y-2">
-                  {bucketListItems.map((item) =>
-                    item.place ? (
+              {placeSearchTerm.length >= 2 ? (
+                searchResults === undefined ? (
+                  <p className="text-center text-muted py-4">Searching...</p>
+                ) : searchResults.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted mb-2">No places found for "{placeSearchTerm}"</p>
+                    <Link to="/places" onClick={() => setShowAddPlace(false)}>
+                      <Button size="sm" variant="ghost" leftIcon={<Plus size={14} />}>
+                        Create a new place
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {searchResults.map((place) => (
                       <button
-                        key={item._id}
-                        onClick={() => handleAddPlace(item.place!._id)}
+                        key={place._id}
+                        onClick={() => { handleAddPlace(place._id); setPlaceSearchTerm(''); }}
                         className="w-full text-left p-3 rounded-lg border border-border-light hover:border-secondary hover:bg-secondary/5 transition-colors"
                       >
-                        <p className="font-medium text-foreground">{item.place.name}</p>
+                        <p className="font-medium text-foreground">{place.name}</p>
                         <p className="text-sm text-muted">
-                          {[item.place.city, item.place.country].filter(Boolean).join(', ')}
+                          {[place.city, place.country].filter(Boolean).join(', ')}
                         </p>
                       </button>
-                    ) : null,
+                    ))}
+                  </div>
+                )
+              ) : (
+                <>
+                  {bucketListItems && bucketListItems.length > 0 && (
+                    <>
+                      <p className="text-sm font-medium text-muted mb-2">From your bucket list</p>
+                      <div className="space-y-2">
+                        {bucketListItems.map((item) =>
+                          item.place ? (
+                            <button
+                              key={item._id}
+                              onClick={() => handleAddPlace(item.place!._id)}
+                              className="w-full text-left p-3 rounded-lg border border-border-light hover:border-secondary hover:bg-secondary/5 transition-colors"
+                            >
+                              <p className="font-medium text-foreground">{item.place.name}</p>
+                              <p className="text-sm text-muted">
+                                {[item.place.city, item.place.country].filter(Boolean).join(', ')}
+                              </p>
+                            </button>
+                          ) : null,
+                        )}
+                      </div>
+                    </>
                   )}
-                </div>
+                  {(!bucketListItems || bucketListItems.length === 0) && (
+                    <div className="text-center py-8">
+                      <p className="text-muted mb-2">Search for places or add new ones</p>
+                      <Link to="/places" onClick={() => setShowAddPlace(false)}>
+                        <Button size="sm" variant="ghost" leftIcon={<Plus size={14} />}>
+                          Go to Places
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </Card>
