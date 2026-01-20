@@ -3,6 +3,16 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
+# Build arguments for Vite environment variables
+ARG VITE_CONVEX_URL=http://localhost:3210
+ARG VITE_STADIA_API_KEY=
+ARG VITE_MAPILLARY_ACCESS_TOKEN=
+
+# Set as environment variables for the build
+ENV VITE_CONVEX_URL=$VITE_CONVEX_URL
+ENV VITE_STADIA_API_KEY=$VITE_STADIA_API_KEY
+ENV VITE_MAPILLARY_ACCESS_TOKEN=$VITE_MAPILLARY_ACCESS_TOKEN
+
 # Copy package files
 COPY package*.json ./
 
@@ -12,7 +22,7 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the application
+# Build the application (Vite will embed VITE_* env vars)
 RUN npm run build
 
 # Production stage: Create minimal runtime image
@@ -32,6 +42,9 @@ RUN npm ci --omit=dev && npm cache clean --force
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
+
+# Copy Convex functions for deployment (needed if deploying from container)
+COPY --from=builder /app/convex ./convex
 
 # Set ownership to non-root user
 RUN chown -R wanderlust:nodejs /app

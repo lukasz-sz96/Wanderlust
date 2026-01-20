@@ -1,10 +1,66 @@
-version: '3.8'
-
 services:
+  # Self-hosted Convex Backend
+  convex-backend:
+    image: ghcr.io/get-convex/convex-backend:latest
+    container_name: convex-backend
+    restart: unless-stopped
+    stop_grace_period: 10s
+    stop_signal: SIGINT
+    ports:
+      - '3210:3210'   # Convex API
+      - '3211:3211'   # HTTP Actions
+    volumes:
+      - convex-data:/convex/data
+    environment:
+      - CONVEX_CLOUD_ORIGIN=${CONVEX_CLOUD_ORIGIN:-http://convex-backend:3210}
+      - CONVEX_SITE_ORIGIN=${CONVEX_SITE_ORIGIN:-http://convex-backend:3211}
+      - RUST_LOG=${RUST_LOG:-info}
+      - DOCUMENT_RETENTION_DELAY=${DOCUMENT_RETENTION_DELAY:-172800}
+      # Optional: External database (uses SQLite by default)
+      - POSTGRES_URL=${POSTGRES_URL:-}
+      - MYSQL_URL=${MYSQL_URL:-}
+      - DO_NOT_REQUIRE_SSL=${DO_NOT_REQUIRE_SSL:-}
+      # Optional: S3 storage for files
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_REGION=${AWS_REGION:-}
+      - S3_ENDPOINT_URL=${S3_ENDPOINT_URL:-}
+      - S3_STORAGE_FILES_BUCKET=${S3_STORAGE_FILES_BUCKET:-}
+      - S3_STORAGE_EXPORTS_BUCKET=${S3_STORAGE_EXPORTS_BUCKET:-}
+      - AWS_S3_FORCE_PATH_STYLE=${AWS_S3_FORCE_PATH_STYLE:-}
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3210/version']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - wanderlust-network
+
+  # Convex Dashboard
+  convex-dashboard:
+    image: ghcr.io/get-convex/convex-dashboard:latest
+    container_name: convex-dashboard
+    restart: unless-stopped
+    stop_grace_period: 10s
+    stop_signal: SIGINT
+    ports:
+      - '6791:6791'
+    environment:
+      - NEXT_PUBLIC_DEPLOYMENT_URL=${NEXT_PUBLIC_DEPLOYMENT_URL:-http://convex-backend:3210}
+    depends_on:
+      convex-backend:
+        condition: service_healthy
+    networks:
+      - wanderlust-network
+
+  # Wanderlust Application
   wanderlust:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - VITE_CONVEX_URL=${VITE_CONVEX_URL:-http://localhost:3210}
     image: wanderlust:latest
     container_name: wanderlust
     restart: unless-stopped
@@ -13,12 +69,14 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      # Convex
-      - VITE_CONVEX_URL=${VITE_CONVEX_URL}
-      - VITE_CONVEX_SITE_URL=${VITE_CONVEX_SITE_URL}
+      # Convex connection (use external URL for browser access)
+      - VITE_CONVEX_URL=${VITE_CONVEX_URL:-http://localhost:3210}
       # Maps (optional)
       - VITE_STADIA_API_KEY=${VITE_STADIA_API_KEY:-}
       - VITE_MAPILLARY_ACCESS_TOKEN=${VITE_MAPILLARY_ACCESS_TOKEN:-}
+    depends_on:
+      convex-backend:
+        condition: service_healthy
     healthcheck:
       test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:3000/']
       interval: 30s
@@ -29,6 +87,10 @@ services:
       - 'com.centurylinklabs.watchtower.enable=true'
     networks:
       - wanderlust-network
+
+volumes:
+  convex-data:
+    driver: local
 
 networks:
   wanderlust-network:
