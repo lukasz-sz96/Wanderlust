@@ -22,7 +22,7 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the application (Vite will embed VITE_* env vars)
+# Build the application (TanStack Start + Nitro builds to .output/)
 RUN npm run build
 
 # Production stage: Create minimal runtime image
@@ -40,8 +40,8 @@ COPY package*.json ./
 # Install only production dependencies
 RUN npm ci --omit=dev && npm cache clean --force
 
-# Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
+# Copy built application from builder stage (TanStack Start + Nitro output)
+COPY --from=builder /app/.output ./.output
 
 # Copy Convex functions for deployment (needed if deploying from container)
 COPY --from=builder /app/convex ./convex
@@ -63,5 +63,5 @@ ENV PORT=3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
 
-# Start the application
-CMD ["npm", "run", "start"]
+# Start the application (TanStack Start + Nitro server)
+CMD ["node", ".output/server/index.mjs"]

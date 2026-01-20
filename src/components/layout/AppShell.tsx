@@ -47,7 +47,7 @@ export function AppShell({ children }: AppShellProps) {
           <span className="font-semibold text-foreground">Wanderlust</span>
         </header>
 
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 min-h-0 overflow-auto">{children}</main>
       </div>
     </div>
   );

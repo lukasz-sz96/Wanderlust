@@ -5,8 +5,13 @@ let _authUtils: ReturnType<typeof convexBetterAuthReactStart> | null = null;
 
 function getAuthUtils() {
   if (!_authUtils) {
+    // Use CONVEX_URL for server-side (Docker internal network), fallback to VITE_CONVEX_URL
+    const convexUrl = process.env.CONVEX_URL || process.env.VITE_CONVEX_URL;
+    if (!convexUrl) {
+      throw new Error('CONVEX_URL or VITE_CONVEX_URL must be set');
+    }
     _authUtils = convexBetterAuthReactStart({
-      convexUrl: process.env.VITE_CONVEX_URL!,
+      convexUrl,
       convexSiteUrl: process.env.CONVEX_SITE_URL!,
     });
   }

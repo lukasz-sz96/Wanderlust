@@ -1,14 +1,20 @@
 import { createFileRoute, redirect, Link } from '@tanstack/react-router';
+import { createServerFn } from '@tanstack/react-start';
 import { getToken } from '../lib/auth-server';
 import { MapPin, Plane, BookOpen, Star, ArrowRight } from 'lucide-react';
 import { Button, Card } from '../components/ui';
 
+const checkAuth = createServerFn({ method: 'GET' }).handler(async () => {
+  const token = await getToken();
+  return { isAuthenticated: !!token };
+});
+
 export const Route = createFileRoute('/')({
   component: LandingPage,
   beforeLoad: async () => {
-    const token = await getToken();
+    const { isAuthenticated } = await checkAuth();
 
-    if (token) {
+    if (isAuthenticated) {
       throw redirect({ to: '/dashboard' });
     }
   },

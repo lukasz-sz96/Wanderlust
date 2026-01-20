@@ -41,7 +41,7 @@ const DashboardPage = () => {
     markers.length > 0 ? { lat: markers[0].latitude, lng: markers[0].longitude } : { lat: 48.8566, lng: 2.3522 };
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex relative">
+    <div className="h-full flex relative">
       <div
         className={`
           absolute lg:relative z-20 h-full bg-surface border-r border-border-light

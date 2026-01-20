@@ -12,8 +12,9 @@ services:
     volumes:
       - convex-data:/convex/data
     environment:
-      - CONVEX_CLOUD_ORIGIN=${CONVEX_CLOUD_ORIGIN:-http://convex-backend:3210}
-      - CONVEX_SITE_ORIGIN=${CONVEX_SITE_ORIGIN:-http://convex-backend:3211}
+      # IMPORTANT: These must be external URLs that browsers can access
+      - CONVEX_CLOUD_ORIGIN=${CONVEX_CLOUD_ORIGIN:-http://localhost:3210}
+      - CONVEX_SITE_ORIGIN=${CONVEX_SITE_ORIGIN:-http://localhost:3211}
       - RUST_LOG=${RUST_LOG:-info}
       - DOCUMENT_RETENTION_DELAY=${DOCUMENT_RETENTION_DELAY:-172800}
       # Optional: External database (uses SQLite by default)
@@ -69,8 +70,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      # Convex connection (use external URL for browser access)
-      - VITE_CONVEX_URL=${VITE_CONVEX_URL:-http://localhost:3210}
+      # Convex connection for SSR (Docker internal network)
+      - CONVEX_URL=http://convex-backend:3210
+      # Convex site URL for auth callbacks (Docker internal network)
+      - CONVEX_SITE_URL=http://convex-backend:3211
       # Maps (optional)
       - VITE_STADIA_API_KEY=${VITE_STADIA_API_KEY:-}
       - VITE_MAPILLARY_ACCESS_TOKEN=${VITE_MAPILLARY_ACCESS_TOKEN:-}
