@@ -149,12 +149,14 @@ export default defineSchema({
     longitude: v.optional(v.number()),
     takenAt: v.optional(v.number()),
     caption: v.optional(v.string()),
+    visibility: v.optional(v.union(v.literal('public'), v.literal('followers'), v.literal('private'))),
     createdAt: v.number(),
   })
     .index('by_user', ['userId'])
     .index('by_trip', ['tripId'])
     .index('by_journal_entry', ['journalEntryId'])
-    .index('by_place', ['placeId']),
+    .index('by_place', ['placeId'])
+    .index('by_visibility', ['visibility']),
 
   follows: defineTable({
     followerId: v.id('users'),

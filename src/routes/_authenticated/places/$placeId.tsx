@@ -5,6 +5,7 @@ import type { Id } from '../../../../convex/_generated/dataModel';
 import { MapView } from '../../../components/maps';
 import { MarkVisitedModal } from '../../../components/places';
 import { WeatherWidget, WeatherSnapshotBadge } from '../../../components/weather';
+import { PlacePhotoFeed, PhotoUploadModal } from '../../../components/photos';
 import { Card, CardContent, Button, Badge, IconButton, PageLoading } from '../../../components/ui';
 import {
   ArrowLeft,
@@ -19,6 +20,8 @@ import {
   Calendar,
   Cloud,
   Loader2,
+  Camera,
+  ImagePlus,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -34,6 +37,7 @@ const PlaceDetailPage = () => {
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showMarkVisitedModal, setShowMarkVisitedModal] = useState(false);
+  const [showPhotoUploadModal, setShowPhotoUploadModal] = useState(false);
   const [isAddingToBucketList, setIsAddingToBucketList] = useState(false);
   const [isRemovingFromBucketList, setIsRemovingFromBucketList] = useState(false);
   const deletePlace = useMutation(api.places.remove);
@@ -154,6 +158,28 @@ const PlaceDetailPage = () => {
               </CardContent>
             </Card>
           )}
+
+          <Card>
+            <CardContent>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <Camera size={18} className="text-primary" />
+                  Photos
+                </h3>
+                {bucketListItem?.status === 'visited' && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    leftIcon={<ImagePlus size={16} />}
+                    onClick={() => setShowPhotoUploadModal(true)}
+                  >
+                    Add Photos
+                  </Button>
+                )}
+              </div>
+              <PlacePhotoFeed placeId={place._id} />
+            </CardContent>
+          </Card>
         </div>
 
         <div className="space-y-6">
@@ -301,6 +327,13 @@ const PlaceDetailPage = () => {
           longitude={place.longitude}
         />
       )}
+
+      <PhotoUploadModal
+        placeId={place._id}
+        placeName={place.name}
+        isOpen={showPhotoUploadModal}
+        onClose={() => setShowPhotoUploadModal(false)}
+      />
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

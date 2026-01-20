@@ -18,9 +18,10 @@ interface MapPlacePopupProps {
   place: PlacePopupData | null;
   onClose: () => void;
   position?: { x: number; y: number };
+  containerRef?: React.RefObject<HTMLDivElement>;
 }
 
-export const MapPlacePopup = ({ place, onClose, position }: MapPlacePopupProps) => {
+export const MapPlacePopup = ({ place, onClose, position, containerRef }: MapPlacePopupProps) => {
   if (!place) return null;
 
   const isVisited = place.status === 'visited';
@@ -31,6 +32,33 @@ export const MapPlacePopup = ({ place, onClose, position }: MapPlacePopupProps) 
     const url = `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`;
     window.open(url, '_blank');
   };
+
+  const getPopupPosition = () => {
+    if (!position) return {};
+
+    const popupWidth = 320;
+    const popupHeight = 340;
+
+    const containerRect = containerRef?.current?.getBoundingClientRect();
+    const offsetX = containerRect?.left ?? 0;
+    const offsetY = containerRect?.top ?? 0;
+    const containerWidth = containerRect?.width ?? window.innerWidth;
+    const containerHeight = containerRect?.height ?? window.innerHeight;
+
+    let left = position.x - offsetX - popupWidth / 2;
+    let top = position.y - offsetY - popupHeight - 20;
+
+    left = Math.max(10, Math.min(left, containerWidth - popupWidth - 10));
+    top = Math.max(10, Math.min(top, containerHeight - popupHeight - 10));
+
+    if (top < 10) {
+      top = position.y - offsetY + 50;
+    }
+
+    return { left, top };
+  };
+
+  const popupStyle = getPopupPosition();
 
   return (
     <AnimatePresence>
@@ -54,14 +82,7 @@ export const MapPlacePopup = ({ place, onClose, position }: MapPlacePopupProps) 
               stiffness: 400,
               damping: 30,
             }}
-            style={
-              position
-                ? {
-                    left: Math.min(position.x, window.innerWidth - 340),
-                    top: Math.min(position.y - 220, window.innerHeight - 300),
-                  }
-                : {}
-            }
+            style={position ? popupStyle : {}}
             className={`
               absolute z-50 w-80
               ${!position ? 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2' : ''}

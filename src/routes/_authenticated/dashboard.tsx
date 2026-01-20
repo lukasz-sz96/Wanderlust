@@ -1,14 +1,16 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { api } from '../../../convex/_generated/api';
 import { useCurrentUser } from '../../lib/hooks/useUserSync';
 import { useOnboarding } from '../../lib/hooks/useOnboarding';
-import { MapView, MapPlacePopup, type PlacePopupData, type MarkerClickEvent } from '../../components/maps';
+import { MapView, MapPlacePopup, MapDiscoverToggle, type PlacePopupData, type MarkerClickEvent } from '../../components/maps';
 import { Card, Button } from '../../components/ui';
 import { AddPlaceModal } from '../../components/places';
 import { OnboardingModal } from '../../components/onboarding';
-import { MapPin, Plane, BookOpen, ChevronLeft, ChevronRight, Plus, Heart, CheckCircle, Star } from 'lucide-react';
+import { MapPin, Plane, BookOpen, ChevronLeft, ChevronRight, Plus, Heart, CheckCircle, Star, Eye, Users } from 'lucide-react';
+
+type MapMode = 'my-places' | 'discover';
 
 export const Route = createFileRoute('/_authenticated/dashboard')({
   component: DashboardPage,
@@ -16,12 +18,15 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
 
 const DashboardPage = () => {
   const user = useCurrentUser();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const { showOnboarding, completeOnboarding } = useOnboarding();
   const [greeting, setGreeting] = useState('Hello');
   const [selectedPlace, setSelectedPlace] = useState<PlacePopupData | null>(null);
   const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | undefined>();
+  const [mapMode, setMapMode] = useState<MapMode>('my-places');
+  const mapContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setGreeting(getGreeting());
@@ -29,21 +34,67 @@ const DashboardPage = () => {
 
   const bucketListItems = useQuery(api.bucketList.list, {});
   const stats = useQuery(api.bucketList.getStats, {});
+  const placesWithPublicPhotos = useQuery(api.photos.getPlacesWithPublicPhotos, {});
+  const communityPlaces = useQuery(
+    api.places.listCommunityPlaces,
+    mapMode === 'discover' ? { limit: 100 } : 'skip'
+  );
+
+  const publicPlaceIds = useMemo(
+    () => new Set(placesWithPublicPhotos ?? []),
+    [placesWithPublicPhotos]
+  );
 
   const displayName = user?.displayName?.split(' ')[0] || 'Traveler';
 
-  const markers =
-    bucketListItems
-      ?.filter((item) => item.place)
-      .map((item) => ({
-        id: item.place!._id,
-        latitude: item.place!.latitude,
-        longitude: item.place!.longitude,
-        label: item.place!.name,
-        color: item.status === 'visited' ? '#81B29A' : '#E07A5F',
-      })) ?? [];
+  const myPlaceIds = useMemo(
+    () => new Set(bucketListItems?.map((item) => item.place?._id).filter(Boolean) ?? []),
+    [bucketListItems]
+  );
+
+  const myMarkers = useMemo(
+    () =>
+      bucketListItems
+        ?.filter((item) => item.place)
+        .map((item) => ({
+          id: item.place!._id,
+          latitude: item.place!.latitude,
+          longitude: item.place!.longitude,
+          label: item.place!.name,
+          color: item.status === 'visited' ? '#81B29A' : '#E07A5F',
+          hasPublicContent: publicPlaceIds.has(item.place!._id),
+        })) ?? [],
+    [bucketListItems, publicPlaceIds]
+  );
+
+  const communityMarkers = useMemo(() => {
+    if (mapMode !== 'discover' || !communityPlaces) return [];
+    return communityPlaces
+      .filter((place) => !myPlaceIds.has(place._id))
+      .map((place) => ({
+        id: `community-${place._id}`,
+        latitude: place.latitude,
+        longitude: place.longitude,
+        label: place.name,
+        color: '#9C89B8',
+        isCommunity: true,
+        photoCount: place.photoCount,
+        previewUrl: place.previewUrl,
+      }));
+  }, [mapMode, communityPlaces, myPlaceIds]);
+
+  const markers = useMemo(
+    () => [...myMarkers, ...communityMarkers],
+    [myMarkers, communityMarkers]
+  );
 
   const handleMarkerClick = (event: MarkerClickEvent) => {
+    if (event.markerId.startsWith('community-')) {
+      const placeId = event.markerId.replace('community-', '');
+      navigate({ to: '/places/$placeId', params: { placeId } });
+      return;
+    }
+
     const bucketItem = bucketListItems?.find((item) => item.place?._id === event.markerId);
     if (bucketItem?.place) {
       setSelectedPlace({
@@ -202,7 +253,7 @@ const DashboardPage = () => {
         {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
       </button>
 
-      <div className="flex-1 relative">
+      <div className="flex-1 relative" ref={mapContainerRef}>
         <MapView
           latitude={defaultCenter.lat}
           longitude={defaultCenter.lng}
@@ -216,26 +267,39 @@ const DashboardPage = () => {
           place={selectedPlace}
           onClose={handleClosePopup}
           position={popupPosition}
+          containerRef={mapContainerRef}
         />
 
-        {markers.length > 0 && (
-          <div className="absolute bottom-4 left-4 right-4 lg:left-auto lg:right-4 lg:w-64">
-            <Card className="bg-surface/95 backdrop-blur-sm">
-              <div className="p-3">
-                <div className="flex items-center gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-primary" />
-                    <span className="text-muted">Want to visit</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-secondary" />
-                    <span className="text-muted">Visited</span>
-                  </div>
+        <div className="absolute top-4 left-4 z-10">
+          <MapDiscoverToggle mode={mapMode} onChange={setMapMode} />
+        </div>
+
+        <div className="absolute bottom-4 left-4 right-4 lg:left-auto lg:right-4 lg:w-auto">
+          <Card className="bg-surface/95 backdrop-blur-sm">
+            <div className="p-3">
+              <div className="flex items-center gap-4 text-sm flex-wrap">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-primary" />
+                  <span className="text-muted">Want to visit</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-secondary" />
+                  <span className="text-muted">Visited</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Eye size={12} className="text-info" />
+                  <span className="text-muted">Shared publicly</span>
+                </div>
+                {mapMode === 'discover' && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full border-2 border-[#9C89B8] bg-transparent" />
+                    <span className="text-muted">Community</span>
+                  </div>
+                )}
               </div>
-            </Card>
-          </div>
-        )}
+            </div>
+          </Card>
+        </div>
       </div>
 
       <AddPlaceModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} />

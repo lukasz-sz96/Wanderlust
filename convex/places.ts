@@ -329,3 +329,98 @@ export const getCategories = query({
     return Array.from(categories).sort();
   },
 });
+
+export const listCommunityPlaces = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  returns: v.array(
+    v.object({
+      _id: v.id('places'),
+      name: v.string(),
+      latitude: v.number(),
+      longitude: v.number(),
+      city: v.optional(v.string()),
+      country: v.optional(v.string()),
+      category: v.optional(v.string()),
+      photoCount: v.number(),
+      previewUrl: v.optional(v.string()),
+      contributors: v.array(
+        v.object({
+          _id: v.id('users'),
+          displayName: v.optional(v.string()),
+          avatarUrl: v.optional(v.string()),
+        }),
+      ),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const limit = args.limit || 100;
+
+    const publicPhotos = await ctx.db
+      .query('photos')
+      .withIndex('by_visibility', (q) => q.eq('visibility', 'public'))
+      .collect();
+
+    const placePhotoMap = new Map<
+      Id<'places'>,
+      { photos: typeof publicPhotos; userIds: Set<string> }
+    >();
+
+    for (const photo of publicPhotos) {
+      if (!photo.placeId) continue;
+
+      if (!placePhotoMap.has(photo.placeId)) {
+        placePhotoMap.set(photo.placeId, { photos: [], userIds: new Set() });
+      }
+
+      const entry = placePhotoMap.get(photo.placeId)!;
+      entry.photos.push(photo);
+      entry.userIds.add(photo.userId);
+    }
+
+    const placeIds = Array.from(placePhotoMap.keys()).slice(0, limit);
+
+    const communityPlaces = await Promise.all(
+      placeIds.map(async (placeId) => {
+        const place = await ctx.db.get(placeId);
+        if (!place) return null;
+
+        const entry = placePhotoMap.get(placeId)!;
+        const sortedPhotos = entry.photos.sort((a, b) => b.createdAt - a.createdAt);
+        const previewPhoto = sortedPhotos[0];
+
+        const previewUrl = previewPhoto
+          ? await ctx.storage.getUrl(previewPhoto.storageId)
+          : null;
+
+        const contributorIds = Array.from(entry.userIds).slice(0, 3);
+        const contributors = await Promise.all(
+          contributorIds.map(async (userId) => {
+            const user = await ctx.db.get(userId as Id<'users'>);
+            return {
+              _id: userId as Id<'users'>,
+              displayName: user?.displayName,
+              avatarUrl: user?.avatarUrl,
+            };
+          }),
+        );
+
+        return {
+          _id: place._id,
+          name: place.name,
+          latitude: place.latitude,
+          longitude: place.longitude,
+          city: place.city,
+          country: place.country,
+          category: place.category,
+          photoCount: entry.photos.length,
+          previewUrl: previewUrl || undefined,
+          contributors,
+        };
+      }),
+    );
+
+    return communityPlaces.filter((p): p is NonNullable<typeof p> => p !== null);
+  },
+});

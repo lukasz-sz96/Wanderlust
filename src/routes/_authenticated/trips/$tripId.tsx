@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
 import { MapView } from '../../../components/maps';
-import { Card, CardContent, Button, Badge, IconButton, PageLoading, Input } from '../../../components/ui';
+import { Card, CardContent, Button, Badge, IconButton, PageLoading } from '../../../components/ui';
 import { PhotoUpload, PhotoGallery } from '../../../components/photos';
+import { AddActivityModal } from '../../../components/trips';
 import {
   ArrowLeft,
   Plane,
@@ -21,8 +22,6 @@ import {
   Share2,
   Image,
   Upload,
-  Search,
-  X,
 } from 'lucide-react';
 import { ShareTripModal } from '../../../components/social/ShareTripModal';
 
@@ -34,25 +33,17 @@ const TripDetailPage = () => {
   const { tripId } = Route.useParams();
   const trip = useQuery(api.trips.get, { tripId: tripId as Id<'trips'> });
   const itineraryItems = useQuery(api.itinerary.listByTrip, { tripId: tripId as Id<'trips'> });
-  const bucketListItems = useQuery(api.bucketList.list, { status: 'want_to_visit' });
   const photos = useQuery(api.photos.listByTrip, { tripId: tripId as Id<'trips'> });
 
   const updateTrip = useMutation(api.trips.update);
   const deleteTrip = useMutation(api.trips.remove);
-  const addItineraryItem = useMutation(api.itinerary.add);
   const removeItineraryItem = useMutation(api.itinerary.remove);
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showAddPlace, setShowAddPlace] = useState(false);
+  const [showAddActivity, setShowAddActivity] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [selectedDay, setSelectedDay] = useState(1);
-  const [placeSearchTerm, setPlaceSearchTerm] = useState('');
-
-  const searchResults = useQuery(
-    api.places.search,
-    placeSearchTerm.length >= 2 ? { searchTerm: placeSearchTerm } : 'skip'
-  );
 
   if (trip === undefined || itineraryItems === undefined || photos === undefined) {
     return <PageLoading message="Loading trip..." />;
@@ -82,16 +73,6 @@ const TripDetailPage = () => {
 
   const handleStatusChange = async (status: 'planning' | 'active' | 'completed') => {
     await updateTrip({ tripId: trip._id, status });
-  };
-
-  const handleAddPlace = async (placeId: Id<'places'>) => {
-    await addItineraryItem({
-      tripId: trip._id,
-      placeId,
-      dayNumber: selectedDay,
-      category: 'activity',
-    });
-    setShowAddPlace(false);
   };
 
   const handleRemoveItem = async (itemId: Id<'itineraryItems'>) => {
@@ -217,7 +198,7 @@ const TripDetailPage = () => {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-foreground">Itinerary</h2>
-              <Button size="sm" leftIcon={<Plus size={14} />} onClick={() => setShowAddPlace(true)}>
+              <Button size="sm" leftIcon={<Plus size={14} />} onClick={() => setShowAddActivity(true)}>
                 Add Activity
               </Button>
             </div>
@@ -256,7 +237,7 @@ const TripDetailPage = () => {
                       size="sm"
                       variant="ghost"
                       leftIcon={<Plus size={14} />}
-                      onClick={() => setShowAddPlace(true)}
+                      onClick={() => setShowAddActivity(true)}
                     >
                       Add Activity
                     </Button>
@@ -336,9 +317,17 @@ const TripDetailPage = () => {
           <Card padding="none" className="overflow-hidden">
             <div className="h-64">
               <MapView
-                latitude={trip.destination?.latitude || 48.8566}
-                longitude={trip.destination?.longitude || 2.3522}
-                zoom={markers.length > 0 ? 10 : 5}
+                latitude={
+                  markers.length > 0
+                    ? markers.reduce((sum, m) => sum + m.latitude, 0) / markers.length
+                    : trip.destination?.latitude || 48.8566
+                }
+                longitude={
+                  markers.length > 0
+                    ? markers.reduce((sum, m) => sum + m.longitude, 0) / markers.length
+                    : trip.destination?.longitude || 2.3522
+                }
+                zoom={markers.length > 0 ? 6 : 5}
                 markers={markers}
                 className="h-full"
               />
@@ -373,98 +362,12 @@ const TripDetailPage = () => {
         </div>
       </div>
 
-      {showAddPlace && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50" onClick={() => { setShowAddPlace(false); setPlaceSearchTerm(''); }} />
-          <Card className="relative z-10 w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b border-border-light">
-              <h2 className="text-lg font-semibold text-foreground">Add to Day {selectedDay}</h2>
-              <button
-                onClick={() => { setShowAddPlace(false); setPlaceSearchTerm(''); }}
-                className="p-2 text-muted hover:text-foreground rounded-lg hover:bg-border-light transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-4 border-b border-border-light">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
-                <Input
-                  value={placeSearchTerm}
-                  onChange={(e) => setPlaceSearchTerm(e.target.value)}
-                  placeholder="Search all your places..."
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4">
-              {placeSearchTerm.length >= 2 ? (
-                searchResults === undefined ? (
-                  <p className="text-center text-muted py-4">Searching...</p>
-                ) : searchResults.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-muted mb-2">No places found for "{placeSearchTerm}"</p>
-                    <Link to="/places" onClick={() => setShowAddPlace(false)}>
-                      <Button size="sm" variant="ghost" leftIcon={<Plus size={14} />}>
-                        Create a new place
-                      </Button>
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {searchResults.map((place) => (
-                      <button
-                        key={place._id}
-                        onClick={() => { handleAddPlace(place._id); setPlaceSearchTerm(''); }}
-                        className="w-full text-left p-3 rounded-lg border border-border-light hover:border-secondary hover:bg-secondary/5 transition-colors"
-                      >
-                        <p className="font-medium text-foreground">{place.name}</p>
-                        <p className="text-sm text-muted">
-                          {[place.city, place.country].filter(Boolean).join(', ')}
-                        </p>
-                      </button>
-                    ))}
-                  </div>
-                )
-              ) : (
-                <>
-                  {bucketListItems && bucketListItems.length > 0 && (
-                    <>
-                      <p className="text-sm font-medium text-muted mb-2">From your bucket list</p>
-                      <div className="space-y-2">
-                        {bucketListItems.map((item) =>
-                          item.place ? (
-                            <button
-                              key={item._id}
-                              onClick={() => handleAddPlace(item.place!._id)}
-                              className="w-full text-left p-3 rounded-lg border border-border-light hover:border-secondary hover:bg-secondary/5 transition-colors"
-                            >
-                              <p className="font-medium text-foreground">{item.place.name}</p>
-                              <p className="text-sm text-muted">
-                                {[item.place.city, item.place.country].filter(Boolean).join(', ')}
-                              </p>
-                            </button>
-                          ) : null,
-                        )}
-                      </div>
-                    </>
-                  )}
-                  {(!bucketListItems || bucketListItems.length === 0) && (
-                    <div className="text-center py-8">
-                      <p className="text-muted mb-2">Search for places or add new ones</p>
-                      <Link to="/places" onClick={() => setShowAddPlace(false)}>
-                        <Button size="sm" variant="ghost" leftIcon={<Plus size={14} />}>
-                          Go to Places
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </Card>
-        </div>
-      )}
+      <AddActivityModal
+        isOpen={showAddActivity}
+        onClose={() => setShowAddActivity(false)}
+        tripId={trip._id}
+        dayNumber={selectedDay}
+      />
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

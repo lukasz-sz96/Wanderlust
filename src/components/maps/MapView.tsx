@@ -1,6 +1,6 @@
 import { useRef, useCallback, useState } from 'react';
 import Map, { Marker, NavigationControl, type MapRef, type ViewStateChangeEvent } from 'react-map-gl/maplibre';
-import { MapPin } from 'lucide-react';
+import { MapPin, Camera, Eye } from 'lucide-react';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 const STADIA_API_KEY = import.meta.env.VITE_STADIA_API_KEY || '';
@@ -17,6 +17,10 @@ export interface MapMarker {
   longitude: number;
   label?: string;
   color?: string;
+  isCommunity?: boolean;
+  photoCount?: number;
+  previewUrl?: string;
+  hasPublicContent?: boolean;
 }
 
 export interface MarkerClickEvent {
@@ -98,14 +102,46 @@ export const MapView = ({
               });
             }}
           >
-            <div className="cursor-pointer transform hover:scale-110 transition-transform" title={marker.label}>
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
-                style={{ backgroundColor: marker.color || 'var(--color-primary)' }}
-              >
-                <MapPin className="text-white" size={18} />
+            {marker.isCommunity ? (
+              <div className="cursor-pointer transform hover:scale-110 transition-transform relative" title={marker.label}>
+                <div
+                  className="w-9 h-9 rounded-full border-2 flex items-center justify-center shadow-md bg-surface/90 backdrop-blur-sm"
+                  style={{ borderColor: marker.color || '#9C89B8' }}
+                >
+                  {marker.previewUrl ? (
+                    <img
+                      src={marker.previewUrl}
+                      alt={marker.label}
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <Camera size={16} style={{ color: marker.color || '#9C89B8' }} />
+                  )}
+                </div>
+                {marker.photoCount && marker.photoCount > 1 && (
+                  <div
+                    className="absolute -bottom-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full text-white text-[10px] font-semibold flex items-center justify-center shadow-sm"
+                    style={{ backgroundColor: marker.color || '#9C89B8' }}
+                  >
+                    {marker.photoCount > 99 ? '99+' : marker.photoCount}
+                  </div>
+                )}
               </div>
-            </div>
+            ) : (
+              <div className="cursor-pointer transform hover:scale-110 transition-transform relative" title={marker.label}>
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
+                  style={{ backgroundColor: marker.color || 'var(--color-primary)' }}
+                >
+                  <MapPin className="text-white" size={18} />
+                </div>
+                {marker.hasPublicContent && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white shadow-md flex items-center justify-center border border-border-light">
+                    <Eye size={10} className="text-info" />
+                  </div>
+                )}
+              </div>
+            )}
           </Marker>
         ))}
       </Map>
