@@ -1,19 +1,13 @@
 import { Link } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Home,
-  MapPin,
-  Plane,
-  BookOpen,
-  Settings,
-  LogOut,
-  ChevronLeft,
-  Compass,
-} from 'lucide-react';
+import { Home, MapPin, Plane, BookOpen, Settings, LogOut, ChevronLeft, Compass, Rss, User, Crown, Shield } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useQuery } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
 import { authClient } from '../../lib/auth-client';
 import { Avatar } from '../ui/Avatar';
 import { IconButton } from '../ui/IconButton';
+import { ProBadge } from '../social/ProBadge';
 
 interface NavItem {
   label: string;
@@ -23,6 +17,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: <Home size={20} /> },
+  { label: 'Feed', href: '/feed', icon: <Rss size={20} /> },
   { label: 'Places', href: '/places', icon: <MapPin size={20} /> },
   { label: 'Trips', href: '/trips', icon: <Plane size={20} /> },
   { label: 'Journal', href: '/journal', icon: <BookOpen size={20} /> },
@@ -38,6 +33,9 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
   const { data: session } = authClient.useSession();
   const user = session?.user;
   const [currentPath, setCurrentPath] = useState('/dashboard');
+  const role = useQuery(api.roles.getCurrentRole);
+  const isPro = role?.permissions.includes('pro_badge');
+  const isAdmin = role?.permissions.includes('admin_panel');
 
   useEffect(() => {
     setCurrentPath(window.location.pathname);
@@ -85,12 +83,7 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
           </div>
         )}
         {onCollapsedChange && !collapsed && (
-          <IconButton
-            variant="ghost"
-            size="sm"
-            label="Collapse sidebar"
-            onClick={() => onCollapsedChange(true)}
-          >
+          <IconButton variant="ghost" size="sm" label="Collapse sidebar" onClick={() => onCollapsedChange(true)}>
             <ChevronLeft size={18} />
           </IconButton>
         )}
@@ -104,9 +97,10 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
           const isParentMatch = currentPath.startsWith(item.href + '/');
           // Don't highlight parent if there's a more specific nav item that matches
           const hasMoreSpecificMatch = navItems.some(
-            (other) => other.href !== item.href &&
-            other.href.startsWith(item.href + '/') &&
-            (currentPath === other.href || currentPath.startsWith(other.href + '/'))
+            (other) =>
+              other.href !== item.href &&
+              other.href.startsWith(item.href + '/') &&
+              (currentPath === other.href || currentPath.startsWith(other.href + '/')),
           );
           const isActive = isExactMatch || (isParentMatch && !hasMoreSpecificMatch);
           return (
@@ -117,10 +111,7 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
               className={`
                 flex items-center gap-3 px-3 py-2.5 rounded-lg
                 transition-colors duration-150
-                ${isActive
-                  ? 'bg-primary text-white'
-                  : 'text-muted hover:bg-border-light hover:text-foreground'
-                }
+                ${isActive ? 'bg-primary text-white' : 'text-muted hover:bg-border-light hover:text-foreground'}
                 ${collapsed ? 'justify-center' : ''}
               `}
             >
@@ -143,13 +134,66 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
       </nav>
 
       <div className="p-3 border-t border-border-light space-y-1">
+        {/* Profile Link */}
+        <Link
+          to="/profile"
+          onClick={() => setCurrentPath('/profile')}
+          className={`
+            flex items-center gap-3 px-3 py-2.5 rounded-lg
+            transition-colors duration-150
+            ${currentPath.startsWith('/profile') ? 'bg-primary text-white' : 'text-muted hover:bg-border-light hover:text-foreground'}
+            ${collapsed ? 'justify-center' : ''}
+          `}
+        >
+          <User size={20} />
+          {!collapsed && <span className="font-medium">Profile</span>}
+        </Link>
+
+        {/* Pro Link */}
+        <Link
+          to="/pro"
+          onClick={() => setCurrentPath('/pro')}
+          className={`
+            flex items-center gap-3 px-3 py-2.5 rounded-lg
+            transition-colors duration-150
+            ${currentPath === '/pro' ? 'bg-primary text-white' : 'text-muted hover:bg-border-light hover:text-foreground'}
+            ${collapsed ? 'justify-center' : ''}
+          `}
+        >
+          <Crown size={20} className={isPro ? 'text-amber-500' : ''} />
+          {!collapsed && (
+            <span className="font-medium flex items-center gap-2">
+              Pro
+              {isPro && <ProBadge size="sm" />}
+            </span>
+          )}
+        </Link>
+
+        {/* Admin Link - only for admins */}
+        {isAdmin && (
+          <Link
+            to="/admin/users"
+            onClick={() => setCurrentPath('/admin/users')}
+            className={`
+              flex items-center gap-3 px-3 py-2.5 rounded-lg
+              transition-colors duration-150
+              ${currentPath.startsWith('/admin') ? 'bg-primary text-white' : 'text-muted hover:bg-border-light hover:text-foreground'}
+              ${collapsed ? 'justify-center' : ''}
+            `}
+          >
+            <Shield size={20} />
+            {!collapsed && <span className="font-medium">Admin</span>}
+          </Link>
+        )}
+
+        {/* Settings Link */}
         <Link
           to="/settings"
           onClick={() => setCurrentPath('/settings')}
           className={`
             flex items-center gap-3 px-3 py-2.5 rounded-lg
-            transition-colors duration-150 text-muted
-            hover:bg-border-light hover:text-foreground
+            transition-colors duration-150
+            ${currentPath === '/settings' ? 'bg-primary text-white' : 'text-muted hover:bg-border-light hover:text-foreground'}
             ${collapsed ? 'justify-center' : ''}
           `}
         >
@@ -157,15 +201,14 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
           {!collapsed && <span className="font-medium">Settings</span>}
         </Link>
 
-        <div className={`
+        {/* User Info */}
+        <div
+          className={`
           flex items-center gap-3 px-3 py-2.5
           ${collapsed ? 'justify-center' : ''}
-        `}>
-          <Avatar
-            src={user?.image || undefined}
-            alt={user?.name || user?.email || 'User'}
-            size="sm"
-          />
+        `}
+        >
+          <Avatar src={user?.image || undefined} alt={user?.name || user?.email || 'User'} size="sm" />
           <AnimatePresence mode="wait">
             {!collapsed && (
               <motion.div
@@ -174,20 +217,13 @@ export function Sidebar({ collapsed = false, onCollapsedChange }: SidebarProps) 
                 exit={{ opacity: 0 }}
                 className="flex-1 min-w-0"
               >
-                <p className="text-sm font-medium text-foreground truncate">
-                  {user?.name || 'User'}
-                </p>
+                <p className="text-sm font-medium text-foreground truncate">{user?.name || 'User'}</p>
                 <p className="text-xs text-muted truncate">{user?.email}</p>
               </motion.div>
             )}
           </AnimatePresence>
           {!collapsed && (
-            <IconButton
-              variant="ghost"
-              size="sm"
-              label="Sign out"
-              onClick={handleSignOut}
-            >
+            <IconButton variant="ghost" size="sm" label="Sign out" onClick={handleSignOut}>
               <LogOut size={16} />
             </IconButton>
           )}
