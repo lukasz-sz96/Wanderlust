@@ -1,12 +1,8 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
+import { internal } from './_generated/api';
 
-const moodValidator = v.union(
-  v.literal('amazing'),
-  v.literal('good'),
-  v.literal('neutral'),
-  v.literal('challenging')
-);
+const moodValidator = v.union(v.literal('amazing'), v.literal('good'), v.literal('neutral'), v.literal('challenging'));
 
 export const create = mutation({
   args: {
@@ -21,7 +17,7 @@ export const create = mutation({
         temperature: v.number(),
         condition: v.string(),
         icon: v.string(),
-      })
+      }),
     ),
   },
   returns: v.id('journalEntries'),
@@ -52,6 +48,19 @@ export const create = mutation({
       weatherSnapshot: args.weatherSnapshot,
       createdAt: now,
       updatedAt: now,
+    });
+
+    // Record activity to feed
+    let tripName: string | undefined;
+    if (args.tripId) {
+      const trip = await ctx.db.get(args.tripId);
+      tripName = trip?.title;
+    }
+    await ctx.runMutation(internal.feed.recordActivity, {
+      userId: user._id,
+      type: 'journal_posted',
+      referenceId: entryId,
+      metadata: { title: args.title, tripName },
     });
 
     return entryId;
@@ -163,7 +172,7 @@ export const get = query({
           temperature: v.number(),
           condition: v.string(),
           icon: v.string(),
-        })
+        }),
       ),
       entryDate: v.string(),
       createdAt: v.number(),
@@ -172,7 +181,7 @@ export const get = query({
         v.object({
           _id: v.id('trips'),
           title: v.string(),
-        })
+        }),
       ),
       place: v.optional(
         v.object({
@@ -180,10 +189,10 @@ export const get = query({
           name: v.string(),
           city: v.optional(v.string()),
           country: v.optional(v.string()),
-        })
+        }),
       ),
     }),
-    v.null()
+    v.null(),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -253,7 +262,7 @@ export const list = query({
           temperature: v.number(),
           condition: v.string(),
           icon: v.string(),
-        })
+        }),
       ),
       entryDate: v.string(),
       createdAt: v.number(),
@@ -262,7 +271,7 @@ export const list = query({
         v.object({
           _id: v.id('trips'),
           title: v.string(),
-        })
+        }),
       ),
       place: v.optional(
         v.object({
@@ -270,10 +279,10 @@ export const list = query({
           name: v.string(),
           city: v.optional(v.string()),
           country: v.optional(v.string()),
-        })
+        }),
       ),
       photoCount: v.number(),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -340,7 +349,7 @@ export const list = query({
           place,
           photoCount: photos.length,
         };
-      })
+      }),
     );
 
     return enrichedEntries;

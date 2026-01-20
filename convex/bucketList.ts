@@ -1,12 +1,9 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import { Id } from './_generated/dataModel';
+import { internal } from './_generated/api';
 
-const statusValidator = v.union(
-  v.literal('want_to_visit'),
-  v.literal('visited'),
-  v.literal('skipped')
-);
+const statusValidator = v.union(v.literal('want_to_visit'), v.literal('visited'), v.literal('skipped'));
 
 export const add = mutation({
   args: {
@@ -72,7 +69,7 @@ export const updateStatus = mutation({
         temperature: v.number(),
         condition: v.string(),
         icon: v.string(),
-      })
+      }),
     ),
   },
   returns: v.null(),
@@ -120,6 +117,17 @@ export const updateStatus = mutation({
     }
 
     await ctx.db.patch(args.itemId, updates);
+
+    // Record activity to feed when marking as visited
+    if (args.status === 'visited') {
+      const place = await ctx.db.get(item.placeId);
+      await ctx.runMutation(internal.feed.recordActivity, {
+        userId: user._id,
+        type: 'place_visited',
+        referenceId: item.placeId,
+        metadata: { placeName: place?.name, rating: args.rating },
+      });
+    }
 
     return null;
   },
@@ -241,7 +249,7 @@ export const list = query({
           temperature: v.number(),
           condition: v.string(),
           icon: v.string(),
-        })
+        }),
       ),
       createdAt: v.number(),
       place: v.union(
@@ -255,9 +263,9 @@ export const list = query({
           longitude: v.number(),
           description: v.optional(v.string()),
         }),
-        v.null()
+        v.null(),
       ),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -279,9 +287,7 @@ export const list = query({
     if (status) {
       items = await ctx.db
         .query('bucketListItems')
-        .withIndex('by_user_and_status', (q) =>
-          q.eq('userId', user._id).eq('status', status)
-        )
+        .withIndex('by_user_and_status', (q) => q.eq('userId', user._id).eq('status', status))
         .collect();
     } else {
       items = await ctx.db
@@ -310,7 +316,7 @@ export const list = query({
               }
             : null,
         };
-      })
+      }),
     );
 
     return enrichedItems;
@@ -338,11 +344,11 @@ export const getByPlace = query({
           temperature: v.number(),
           condition: v.string(),
           icon: v.string(),
-        })
+        }),
       ),
       createdAt: v.number(),
     }),
-    v.null()
+    v.null(),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();

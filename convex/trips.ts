@@ -1,11 +1,8 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
+import { internal } from './_generated/api';
 
-const statusValidator = v.union(
-  v.literal('planning'),
-  v.literal('active'),
-  v.literal('completed')
-);
+const statusValidator = v.union(v.literal('planning'), v.literal('active'), v.literal('completed'));
 
 export const create = mutation({
   args: {
@@ -16,7 +13,7 @@ export const create = mutation({
         name: v.string(),
         latitude: v.number(),
         longitude: v.number(),
-      })
+      }),
     ),
     startDate: v.optional(v.string()),
     endDate: v.optional(v.string()),
@@ -50,6 +47,14 @@ export const create = mutation({
       updatedAt: now,
     });
 
+    // Record activity to feed
+    await ctx.runMutation(internal.feed.recordActivity, {
+      userId: user._id,
+      type: 'trip_created',
+      referenceId: tripId,
+      metadata: { destination: args.destination?.name },
+    });
+
     return tripId;
   },
 });
@@ -64,7 +69,7 @@ export const update = mutation({
         name: v.string(),
         latitude: v.number(),
         longitude: v.number(),
-      })
+      }),
     ),
     startDate: v.optional(v.string()),
     endDate: v.optional(v.string()),
@@ -163,7 +168,7 @@ export const get = query({
           name: v.string(),
           latitude: v.number(),
           longitude: v.number(),
-        })
+        }),
       ),
       startDate: v.optional(v.string()),
       endDate: v.optional(v.string()),
@@ -171,7 +176,7 @@ export const get = query({
       createdAt: v.number(),
       updatedAt: v.number(),
     }),
-    v.null()
+    v.null(),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -195,7 +200,7 @@ export const get = query({
 
     let coverImageUrl: string | undefined;
     if (trip.coverImageId) {
-      coverImageUrl = await ctx.storage.getUrl(trip.coverImageId) ?? undefined;
+      coverImageUrl = (await ctx.storage.getUrl(trip.coverImageId)) ?? undefined;
     }
 
     return {
@@ -223,7 +228,7 @@ export const list = query({
           name: v.string(),
           latitude: v.number(),
           longitude: v.number(),
-        })
+        }),
       ),
       startDate: v.optional(v.string()),
       endDate: v.optional(v.string()),
@@ -231,7 +236,7 @@ export const list = query({
       createdAt: v.number(),
       updatedAt: v.number(),
       itemCount: v.number(),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -253,9 +258,7 @@ export const list = query({
     if (status) {
       trips = await ctx.db
         .query('trips')
-        .withIndex('by_user_and_status', (q) =>
-          q.eq('userId', user._id).eq('status', status)
-        )
+        .withIndex('by_user_and_status', (q) => q.eq('userId', user._id).eq('status', status))
         .collect();
     } else {
       trips = await ctx.db
@@ -270,7 +273,7 @@ export const list = query({
       trips.map(async (trip) => {
         let coverImageUrl: string | undefined;
         if (trip.coverImageId) {
-          coverImageUrl = await ctx.storage.getUrl(trip.coverImageId) ?? undefined;
+          coverImageUrl = (await ctx.storage.getUrl(trip.coverImageId)) ?? undefined;
         }
 
         const itineraryItems = await ctx.db
@@ -283,7 +286,7 @@ export const list = query({
           coverImageUrl,
           itemCount: itineraryItems.length,
         };
-      })
+      }),
     );
 
     return enrichedTrips;
