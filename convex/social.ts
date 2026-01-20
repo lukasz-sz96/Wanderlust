@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
-import { query, mutation } from './_generated/server';
-import { Id, Doc } from './_generated/dataModel';
-import { checkPermission, FREE_LIMITS } from './roles';
+import { mutation, query } from './_generated/server';
+import { FREE_LIMITS, checkPermission } from './roles';
+import type { Doc, Id } from './_generated/dataModel';
 
 // Helper to get user by auth identity
 async function getCurrentUser(ctx: {
@@ -76,7 +76,7 @@ export const getProfile = query({
       return null;
     }
 
-    const targetUser = await ctx.db.get(targetUserId);
+    const targetUser = await ctx.db.get("users", targetUserId);
     if (!targetUser) {
       return null;
     }
@@ -139,7 +139,7 @@ export const getProfile = query({
 
     // Batch fetch places for visited items to avoid N+1
     const placeIds = [...new Set(visitedItems.map((item) => item.placeId))];
-    const placeDocs = await Promise.all(placeIds.map((id) => ctx.db.get(id)));
+    const placeDocs = await Promise.all(placeIds.map((id) => ctx.db.get("places", id)));
     const countriesSet = new Set<string>();
     for (const place of placeDocs) {
       if (place?.countryCode) {
@@ -229,8 +229,8 @@ export const updateProfile = mutation({
     const updates: {
       updatedAt: number;
       bio?: string;
-      travelStyles?: string[];
-      languages?: string[];
+      travelStyles?: Array<string>;
+      languages?: Array<string>;
       homeLocation?: string;
       profileVisibility?: 'public' | 'friends' | 'private';
     } = {
@@ -253,7 +253,7 @@ export const updateProfile = mutation({
       updates.profileVisibility = args.profileVisibility;
     }
 
-    await ctx.db.patch(currentUser._id, updates);
+    await ctx.db.patch("users", currentUser._id, updates);
 
     return null;
   },
@@ -280,7 +280,7 @@ export const uploadCoverPhoto = mutation({
       throw new Error('User not found');
     }
 
-    await ctx.db.patch(currentUser._id, {
+    await ctx.db.patch("users", currentUser._id, {
       coverPhotoId: args.coverPhotoId,
       updatedAt: Date.now(),
     });
@@ -316,7 +316,7 @@ export const follow = mutation({
     }
 
     // Check if target user exists
-    const targetUser = await ctx.db.get(args.userId);
+    const targetUser = await ctx.db.get("users", args.userId);
     if (!targetUser) {
       throw new Error('User not found');
     }
@@ -390,7 +390,7 @@ export const unfollow = mutation({
     }
 
     // Delete the follow relationship
-    await ctx.db.delete(followRecord._id);
+    await ctx.db.delete("follows", followRecord._id);
 
     return null;
   },
@@ -458,7 +458,7 @@ export const getFollowers = query({
     const limit = args.limit || 20;
 
     // Get target user
-    const targetUser = await ctx.db.get(args.userId);
+    const targetUser = await ctx.db.get("users", args.userId);
     if (!targetUser) {
       return { followers: [], nextCursor: undefined, hasMore: false };
     }
@@ -492,10 +492,10 @@ export const getFollowers = query({
 
     // Batch fetch all follower users
     const followerIds = resultFollows.map((f) => f.followerId);
-    const users = await Promise.all(followerIds.map((id) => ctx.db.get(id)));
+    const users = await Promise.all(followerIds.map((id) => ctx.db.get("users", id)));
 
     // Batch check follow status if current user exists
-    let followStatusMap = new Map<string, boolean>();
+    const followStatusMap = new Map<string, boolean>();
     if (currentUser) {
       const followChecks = await Promise.all(
         followerIds.map((id) =>
@@ -511,14 +511,14 @@ export const getFollowers = query({
     }
 
     // Build result
-    const followers: {
+    const followers: Array<{
       _id: Id<'users'>;
       displayName: string | undefined;
       avatarUrl: string | undefined;
       bio: string | undefined;
       isFollowing: boolean;
       followedAt: number;
-    }[] = [];
+    }> = [];
 
     for (let i = 0; i < resultFollows.length; i++) {
       const user = users[i];
@@ -574,7 +574,7 @@ export const getFollowing = query({
     const limit = args.limit || 20;
 
     // Get target user
-    const targetUser = await ctx.db.get(args.userId);
+    const targetUser = await ctx.db.get("users", args.userId);
     if (!targetUser) {
       return { following: [], nextCursor: undefined, hasMore: false };
     }
@@ -608,10 +608,10 @@ export const getFollowing = query({
 
     // Batch fetch all following users
     const followingIds = resultFollows.map((f) => f.followingId);
-    const users = await Promise.all(followingIds.map((id) => ctx.db.get(id)));
+    const users = await Promise.all(followingIds.map((id) => ctx.db.get("users", id)));
 
     // Batch check follow status if current user exists
-    let followStatusMap = new Map<string, boolean>();
+    const followStatusMap = new Map<string, boolean>();
     if (currentUser) {
       const followChecks = await Promise.all(
         followingIds.map((id) =>
@@ -629,14 +629,14 @@ export const getFollowing = query({
     }
 
     // Build result
-    const following: {
+    const following: Array<{
       _id: Id<'users'>;
       displayName: string | undefined;
       avatarUrl: string | undefined;
       bio: string | undefined;
       isFollowing: boolean;
       followedAt: number;
-    }[] = [];
+    }> = [];
 
     for (let i = 0; i < resultFollows.length; i++) {
       const user = users[i];
@@ -711,7 +711,7 @@ export const searchUsers = query({
     const limitedUsers = matchingUsers.slice(0, limit);
 
     // Batch check follow status
-    let followStatusMap = new Map<string, boolean>();
+    const followStatusMap = new Map<string, boolean>();
     if (currentUser && limitedUsers.length > 0) {
       const followChecks = await Promise.all(
         limitedUsers.map((user) =>
@@ -774,8 +774,8 @@ export const getSuggestedUsers = query({
         .query('follows')
         .withIndex('by_follower', (q) => q.eq('followerId', currentUser._id))
         .collect();
-      for (const follow of follows) {
-        followingIds.add(follow.followingId);
+      for (const followEntry of follows) {
+        followingIds.add(followEntry.followingId);
       }
     }
 

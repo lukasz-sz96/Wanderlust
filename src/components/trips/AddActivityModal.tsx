@@ -1,23 +1,24 @@
 import { useState } from 'react';
 import { useMutation, useQuery } from 'convex/react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { api } from '../../../convex/_generated/api';
-import type { Id } from '../../../convex/_generated/dataModel';
-import { Button, Input } from '../ui';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  X,
+  Car,
+  CheckCircle,
+  Clock,
+  Globe,
+  Home,
+  Loader2,
   MapPin,
   Search,
-  Loader2,
-  Clock,
-  Utensils,
-  Car,
-  Home,
-  CheckCircle,
-  Globe,
   Sparkles,
+  Utensils,
+  X,
 } from 'lucide-react';
-import { searchByName, type SearchResult } from '../../lib/api/overpass';
+import { api } from '../../../convex/_generated/api';
+import { Button, Input } from '../ui';
+import {  searchByName } from '../../lib/api/overpass';
+import type {SearchResult} from '../../lib/api/overpass';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 interface AddActivityModalProps {
   isOpen: boolean;
@@ -28,7 +29,7 @@ interface AddActivityModalProps {
 
 type ActivityCategory = 'activity' | 'meal' | 'transport' | 'accommodation' | 'other';
 
-const categoryOptions: { value: ActivityCategory; label: string; icon: typeof MapPin }[] = [
+const categoryOptions: Array<{ value: ActivityCategory; label: string; icon: typeof MapPin }> = [
   { value: 'activity', label: 'Activity', icon: MapPin },
   { value: 'meal', label: 'Meal', icon: Utensils },
   { value: 'transport', label: 'Transport', icon: Car },
@@ -37,7 +38,7 @@ const categoryOptions: { value: ActivityCategory; label: string; icon: typeof Ma
 
 export const AddActivityModal = ({ isOpen, onClose, tripId, dayNumber }: AddActivityModalProps) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [osmResults, setOsmResults] = useState<SearchResult[]>([]);
+  const [osmResults, setOsmResults] = useState<Array<SearchResult>>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<SearchResult | null>(null);

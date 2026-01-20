@@ -1,6 +1,6 @@
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
-import { AlertTriangle, Home, Compass } from 'lucide-react';
+import { AlertTriangle, Compass, Home } from 'lucide-react';
 import appCssUrl from '../app.css?url';
 import { getToken } from '../lib/auth-server';
 import type { QueryClient } from '@tanstack/react-query';

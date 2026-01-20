@@ -1,16 +1,12 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate  } from '@tanstack/react-router';
 import { useMutation, useQuery } from 'convex/react';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, Calendar, Cloud, Frown, Loader2, MapPin, Meh, Plane, Save, Search, Smile, Star, X } from 'lucide-react';
 import { api } from '../../../../convex/_generated/api';
-import type { Id } from '../../../../convex/_generated/dataModel';
 import { Button, Card, CardContent, Input, PageLoading, RichTextEditor } from '../../../components/ui';
-import { ArrowLeft, Save, Calendar, MapPin, Plane, Star, Smile, Meh, Frown, Loader2, Cloud, Search, X } from 'lucide-react';
-import { Link } from '@tanstack/react-router';
-import { fetchHistoricalWeather, formatTemperature, type HistoricalWeather } from '../../../lib/api/weather';
-
-export const Route = createFileRoute('/_authenticated/journal/new')({
-  component: NewJournalEntryPage,
-});
+import {  fetchHistoricalWeather, formatTemperature } from '../../../lib/api/weather';
+import type { Id } from '../../../../convex/_generated/dataModel';
+import type {HistoricalWeather} from '../../../lib/api/weather';
 
 type Mood = 'amazing' | 'good' | 'neutral' | 'challenging';
 
@@ -126,7 +122,7 @@ const NewJournalEntryPage = () => {
     }
   };
 
-  const moods: { id: Mood; label: string; icon: React.ReactNode; color: string }[] = [
+  const moods: Array<{ id: Mood; label: string; icon: React.ReactNode; color: string }> = [
     { id: 'amazing', label: 'Amazing', icon: <Star size={20} />, color: 'text-warning bg-warning/10 border-warning' },
     { id: 'good', label: 'Good', icon: <Smile size={20} />, color: 'text-secondary bg-secondary/10 border-secondary' },
     { id: 'neutral', label: 'Neutral', icon: <Meh size={20} />, color: 'text-muted bg-border-light border-border' },
@@ -275,7 +271,7 @@ const NewJournalEntryPage = () => {
                               </button>
                             ))
                           )
-                        ) : bucketList && bucketList.length > 0 ? (
+                        ) : bucketList.length > 0 ? (
                           <>
                             <div className="px-3 py-2 text-xs font-medium text-muted border-b border-border-light">
                               Recent places
@@ -360,3 +356,7 @@ const NewJournalEntryPage = () => {
     </div>
   );
 };
+
+export const Route = createFileRoute('/_authenticated/journal/new')({
+  component: NewJournalEntryPage,
+});

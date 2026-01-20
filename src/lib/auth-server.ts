@@ -18,26 +18,20 @@ function getAuthUtils() {
   return _authUtils;
 }
 
-export const getToken = async () => {
+export const getToken = () => {
   return getAuthUtils().getToken();
 };
 
-export const fetchAuthQuery = async (
-  ...args: Parameters<ReturnType<typeof convexBetterAuthReactStart>['fetchAuthQuery']>
-) => {
-  return getAuthUtils().fetchAuthQuery(...args);
+export const fetchAuthQuery = (...args: Array<any>) => {
+  return (getAuthUtils().fetchAuthQuery as any)(...args);
 };
 
-export const fetchAuthMutation = async (
-  ...args: Parameters<ReturnType<typeof convexBetterAuthReactStart>['fetchAuthMutation']>
-) => {
-  return getAuthUtils().fetchAuthMutation(...args);
+export const fetchAuthMutation = (...args: Array<any>) => {
+  return (getAuthUtils().fetchAuthMutation as any)(...args);
 };
 
-export const fetchAuthAction = async (
-  ...args: Parameters<ReturnType<typeof convexBetterAuthReactStart>['fetchAuthAction']>
-) => {
-  return getAuthUtils().fetchAuthAction(...args);
+export const fetchAuthAction = (...args: Array<any>) => {
+  return (getAuthUtils().fetchAuthAction as any)(...args);
 };
 
 export const handler = (...args: Parameters<ReturnType<typeof convexBetterAuthReactStart>['handler']>) => {

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useMutation } from 'convex/react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Loader2, UserMinus, UserPlus } from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
-import { Id } from '../../../convex/_generated/dataModel';
-import { motion, AnimatePresence } from 'framer-motion';
-import { UserPlus, UserMinus, Loader2 } from 'lucide-react';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 interface FollowButtonProps {
   userId: Id<'users'>;

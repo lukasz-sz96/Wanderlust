@@ -1,19 +1,15 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useQuery, useMutation } from 'convex/react';
-import { api } from '../../../../convex/_generated/api';
-import { useState, useEffect } from 'react';
+import { useMutation, useQuery } from 'convex/react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { AnimatedPage, Card, CardContent, Input, Avatar, PageLoading } from '../../../components/ui';
+import { AlertCircle, Crown, Search, Shield, Users } from 'lucide-react';
+import { api } from '../../../../convex/_generated/api';
+import { AnimatedPage, Avatar, Card, CardContent, Input, PageLoading } from '../../../components/ui';
 import { ProBadge } from '../../../components/social/ProBadge';
-import { Shield, Search, Crown, Users, AlertCircle } from 'lucide-react';
-import { Id } from '../../../../convex/_generated/dataModel';
+import type { Id } from '../../../../convex/_generated/dataModel';
 
 const ROLES = ['free', 'pro', 'moderator', 'admin'] as const;
 type Role = (typeof ROLES)[number];
-
-export const Route = createFileRoute('/_authenticated/admin/users')({
-  component: AdminUsersPage,
-});
 
 function AdminUsersPage() {
   const navigate = useNavigate();
@@ -178,3 +174,7 @@ function AdminUsersPage() {
     </AnimatedPage>
   );
 }
+
+export const Route = createFileRoute('/_authenticated/admin/users')({
+  component: AdminUsersPage,
+});

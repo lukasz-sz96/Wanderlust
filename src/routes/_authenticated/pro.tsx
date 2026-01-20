@@ -1,23 +1,20 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
 import { motion } from 'framer-motion';
-import { AnimatedPage, Card, CardContent, Button } from '../../components/ui';
 import {
-  Crown,
-  Check,
-  Users,
-  Share2,
-  Clock,
-  Link2,
   BarChart3,
+  Check,
+  Clock,
+  Crown,
+  Link2,
+  Share2,
   Sparkles,
-  LucideIcon,
+  Users
 } from 'lucide-react';
-
-export const Route = createFileRoute('/_authenticated/pro')({
-  component: ProPage,
-});
+import { api } from '../../../convex/_generated/api';
+import { AnimatedPage, Button, Card, CardContent } from '../../components/ui';
+import type {
+  LucideIcon} from 'lucide-react';
 
 interface Feature {
   icon: LucideIcon;
@@ -27,7 +24,7 @@ interface Feature {
   pro: string | boolean;
 }
 
-const features: Feature[] = [
+const features: Array<Feature> = [
   {
     icon: Users,
     title: 'Unlimited Follows',
@@ -225,3 +222,7 @@ function ProPage() {
     </AnimatedPage>
   );
 }
+
+export const Route = createFileRoute('/_authenticated/pro')({
+  component: ProPage,
+});

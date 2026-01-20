@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Home, MapPin, Plane, BookOpen, Settings, LogOut, ChevronLeft, Compass, Rss, User, Crown, Shield, Users } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { BookOpen, ChevronLeft, Compass, Crown, Home, LogOut, MapPin, Plane, Rss, Settings, Shield, User, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { authClient } from '../../lib/auth-client';
@@ -15,7 +15,7 @@ interface NavItem {
   icon: React.ReactNode;
 }
 
-const navItems: NavItem[] = [
+const navItems: Array<NavItem> = [
   { label: 'Dashboard', href: '/dashboard', icon: <Home size={20} /> },
   { label: 'Feed', href: '/feed', icon: <Rss size={20} /> },
   { label: 'Places', href: '/places', icon: <MapPin size={20} /> },

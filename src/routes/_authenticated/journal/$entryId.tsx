@@ -1,29 +1,25 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useQuery, useMutation } from 'convex/react';
+import { Link, createFileRoute } from '@tanstack/react-router';
+import { useMutation, useQuery } from 'convex/react';
 import { useState } from 'react';
-import { api } from '../../../../convex/_generated/api';
-import type { Id } from '../../../../convex/_generated/dataModel';
-import { Card, CardContent, Button, Badge, IconButton, PageLoading } from '../../../components/ui';
-import { PhotoUpload, PhotoGallery } from '../../../components/photos';
 import {
   ArrowLeft,
   BookOpen,
   Calendar,
-  MapPin,
-  Plane,
-  Trash2,
-  Star,
-  Smile,
-  Meh,
   Frown,
   Image,
+  MapPin,
+  Meh,
+  Plane,
+  Smile,
+  Star,
+  Trash2,
   Upload,
 } from 'lucide-react';
+import { api } from '../../../../convex/_generated/api';
+import { PhotoGallery, PhotoUpload } from '../../../components/photos';
+import { Badge, Button, Card, CardContent, IconButton, PageLoading } from '../../../components/ui';
 import { formatTemperature } from '../../../lib/api/weather';
-
-export const Route = createFileRoute('/_authenticated/journal/$entryId')({
-  component: JournalEntryPage,
-});
+import type { Id } from '../../../../convex/_generated/dataModel';
 
 const JournalEntryPage = () => {
   const { entryId } = Route.useParams();
@@ -104,7 +100,7 @@ const JournalEntryPage = () => {
   const getContentText = (content: unknown): string => {
     if (!content) return '';
     if (typeof content === 'string') return content;
-    if (typeof content === 'object' && content !== null) {
+    if (typeof content === 'object') {
       const doc = content as { content?: Array<{ content?: Array<{ text?: string }> }> };
       if (doc.content) {
         return doc.content
@@ -251,3 +247,7 @@ const JournalEntryPage = () => {
     </div>
   );
 };
+
+export const Route = createFileRoute('/_authenticated/journal/$entryId')({
+  component: JournalEntryPage,
+});

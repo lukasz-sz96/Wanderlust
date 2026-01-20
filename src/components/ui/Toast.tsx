@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';
+import { createContext, useCallback, useContext, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { AlertCircle, CheckCircle, Info, X, XCircle } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -12,7 +13,7 @@ interface Toast {
 }
 
 interface ToastContextType {
-  toasts: Toast[];
+  toasts: Array<Toast>;
   addToast: (message: string, type?: ToastType, duration?: number) => void;
   removeToast: (id: string) => void;
   success: (message: string, duration?: number) => void;
@@ -36,7 +37,7 @@ interface ToastProviderProps {
 }
 
 export function ToastProvider({ children }: ToastProviderProps) {
-  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [toasts, setToasts] = useState<Array<Toast>>([]);
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
@@ -78,7 +79,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
 }
 
 interface ToastContainerProps {
-  toasts: Toast[];
+  toasts: Array<Toast>;
   onRemove: (id: string) => void;
 }
 

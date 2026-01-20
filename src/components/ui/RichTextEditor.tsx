@@ -1,20 +1,21 @@
-import { useEditor, EditorContent, type Editor } from '@tiptap/react';
+import {  EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
 import {
   Bold,
+  Heading1,
+  Heading2,
+  ImageIcon,
   Italic,
-  Strikethrough,
   List,
   ListOrdered,
   Quote,
-  Heading1,
-  Heading2,
-  Undo,
   Redo,
-  ImageIcon,
+  Strikethrough,
+  Undo,
 } from 'lucide-react';
+import type {Editor} from '@tiptap/react';
 
 interface RichTextEditorProps {
   content: string;
@@ -151,8 +152,8 @@ export const RichTextEditor = ({ content, onChange, placeholder = 'Write somethi
       }),
     ],
     content,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getJSON());
+    onUpdate: ({ editor: editorInstance }) => {
+      onChange(editorInstance.getJSON());
     },
     editorProps: {
       attributes: {

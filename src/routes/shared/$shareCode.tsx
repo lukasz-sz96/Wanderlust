@@ -1,23 +1,19 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useQuery, useMutation } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
+import { Link, createFileRoute } from '@tanstack/react-router';
+import { useMutation, useQuery } from 'convex/react';
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AnimatedPage, Card, CardContent, PageLoading, Avatar, Button } from '../../components/ui';
 import {
-  MapPin,
+  ArrowRight,
   Calendar,
+  Clock,
   Compass,
   Eye,
-  Clock,
-  ArrowRight,
+  MapPin,
   MapPinOff,
 } from 'lucide-react';
 import { format } from 'date-fns';
-
-export const Route = createFileRoute('/shared/$shareCode')({
-  component: SharedTripPage,
-});
+import { AnimatedPage, Avatar, Button, Card, CardContent, PageLoading } from '../../components/ui';
+import { api } from '../../../convex/_generated/api';
 
 function SharedTripPage() {
   const { shareCode } = Route.useParams();
@@ -63,15 +59,17 @@ function SharedTripPage() {
 
   // Group itinerary by day
   type ItineraryItem = (typeof itineraryItems)[number];
-  const dayGroups = itineraryItems.reduce(
+  const dayGroups = itineraryItems.reduce<Partial<Record<number, Array<ItineraryItem>>>>(
     (acc, item) => {
-      if (!acc[item.dayNumber]) {
-        acc[item.dayNumber] = [];
+      const existing = acc[item.dayNumber];
+      if (existing) {
+        existing.push(item);
+      } else {
+        acc[item.dayNumber] = [item];
       }
-      acc[item.dayNumber].push(item);
       return acc;
     },
-    {} as Record<number, ItineraryItem[]>
+    {}
   );
 
   return (
@@ -161,6 +159,7 @@ function SharedTripPage() {
               </Card>
             ) : (
               Object.entries(dayGroups)
+                .filter((entry): entry is [string, Array<ItineraryItem>] => entry[1] !== undefined)
                 .sort(([a], [b]) => Number(a) - Number(b))
                 .map(([day, items]) => (
                   <motion.div
@@ -261,3 +260,7 @@ function SharedTripPage() {
     </div>
   );
 }
+
+export const Route = createFileRoute('/shared/$shareCode')({
+  component: SharedTripPage,
+});

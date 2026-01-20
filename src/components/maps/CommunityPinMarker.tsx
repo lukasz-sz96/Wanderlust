@@ -12,7 +12,7 @@ interface CommunityPinMarkerProps {
   name: string;
   photoCount: number;
   previewUrl?: string;
-  contributors: Contributor[];
+  contributors: Array<Contributor>;
   isHovered?: boolean;
   onClick?: () => void;
 }

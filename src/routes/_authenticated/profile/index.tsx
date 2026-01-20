@@ -4,10 +4,6 @@ import { useEffect } from 'react';
 import { api } from '../../../../convex/_generated/api';
 import { PageLoading } from '../../../components/ui';
 
-export const Route = createFileRoute('/_authenticated/profile/')({
-  component: ProfileIndexPage,
-});
-
 function ProfileIndexPage() {
   const navigate = useNavigate();
   const profile = useQuery(api.social.getProfile, {});
@@ -20,3 +16,7 @@ function ProfileIndexPage() {
 
   return <PageLoading />;
 }
+
+export const Route = createFileRoute('/_authenticated/profile/')({
+  component: ProfileIndexPage,
+});

@@ -1,13 +1,9 @@
 import { useState } from 'react';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { Mail, ArrowLeft, Compass, Loader2, CheckCircle } from 'lucide-react';
-import { Button, Input, Card, CardContent } from '../components/ui';
+import { ArrowLeft, CheckCircle, Compass, Loader2, Mail } from 'lucide-react';
+import { Button, Card, CardContent, Input } from '../components/ui';
 import { authClient } from '../lib/auth-client';
-
-export const Route = createFileRoute('/forgot-password')({
-  component: ForgotPasswordPage,
-});
 
 function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -21,7 +17,7 @@ function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      await authClient.forgetPassword({
+      await (authClient as any).forgetPassword({
         email,
         redirectTo: '/reset-password',
       });
@@ -143,3 +139,7 @@ function ForgotPasswordPage() {
     </div>
   );
 }
+
+export const Route = createFileRoute('/forgot-password')({
+  component: ForgotPasswordPage,
+});

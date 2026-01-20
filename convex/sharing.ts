@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
-import { query, mutation } from './_generated/server';
-import { Doc, Id } from './_generated/dataModel';
-import { checkPermission, FREE_LIMITS } from './roles';
+import { mutation, query } from './_generated/server';
+import { FREE_LIMITS, checkPermission } from './roles';
+import type { Doc, Id } from './_generated/dataModel';
 
 // Helper to generate 8-character alphanumeric share code
 function generateShareCode(): string {
@@ -60,7 +60,7 @@ export const createShareLink = mutation({
     }
 
     // Verify trip ownership
-    const trip = await ctx.db.get(args.tripId);
+    const trip = await ctx.db.get("trips", args.tripId);
     if (!trip) {
       throw new Error('Trip not found');
     }
@@ -214,13 +214,13 @@ export const getSharedTrip = query({
     }
 
     // Get the trip
-    const trip = await ctx.db.get(sharedTrip.tripId);
+    const trip = await ctx.db.get("trips", sharedTrip.tripId);
     if (!trip) {
       return null;
     }
 
     // Get the owner
-    const owner = await ctx.db.get(trip.userId);
+    const owner = await ctx.db.get("users", trip.userId);
     if (!owner) {
       return null;
     }
@@ -248,7 +248,7 @@ export const getSharedTrip = query({
       return a.orderIndex - b.orderIndex;
     });
 
-    const itineraryItems: {
+    const itineraryItems: Array<{
       _id: Id<'itineraryItems'>;
       dayNumber: number;
       orderIndex: number;
@@ -267,10 +267,10 @@ export const getSharedTrip = query({
         country: string | undefined;
         category: string | undefined;
       };
-    }[] = [];
+    }> = [];
 
     for (const item of items) {
-      const place = await ctx.db.get(item.placeId);
+      const place = await ctx.db.get("places", item.placeId);
       if (!place) {
         continue;
       }
@@ -351,7 +351,7 @@ export const getShareSettings = query({
     }
 
     // Verify trip ownership
-    const trip = await ctx.db.get(args.tripId);
+    const trip = await ctx.db.get("trips", args.tripId);
     if (!trip || trip.userId !== currentUser._id) {
       return null;
     }
@@ -405,7 +405,7 @@ export const updateShareSettings = mutation({
     }
 
     // Verify trip ownership
-    const trip = await ctx.db.get(args.tripId);
+    const trip = await ctx.db.get("trips", args.tripId);
     if (!trip) {
       throw new Error('Trip not found');
     }
@@ -464,7 +464,7 @@ export const updateShareSettings = mutation({
 
     // Apply updates
     if (Object.keys(updates).length > 0) {
-      await ctx.db.patch(sharedTrip._id, updates);
+      await ctx.db.patch("sharedTrips", sharedTrip._id, updates);
     }
 
     return null;
@@ -493,7 +493,7 @@ export const deleteShareLink = mutation({
     }
 
     // Verify trip ownership
-    const trip = await ctx.db.get(args.tripId);
+    const trip = await ctx.db.get("trips", args.tripId);
     if (!trip) {
       throw new Error('Trip not found');
     }
@@ -509,7 +509,7 @@ export const deleteShareLink = mutation({
       .unique();
 
     if (sharedTrip) {
-      await ctx.db.delete(sharedTrip._id);
+      await ctx.db.delete("sharedTrips", sharedTrip._id);
     }
 
     return null;
@@ -538,7 +538,7 @@ export const incrementViewCount = mutation({
     }
 
     if (sharedTrip && sharedTrip.isPublic) {
-      await ctx.db.patch(sharedTrip._id, {
+      await ctx.db.patch("sharedTrips", sharedTrip._id, {
         viewCount: sharedTrip.viewCount + 1,
       });
     }

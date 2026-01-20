@@ -1,9 +1,9 @@
 import { v } from 'convex/values';
-import { query, mutation } from './_generated/server';
-import { Doc } from './_generated/dataModel';
+import { mutation, query } from './_generated/server';
+import type { Doc } from './_generated/dataModel';
 
 // Role hierarchy and permissions
-const ROLE_PERMISSIONS: Record<string, string[]> = {
+const ROLE_PERMISSIONS: Partial<Record<string, Array<string>>> = {
   free: ['basic'],
   pro: [
     'basic',
@@ -50,7 +50,9 @@ export const FREE_LIMITS = {
 
 export function checkPermission(role: string | undefined, permission: string): boolean {
   const userRole = role || 'free';
-  return ROLE_PERMISSIONS[userRole]?.includes(permission) ?? false;
+  const permissions = ROLE_PERMISSIONS[userRole];
+  if (!permissions) return false;
+  return permissions.includes(permission);
 }
 
 export function getUserRole(user: Doc<'users'>): string {
@@ -121,7 +123,7 @@ export const setUserRole = mutation({
       throw new Error('Not authorized to manage roles');
     }
 
-    await ctx.db.patch(args.userId, {
+    await ctx.db.patch("users", args.userId, {
       role: args.role,
       roleUpdatedAt: Date.now(),
     });
@@ -169,13 +171,13 @@ export const listUsers = query({
     const limit = args.limit || 50;
 
     // Use role index if filtering by role, otherwise get all
-    let query = args.role
+    const usersQuery = args.role
       ? ctx.db.query('users').withIndex('by_role', (q) => q.eq('role', args.role))
       : ctx.db.query('users');
 
     // Collect with a reasonable limit to avoid memory issues
     const maxFetch = args.search ? 500 : limit + 1; // Fetch more if searching
-    let users = await query.take(maxFetch);
+    let users = await usersQuery.take(maxFetch);
 
     // Apply cursor manually (skip users until we find cursor)
     if (args.cursor) {

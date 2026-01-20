@@ -1,5 +1,6 @@
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import {   forwardRef } from 'react';
 import { motion } from 'framer-motion';
+import type {ButtonHTMLAttributes, ReactNode} from 'react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -38,6 +39,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       children,
       disabled,
       className = '',
+      onDrag: _onDrag,
+      onDragStart: _onDragStart,
+      onDragEnd: _onDragEnd,
+      onAnimationStart: _onAnimationStart,
+      onAnimationEnd: _onAnimationEnd,
       ...props
     },
     ref,

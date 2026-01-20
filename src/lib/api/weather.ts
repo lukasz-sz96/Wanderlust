@@ -20,11 +20,11 @@ export interface DailyForecast {
 
 export interface WeatherData {
   current: CurrentWeather;
-  daily: DailyForecast[];
+  daily: Array<DailyForecast>;
   timezone: string;
 }
 
-const weatherCodeToCondition: Record<number, { condition: string; icon: string }> = {
+const weatherCodeToCondition: Partial<Record<number, { condition: string; icon: string }>> = {
   0: { condition: 'Clear sky', icon: '☀️' },
   1: { condition: 'Mainly clear', icon: '🌤️' },
   2: { condition: 'Partly cloudy', icon: '⛅' },

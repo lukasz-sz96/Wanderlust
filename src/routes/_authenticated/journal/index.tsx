@@ -1,24 +1,20 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { BookOpen, Calendar, Filter, Frown, Image, MapPin, Meh, Plane, Plus, Search, Smile, SortAsc, Star, X } from 'lucide-react';
 import { api } from '../../../../convex/_generated/api';
-import type { Id } from '../../../../convex/_generated/dataModel';
 import {
+  AnimatedPage,
+  Badge,
   Button,
   Card,
   CardContent,
-  Badge,
-  AnimatedPage,
-  SkeletonJournalEntry,
   EmptyState,
+  SkeletonJournalEntry,
 } from '../../../components/ui';
 import { staggerContainer, staggerItem } from '../../../lib/animations';
-import { BookOpen, Plus, Calendar, MapPin, Plane, Image, Smile, Meh, Frown, Star, Search, X, Filter, SortAsc } from 'lucide-react';
-
-export const Route = createFileRoute('/_authenticated/journal/')({
-  component: JournalPage,
-});
+import type { Id } from '../../../../convex/_generated/dataModel';
 
 type Mood = 'amazing' | 'good' | 'neutral' | 'challenging';
 type SortBy = 'recent' | 'oldest' | 'mood';
@@ -70,14 +66,15 @@ const JournalPage = () => {
       case 'oldest':
         filtered.sort((a, b) => new Date(a.entryDate).getTime() - new Date(b.entryDate).getTime());
         break;
-      case 'mood':
+      case 'mood': {
         const moodOrder = { amazing: 0, good: 1, neutral: 2, challenging: 3 };
         filtered.sort((a, b) => {
-          const moodA = a.mood ? moodOrder[a.mood as keyof typeof moodOrder] : 4;
-          const moodB = b.mood ? moodOrder[b.mood as keyof typeof moodOrder] : 4;
+          const moodA = a.mood ? moodOrder[a.mood] : 4;
+          const moodB = b.mood ? moodOrder[b.mood] : 4;
           return moodA - moodB;
         });
         break;
+      }
       default:
         filtered.sort((a, b) => new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime());
     }
@@ -100,7 +97,7 @@ const JournalPage = () => {
   const getContentText = (content: unknown): string => {
     if (!content) return '';
     if (typeof content === 'string') return content;
-    if (typeof content === 'object' && content !== null) {
+    if (typeof content === 'object') {
       const doc = content as { content?: Array<{ content?: Array<{ text?: string }> }> };
       if (doc.content) {
         return doc.content
@@ -173,7 +170,7 @@ const JournalPage = () => {
   const getContentPreview = (content: unknown): string => {
     if (!content) return '';
     if (typeof content === 'string') return content.slice(0, 150);
-    if (typeof content === 'object' && content !== null) {
+    if (typeof content === 'object') {
       const doc = content as { content?: Array<{ content?: Array<{ text?: string }> }> };
       if (doc.content) {
         const text = doc.content
@@ -423,3 +420,7 @@ const JournalPage = () => {
     </AnimatedPage>
   );
 };
+
+export const Route = createFileRoute('/_authenticated/journal/')({
+  component: JournalPage,
+});

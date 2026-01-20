@@ -1,5 +1,7 @@
-import { type HTMLAttributes, type ReactNode, forwardRef } from 'react';
-import { motion, type HTMLMotionProps } from 'framer-motion';
+import {   forwardRef } from 'react';
+import {  motion } from 'framer-motion';
+import type {HTMLMotionProps} from 'framer-motion';
+import type {HTMLAttributes, ReactNode} from 'react';
 
 type CardVariant = 'default' | 'elevated' | 'outline';
 

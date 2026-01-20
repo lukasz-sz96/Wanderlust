@@ -1,33 +1,29 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useQuery, useMutation } from 'convex/react';
+import { Link, createFileRoute } from '@tanstack/react-router';
+import { useMutation, useQuery } from 'convex/react';
 import { useState } from 'react';
-import { api } from '../../../../convex/_generated/api';
-import type { Id } from '../../../../convex/_generated/dataModel';
-import { MapView } from '../../../components/maps';
-import { Card, CardContent, Button, Badge, IconButton, PageLoading } from '../../../components/ui';
-import { PhotoUpload, PhotoGallery } from '../../../components/photos';
-import { AddActivityModal } from '../../../components/trips';
 import {
   ArrowLeft,
-  Plane,
-  MapPin,
   Calendar,
-  Plus,
-  Trash2,
-  Clock,
-  Utensils,
   Car,
-  Home,
   CheckCircle,
-  Share2,
+  Clock,
+  Home,
   Image,
+  MapPin,
+  Plane,
+  Plus,
+  Share2,
+  Trash2,
   Upload,
+  Utensils,
 } from 'lucide-react';
+import { api } from '../../../../convex/_generated/api';
+import { MapView } from '../../../components/maps';
+import { Badge, Button, Card, CardContent, IconButton, PageLoading } from '../../../components/ui';
+import { PhotoGallery, PhotoUpload } from '../../../components/photos';
+import { AddActivityModal } from '../../../components/trips';
 import { ShareTripModal } from '../../../components/social/ShareTripModal';
-
-export const Route = createFileRoute('/_authenticated/trips/$tripId')({
-  component: TripDetailPage,
-});
+import type { Id } from '../../../../convex/_generated/dataModel';
 
 const TripDetailPage = () => {
   const { tripId } = Route.useParams();
@@ -402,3 +398,7 @@ const TripDetailPage = () => {
     </div>
   );
 };
+
+export const Route = createFileRoute('/_authenticated/trips/$tripId')({
+  component: TripDetailPage,
+});

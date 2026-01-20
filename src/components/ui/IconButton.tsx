@@ -1,5 +1,6 @@
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import {   forwardRef } from 'react';
 import { motion } from 'framer-motion';
+import type {ButtonHTMLAttributes, ReactNode} from 'react';
 
 type IconButtonVariant = 'default' | 'ghost' | 'primary' | 'danger';
 type IconButtonSize = 'sm' | 'md' | 'lg';
@@ -25,7 +26,7 @@ const sizeStyles: Record<IconButtonSize, string> = {
 };
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ variant = 'default', size = 'md', label, children, disabled, className = '', ...props }, ref) => {
+  ({ variant = 'default', size = 'md', label, children, disabled, className = '', onDrag: _onDrag, onDragStart: _onDragStart, onDragEnd: _onDragEnd, onAnimationStart: _onAnimationStart, onAnimationEnd: _onAnimationEnd, ...props }, ref) => {
     return (
       <motion.button
         ref={ref}

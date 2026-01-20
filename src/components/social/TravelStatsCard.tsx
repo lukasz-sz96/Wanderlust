@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Globe, Plane, MapPin, BookOpen, LucideIcon } from 'lucide-react';
+import { BookOpen, Globe, MapPin, Plane } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface TravelStatsCardProps {
   stats: {
@@ -20,7 +21,7 @@ interface StatItem {
 }
 
 export function TravelStatsCard({ stats, animate = true }: TravelStatsCardProps) {
-  const statItems: StatItem[] = [
+  const statItems: Array<StatItem> = [
     {
       icon: Globe,
       label: 'Countries',

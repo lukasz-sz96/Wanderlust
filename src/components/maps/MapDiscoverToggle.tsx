@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MapPin, Globe } from 'lucide-react';
+import { Globe, MapPin } from 'lucide-react';
 
 type MapMode = 'my-places' | 'discover';
 

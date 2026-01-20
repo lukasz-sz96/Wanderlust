@@ -1,5 +1,5 @@
-import { Spinner } from './Spinner';
 import { motion } from 'framer-motion';
+import { Spinner } from './Spinner';
 
 interface PageLoadingProps {
   message?: string;

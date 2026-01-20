@@ -1,16 +1,12 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { ArrowRight, Calendar, CheckCircle, Clock, MapPin, Plane, Plus } from 'lucide-react';
 import { api } from '../../../../convex/_generated/api';
-import { Button, Card, CardContent, Badge, AnimatedPage, SkeletonTripCard, EmptyState } from '../../../components/ui';
+import { AnimatedPage, Badge, Button, Card, CardContent, EmptyState, SkeletonTripCard } from '../../../components/ui';
 import { staggerContainer, staggerItem } from '../../../lib/animations';
-import { Plane, Plus, MapPin, Calendar, CheckCircle, Clock, ArrowRight } from 'lucide-react';
 import { CreateTripModal } from '../../../components/trips';
-
-export const Route = createFileRoute('/_authenticated/trips/')({
-  component: TripsPage,
-});
 
 type TabType = 'all' | 'planning' | 'active' | 'completed';
 
@@ -202,3 +198,7 @@ const TripsPage = () => {
     </AnimatedPage>
   );
 };
+
+export const Route = createFileRoute('/_authenticated/trips/')({
+  component: TripsPage,
+});

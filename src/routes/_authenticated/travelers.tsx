@@ -1,18 +1,14 @@
 import { useState } from 'react';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useQuery, useMutation } from 'convex/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Link, createFileRoute } from '@tanstack/react-router';
+import { useMutation, useQuery } from 'convex/react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Globe, MapPin, Plane, Search, Star, TrendingUp, UserPlus, Users } from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
-import type { Id } from '../../../convex/_generated/dataModel';
-import { AnimatedPage, Card, CardContent, Input, PageLoading, Button, Badge } from '../../components/ui';
+import { AnimatedPage, Badge, Button, Card, CardContent, Input, PageLoading } from '../../components/ui';
 import { Avatar } from '../../components/ui/Avatar';
 import { FollowButton } from '../../components/social/FollowButton';
 import { ProBadge } from '../../components/social/ProBadge';
-import { Search, Users, MapPin, Plane, Star, UserPlus, TrendingUp, Globe } from 'lucide-react';
-
-export const Route = createFileRoute('/_authenticated/travelers')({
-  component: TravelersPage,
-});
+import type { Id } from '../../../convex/_generated/dataModel';
 
 function TravelersPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -104,7 +100,7 @@ function TravelersPage() {
           </div>
         )}
 
-        {!isSearching && suggestedUsers && suggestedUsers.length === 0 && (
+        {!isSearching && suggestedUsers.length === 0 && (
           <Card>
             <CardContent className="text-center py-12">
               <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-4">
@@ -214,3 +210,7 @@ function TravelerCard({ user, index, showStats = true }: TravelerCardProps) {
     </motion.div>
   );
 }
+
+export const Route = createFileRoute('/_authenticated/travelers')({
+  component: TravelersPage,
+});

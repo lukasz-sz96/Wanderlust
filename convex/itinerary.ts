@@ -35,7 +35,7 @@ export const add = mutation({
       throw new Error('User not found');
     }
 
-    const trip = await ctx.db.get(args.tripId);
+    const trip = await ctx.db.get("trips", args.tripId);
     if (!trip || trip.userId !== user._id) {
       throw new Error('Trip not found or not authorized');
     }
@@ -60,7 +60,7 @@ export const add = mutation({
       createdAt: Date.now(),
     });
 
-    await ctx.db.patch(args.tripId, { updatedAt: Date.now() });
+    await ctx.db.patch("trips", args.tripId, { updatedAt: Date.now() });
 
     return itemId;
   },
@@ -82,7 +82,7 @@ export const update = mutation({
       throw new Error('Not authenticated');
     }
 
-    const item = await ctx.db.get(args.itemId);
+    const item = await ctx.db.get("itineraryItems", args.itemId);
     if (!item) {
       throw new Error('Item not found');
     }
@@ -96,7 +96,7 @@ export const update = mutation({
       throw new Error('User not found');
     }
 
-    const trip = await ctx.db.get(item.tripId);
+    const trip = await ctx.db.get("trips", item.tripId);
     if (!trip || trip.userId !== user._id) {
       throw new Error('Not authorized');
     }
@@ -108,8 +108,8 @@ export const update = mutation({
     if (args.notes !== undefined) updates.notes = args.notes;
     if (args.category !== undefined) updates.category = args.category;
 
-    await ctx.db.patch(args.itemId, updates);
-    await ctx.db.patch(item.tripId, { updatedAt: Date.now() });
+    await ctx.db.patch("itineraryItems", args.itemId, updates);
+    await ctx.db.patch("trips", item.tripId, { updatedAt: Date.now() });
 
     return null;
   },
@@ -126,7 +126,7 @@ export const remove = mutation({
       throw new Error('Not authenticated');
     }
 
-    const item = await ctx.db.get(args.itemId);
+    const item = await ctx.db.get("itineraryItems", args.itemId);
     if (!item) {
       throw new Error('Item not found');
     }
@@ -140,13 +140,13 @@ export const remove = mutation({
       throw new Error('User not found');
     }
 
-    const trip = await ctx.db.get(item.tripId);
+    const trip = await ctx.db.get("trips", item.tripId);
     if (!trip || trip.userId !== user._id) {
       throw new Error('Not authorized');
     }
 
-    await ctx.db.delete(args.itemId);
-    await ctx.db.patch(item.tripId, { updatedAt: Date.now() });
+    await ctx.db.delete("itineraryItems", args.itemId);
+    await ctx.db.patch("trips", item.tripId, { updatedAt: Date.now() });
 
     return null;
   },
@@ -174,22 +174,22 @@ export const reorder = mutation({
       throw new Error('User not found');
     }
 
-    const trip = await ctx.db.get(args.tripId);
+    const trip = await ctx.db.get("trips", args.tripId);
     if (!trip || trip.userId !== user._id) {
       throw new Error('Not authorized');
     }
 
     for (let i = 0; i < args.itemIds.length; i++) {
-      const item = await ctx.db.get(args.itemIds[i]);
+      const item = await ctx.db.get("itineraryItems", args.itemIds[i]);
       if (item && item.tripId === args.tripId) {
-        await ctx.db.patch(args.itemIds[i], {
+        await ctx.db.patch("itineraryItems", args.itemIds[i], {
           orderIndex: i + 1,
           dayNumber: args.dayNumber,
         });
       }
     }
 
-    await ctx.db.patch(args.tripId, { updatedAt: Date.now() });
+    await ctx.db.patch("trips", args.tripId, { updatedAt: Date.now() });
 
     return null;
   },
@@ -242,7 +242,7 @@ export const listByTrip = query({
       return [];
     }
 
-    const trip = await ctx.db.get(args.tripId);
+    const trip = await ctx.db.get("trips", args.tripId);
     if (!trip || trip.userId !== user._id) {
       return [];
     }
@@ -259,7 +259,7 @@ export const listByTrip = query({
 
     const enrichedItems = await Promise.all(
       items.map(async (item) => {
-        const place = await ctx.db.get(item.placeId);
+        const place = await ctx.db.get("places", item.placeId);
         return {
           ...item,
           place: place
@@ -329,7 +329,7 @@ export const listByDay = query({
       return [];
     }
 
-    const trip = await ctx.db.get(args.tripId);
+    const trip = await ctx.db.get("trips", args.tripId);
     if (!trip || trip.userId !== user._id) {
       return [];
     }
@@ -343,7 +343,7 @@ export const listByDay = query({
 
     const enrichedItems = await Promise.all(
       items.map(async (item) => {
-        const place = await ctx.db.get(item.placeId);
+        const place = await ctx.db.get("places", item.placeId);
         return {
           ...item,
           place: place

@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { Id } from './_generated/dataModel';
+import type { Id } from './_generated/dataModel';
 
 export const generateUploadUrl = mutation({
   args: {},
@@ -77,7 +77,7 @@ export const updateCaption = mutation({
       throw new Error('Not authenticated');
     }
 
-    const photo = await ctx.db.get(args.photoId);
+    const photo = await ctx.db.get("photos", args.photoId);
     if (!photo) {
       throw new Error('Photo not found');
     }
@@ -91,7 +91,7 @@ export const updateCaption = mutation({
       throw new Error('Not authorized');
     }
 
-    await ctx.db.patch(args.photoId, { caption: args.caption });
+    await ctx.db.patch("photos", args.photoId, { caption: args.caption });
 
     return null;
   },
@@ -108,7 +108,7 @@ export const remove = mutation({
       throw new Error('Not authenticated');
     }
 
-    const photo = await ctx.db.get(args.photoId);
+    const photo = await ctx.db.get("photos", args.photoId);
     if (!photo) {
       throw new Error('Photo not found');
     }
@@ -123,7 +123,7 @@ export const remove = mutation({
     }
 
     await ctx.storage.delete(photo.storageId);
-    await ctx.db.delete(args.photoId);
+    await ctx.db.delete("photos", args.photoId);
 
     return null;
   },
@@ -316,7 +316,7 @@ export const updateVisibility = mutation({
       throw new Error('Not authenticated');
     }
 
-    const photo = await ctx.db.get(args.photoId);
+    const photo = await ctx.db.get("photos", args.photoId);
     if (!photo) {
       throw new Error('Photo not found');
     }
@@ -330,7 +330,7 @@ export const updateVisibility = mutation({
       throw new Error('Not authorized');
     }
 
-    await ctx.db.patch(args.photoId, { visibility: args.visibility });
+    await ctx.db.patch("photos", args.photoId, { visibility: args.visibility });
 
     return null;
   },
@@ -408,7 +408,7 @@ export const listByPlace = query({
       visiblePhotos.map(async (photo) => {
         const [url, photoUser] = await Promise.all([
           ctx.storage.getUrl(photo.storageId),
-          ctx.db.get(photo.userId),
+          ctx.db.get("users", photo.userId),
         ]);
 
         return {
@@ -455,7 +455,7 @@ export const getPlacePhotoStats = query({
 
     const contributors = await Promise.all(
       uniqueUserIds.slice(0, 5).map(async (userId) => {
-        const user = await ctx.db.get(userId);
+        const user = await ctx.db.get("users", userId);
         return {
           _id: userId,
           displayName: user?.displayName,

@@ -1,13 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useAction, useMutation } from 'convex/react';
 import { useState } from 'react';
+import { ArrowRight, Calendar, Clock, Compass, Loader2, MapPin, Plus, Search, Shuffle, Sparkles } from 'lucide-react';
 import { api } from '../../../../convex/_generated/api';
-import { Button, Card, CardContent, Input, Badge, useToast } from '../../../components/ui';
-import { Compass, Sparkles, Search, MapPin, Clock, Calendar, Plus, Loader2, Shuffle, ArrowRight } from 'lucide-react';
-
-export const Route = createFileRoute('/_authenticated/places/discover')({
-  component: DiscoverPage,
-});
+import { Badge, Button, Card, CardContent, Input, useToast } from '../../../components/ui';
 
 type Recommendation = {
   name: string;
@@ -27,16 +23,16 @@ type SurpriseDestination = {
   country: string;
   tagline: string;
   description: string;
-  highlights: string[];
-  bestFor: string[];
+  highlights: Array<string>;
+  bestFor: Array<string>;
   latitude?: number;
   longitude?: number;
 };
 
 const DiscoverPage = () => {
   const [query, setQuery] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Array<string>>([]);
+  const [recommendations, setRecommendations] = useState<Array<Recommendation>>([]);
   const [surprise, setSurprise] = useState<SurpriseDestination | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSurpriseLoading, setIsSurpriseLoading] = useState(false);
@@ -350,3 +346,7 @@ const DiscoverPage = () => {
     </div>
   );
 };
+
+export const Route = createFileRoute('/_authenticated/places/discover')({
+  component: DiscoverPage,
+});

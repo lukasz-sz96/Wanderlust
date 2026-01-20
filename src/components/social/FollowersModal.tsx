@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { useQuery } from 'convex/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Loader2, Users, X } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 import { api } from '../../../convex/_generated/api';
-import type { Id } from '../../../convex/_generated/dataModel';
-import { X, Users, Loader2 } from 'lucide-react';
-import { Card, CardContent, Button } from '../ui';
+import { Button, Card, CardContent } from '../ui';
 import { Avatar } from '../ui/Avatar';
 import { FollowButton } from './FollowButton';
-import { ProBadge } from './ProBadge';
-import { Link } from '@tanstack/react-router';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 type Tab = 'followers' | 'following';
 
@@ -133,8 +132,6 @@ interface UserListItemProps {
 }
 
 function UserListItem({ user, onClose }: UserListItemProps) {
-  const isPro = false;
-
   return (
     <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-border-light/50 transition-colors">
       <Link to="/profile/$userId" params={{ userId: user._id }} onClick={onClose}>
@@ -151,7 +148,6 @@ function UserListItem({ user, onClose }: UserListItemProps) {
           <span className="font-medium text-foreground hover:text-primary transition-colors truncate">
             {user.displayName || 'Traveler'}
           </span>
-          {isPro && <ProBadge size="sm" />}
         </Link>
         {user.bio && <p className="text-sm text-muted truncate">{user.bio}</p>}
       </div>

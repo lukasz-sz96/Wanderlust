@@ -1,6 +1,7 @@
-import { useRef, useCallback, useState } from 'react';
-import Map, { Marker, NavigationControl, type MapRef, type ViewStateChangeEvent } from 'react-map-gl/maplibre';
-import { MapPin, Camera, Eye } from 'lucide-react';
+import { useCallback, useRef, useState } from 'react';
+import Map, {  Marker, NavigationControl  } from 'react-map-gl/maplibre';
+import { Camera, Eye, MapPin } from 'lucide-react';
+import type {MapRef, ViewStateChangeEvent} from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 const STADIA_API_KEY = import.meta.env.VITE_STADIA_API_KEY || '';
@@ -32,7 +33,7 @@ interface MapViewProps {
   latitude?: number;
   longitude?: number;
   zoom?: number;
-  markers?: MapMarker[];
+  markers?: Array<MapMarker>;
   style?: 'streets' | 'outdoors' | 'satellite';
   interactive?: boolean;
   showNavigation?: boolean;
@@ -83,7 +84,7 @@ export const MapView = ({
         mapStyle={MAP_STYLES[style]}
         style={{ width: '100%', height: '100%' }}
         interactive={interactive}
-        attributionControl={true}
+        attributionControl={{ compact: true }}
       >
         {showNavigation && <NavigationControl position="top-right" showCompass showZoom />}
 

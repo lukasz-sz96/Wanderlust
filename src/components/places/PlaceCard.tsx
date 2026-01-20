@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { MapPin, Star, Heart, MoreHorizontal } from 'lucide-react';
-import { Card, Badge, IconButton } from '../ui';
+import { Heart, MapPin, MoreHorizontal, Star } from 'lucide-react';
+import { Badge, Card, IconButton } from '../ui';
 import type { Id } from '../../../convex/_generated/dataModel';
 
 export interface PlaceCardProps {

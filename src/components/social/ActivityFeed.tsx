@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useQuery } from 'convex/react';
 import { Link } from '@tanstack/react-router';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronDown, RefreshCw, UserPlus, Users } from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ActivityCard } from './ActivityCard';
 import { Skeleton } from '../ui/Skeleton';
 import { Button } from '../ui/Button';
-import { Users, RefreshCw, ChevronDown, UserPlus } from 'lucide-react';
+import { ActivityCard } from './ActivityCard';
 
 interface ActivityFeedProps {
   className?: string;
@@ -34,13 +34,15 @@ type Activity = {
 
 export function ActivityFeed({ className = '' }: ActivityFeedProps) {
   const [cursor, setCursor] = useState<number | undefined>(undefined);
-  const [allActivities, setAllActivities] = useState<Activity[]>([]);
+  const [allActivities, setAllActivities] = useState<Array<Activity>>([]);
 
   const result = useQuery(api.feed.getFeed, { limit: 20, cursor });
 
   // Merge new results with existing
-  const newActivities = (result?.activities as unknown as Activity[]) || [];
-  const activities: Activity[] = cursor
+  const newActivities: Array<Activity> = result?.activities
+    ? (result.activities as unknown as Array<Activity>)
+    : [];
+  const activities: Array<Activity> = cursor
     ? [...allActivities, ...newActivities]
     : newActivities;
 

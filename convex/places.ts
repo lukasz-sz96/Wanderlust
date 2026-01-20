@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { Id } from './_generated/dataModel';
+import type { Id } from './_generated/dataModel';
 
 const placeSourceValidator = v.union(v.literal('osm'), v.literal('ai_generated'), v.literal('user_created'));
 
@@ -80,7 +80,7 @@ export const update = mutation({
       throw new Error('Not authenticated');
     }
 
-    const place = await ctx.db.get(args.placeId);
+    const place = await ctx.db.get("places", args.placeId);
     if (!place) {
       throw new Error('Place not found');
     }
@@ -95,10 +95,11 @@ export const update = mutation({
     }
 
     const { placeId, ...updates } = args;
-    const filteredUpdates = Object.fromEntries(Object.entries(updates).filter(([_, v]) => v !== undefined));
+    const entries = Object.entries(updates) as Array<[string, unknown]>;
+    const filteredUpdates = Object.fromEntries(entries.filter(([, value]) => value !== undefined));
 
     if (Object.keys(filteredUpdates).length > 0) {
-      await ctx.db.patch(placeId, filteredUpdates);
+      await ctx.db.patch("places", placeId, filteredUpdates);
     }
 
     return null;
@@ -116,7 +117,7 @@ export const remove = mutation({
       throw new Error('Not authenticated');
     }
 
-    const place = await ctx.db.get(args.placeId);
+    const place = await ctx.db.get("places", args.placeId);
     if (!place) {
       throw new Error('Place not found');
     }
@@ -136,10 +137,10 @@ export const remove = mutation({
       .collect();
 
     for (const item of bucketListItems) {
-      await ctx.db.delete(item._id);
+      await ctx.db.delete("bucketListItems", item._id);
     }
 
-    await ctx.db.delete(args.placeId);
+    await ctx.db.delete("places", args.placeId);
 
     return null;
   },
@@ -175,7 +176,7 @@ export const get = query({
     v.null(),
   ),
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.placeId);
+    return await ctx.db.get("places", args.placeId);
   },
 });
 
@@ -223,16 +224,16 @@ export const list = query({
       return [];
     }
 
-    let query;
+    let placesQuery;
     if (args.category) {
-      query = ctx.db
+      placesQuery = ctx.db
         .query('places')
         .withIndex('by_user_and_category', (q) => q.eq('userId', user._id).eq('category', args.category));
     } else {
-      query = ctx.db.query('places').withIndex('by_user', (q) => q.eq('userId', user._id));
+      placesQuery = ctx.db.query('places').withIndex('by_user', (q) => q.eq('userId', user._id));
     }
 
-    const places = await query.order('desc').take(args.limit || 100);
+    const places = await placesQuery.order('desc').take(args.limit || 100);
     return places;
   },
 });
@@ -383,21 +384,19 @@ export const listCommunityPlaces = query({
 
     const communityPlaces = await Promise.all(
       placeIds.map(async (placeId) => {
-        const place = await ctx.db.get(placeId);
+        const place = await ctx.db.get("places", placeId);
         if (!place) return null;
 
         const entry = placePhotoMap.get(placeId)!;
         const sortedPhotos = entry.photos.sort((a, b) => b.createdAt - a.createdAt);
         const previewPhoto = sortedPhotos[0];
 
-        const previewUrl = previewPhoto
-          ? await ctx.storage.getUrl(previewPhoto.storageId)
-          : null;
+        const previewUrl = await ctx.storage.getUrl(previewPhoto.storageId);
 
         const contributorIds = Array.from(entry.userIds).slice(0, 3);
         const contributors = await Promise.all(
           contributorIds.map(async (userId) => {
-            const user = await ctx.db.get(userId as Id<'users'>);
+            const user = await ctx.db.get("users", userId as Id<'users'>);
             return {
               _id: userId as Id<'users'>,
               displayName: user?.displayName,

@@ -1,5 +1,5 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Navigation, ExternalLink, X, Star, Heart, CheckCircle, Compass, XCircle } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { CheckCircle, Compass, ExternalLink, Heart, MapPin, Navigation, Star, X, XCircle } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 
 export interface PlacePopupData {
@@ -18,7 +18,7 @@ interface MapPlacePopupProps {
   place: PlacePopupData | null;
   onClose: () => void;
   position?: { x: number; y: number };
-  containerRef?: React.RefObject<HTMLDivElement>;
+  containerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export const MapPlacePopup = ({ place, onClose, position, containerRef }: MapPlacePopupProps) => {
@@ -62,9 +62,7 @@ export const MapPlacePopup = ({ place, onClose, position, containerRef }: MapPla
 
   return (
     <AnimatePresence>
-      {place && (
-        <>
-          <motion.div
+      <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -286,8 +284,6 @@ export const MapPlacePopup = ({ place, onClose, position, containerRef }: MapPla
               </div>
             </div>
           </motion.div>
-        </>
-      )}
     </AnimatePresence>
   );
 };

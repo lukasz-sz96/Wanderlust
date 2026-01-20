@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, Settings } from 'lucide-react';
+import { Calendar, MapPin, Settings } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 import { Avatar } from '../ui/Avatar';
+import { Button } from '../ui/Button';
 import { ProBadge } from './ProBadge';
 import { FollowButton } from './FollowButton';
 import { FollowersModal } from './FollowersModal';
-import { Button } from '../ui/Button';
-import { Id } from '../../../convex/_generated/dataModel';
-import { Link } from '@tanstack/react-router';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 interface ProfileHeaderProps {
   user: {

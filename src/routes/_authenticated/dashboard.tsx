@@ -1,20 +1,17 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { BookOpen, CheckCircle, ChevronLeft, ChevronRight, Eye, Heart, MapPin, Plane, Plus, Star, Users } from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
 import { useCurrentUser } from '../../lib/hooks/useUserSync';
 import { useOnboarding } from '../../lib/hooks/useOnboarding';
-import { MapView, MapPlacePopup, MapDiscoverToggle, type PlacePopupData, type MarkerClickEvent } from '../../components/maps';
-import { Card, Button } from '../../components/ui';
+import { MapDiscoverToggle, MapPlacePopup, MapView   } from '../../components/maps';
+import { Button, Card } from '../../components/ui';
 import { AddPlaceModal } from '../../components/places';
 import { OnboardingModal } from '../../components/onboarding';
-import { MapPin, Plane, BookOpen, ChevronLeft, ChevronRight, Plus, Heart, CheckCircle, Star, Eye, Users } from 'lucide-react';
+import type {MarkerClickEvent, PlacePopupData} from '../../components/maps';
 
 type MapMode = 'my-places' | 'discover';
-
-export const Route = createFileRoute('/_authenticated/dashboard')({
-  component: DashboardPage,
-});
 
 const DashboardPage = () => {
   const user = useCurrentUser();
@@ -342,3 +339,7 @@ const getGreeting = (): string => {
   if (hour < 18) return 'Good afternoon';
   return 'Good evening';
 };
+
+export const Route = createFileRoute('/_authenticated/dashboard')({
+  component: DashboardPage,
+});

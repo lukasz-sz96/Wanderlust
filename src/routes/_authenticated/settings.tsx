@@ -1,16 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useMutation } from 'convex/react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Globe, Lock, MapPin, Monitor, Moon, RefreshCw, Shield, Sun, Trash2 } from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
 import { useCurrentUser } from '../../lib/hooks/useUserSync';
 import { useOnboarding } from '../../lib/hooks/useOnboarding';
 import { useTheme } from '../../lib/hooks/useTheme';
-import { Card, CardHeader, CardTitle, CardContent, Button, Input, Avatar, useToast, Textarea } from '../../components/ui';
-import { RefreshCw, Sun, Moon, Monitor, Globe, Lock, Shield, Trash2, MapPin } from 'lucide-react';
-
-export const Route = createFileRoute('/_authenticated/settings')({
-  component: SettingsPage,
-});
+import { Avatar, Button, Card, CardContent, CardHeader, CardTitle, Input, Textarea, useToast } from '../../components/ui';
 
 const SettingsPage = () => {
   const user = useCurrentUser();
@@ -302,3 +298,7 @@ const SettingsPage = () => {
     </div>
   );
 };
+
+export const Route = createFileRoute('/_authenticated/settings')({
+  component: SettingsPage,
+});

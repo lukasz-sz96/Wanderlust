@@ -53,7 +53,7 @@ export const create = mutation({
     // Record activity to feed
     let tripName: string | undefined;
     if (args.tripId) {
-      const trip = await ctx.db.get(args.tripId);
+      const trip = await ctx.db.get("trips", args.tripId);
       tripName = trip?.title;
     }
     await ctx.runMutation(internal.feed.recordActivity, {
@@ -84,7 +84,7 @@ export const update = mutation({
       throw new Error('Not authenticated');
     }
 
-    const entry = await ctx.db.get(args.entryId);
+    const entry = await ctx.db.get("journalEntries", args.entryId);
     if (!entry) {
       throw new Error('Entry not found');
     }
@@ -106,7 +106,7 @@ export const update = mutation({
     if (args.mood !== undefined) updates.mood = args.mood;
     if (args.entryDate !== undefined) updates.entryDate = args.entryDate;
 
-    await ctx.db.patch(args.entryId, updates);
+    await ctx.db.patch("journalEntries", args.entryId, updates);
 
     return null;
   },
@@ -123,7 +123,7 @@ export const remove = mutation({
       throw new Error('Not authenticated');
     }
 
-    const entry = await ctx.db.get(args.entryId);
+    const entry = await ctx.db.get("journalEntries", args.entryId);
     if (!entry) {
       throw new Error('Entry not found');
     }
@@ -144,10 +144,10 @@ export const remove = mutation({
 
     for (const photo of photos) {
       await ctx.storage.delete(photo.storageId);
-      await ctx.db.delete(photo._id);
+      await ctx.db.delete("photos", photo._id);
     }
 
-    await ctx.db.delete(args.entryId);
+    await ctx.db.delete("journalEntries", args.entryId);
 
     return null;
   },
@@ -200,7 +200,7 @@ export const get = query({
       return null;
     }
 
-    const entry = await ctx.db.get(args.entryId);
+    const entry = await ctx.db.get("journalEntries", args.entryId);
     if (!entry) {
       return null;
     }
@@ -216,7 +216,7 @@ export const get = query({
 
     let trip;
     if (entry.tripId) {
-      const tripDoc = await ctx.db.get(entry.tripId);
+      const tripDoc = await ctx.db.get("trips", entry.tripId);
       if (tripDoc) {
         trip = { _id: tripDoc._id, title: tripDoc.title };
       }
@@ -224,7 +224,7 @@ export const get = query({
 
     let place;
     if (entry.placeId) {
-      const placeDoc = await ctx.db.get(entry.placeId);
+      const placeDoc = await ctx.db.get("places", entry.placeId);
       if (placeDoc) {
         place = {
           _id: placeDoc._id,
@@ -319,7 +319,7 @@ export const list = query({
       entries.map(async (entry) => {
         let trip;
         if (entry.tripId) {
-          const tripDoc = await ctx.db.get(entry.tripId);
+          const tripDoc = await ctx.db.get("trips", entry.tripId);
           if (tripDoc) {
             trip = { _id: tripDoc._id, title: tripDoc.title };
           }
@@ -327,7 +327,7 @@ export const list = query({
 
         let place;
         if (entry.placeId) {
-          const placeDoc = await ctx.db.get(entry.placeId);
+          const placeDoc = await ctx.db.get("places", entry.placeId);
           if (placeDoc) {
             place = {
               _id: placeDoc._id,

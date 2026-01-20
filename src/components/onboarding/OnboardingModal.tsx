@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowRight, BookOpen, Check, MapPin, Plane, Sparkles } from 'lucide-react';
 import { Button, Card, CardContent } from '../ui';
-import { MapPin, Plane, BookOpen, Sparkles, ArrowRight, Check } from 'lucide-react';
 
 interface OnboardingModalProps {
   isOpen: boolean;

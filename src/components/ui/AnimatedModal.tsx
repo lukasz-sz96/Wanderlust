@@ -1,5 +1,5 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { modalOverlay, modalContent } from '../../lib/animations';
+import { AnimatePresence, motion } from 'framer-motion';
+import { modalContent, modalOverlay } from '../../lib/animations';
 
 interface AnimatedModalProps {
   isOpen: boolean;

@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from 'react';
+import {  useState } from 'react';
 import { motion } from 'framer-motion';
 import { Menu } from 'lucide-react';
-import { Sidebar } from './Sidebar';
 import { IconButton } from '../ui/IconButton';
+import { Sidebar } from './Sidebar';
+import type {ReactNode} from 'react';
 
 interface AppShellProps {
   children: ReactNode;

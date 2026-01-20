@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
-import { query, internalMutation } from './_generated/server';
-import { Id } from './_generated/dataModel';
-import { checkPermission, FREE_LIMITS } from './roles';
+import { internalMutation, query } from './_generated/server';
+import { FREE_LIMITS, checkPermission } from './roles';
+import type { Id } from './_generated/dataModel';
 
 // Record an activity to the feed (internal only - called by other Convex functions)
 export const recordActivity = internalMutation({
@@ -19,7 +19,7 @@ export const recordActivity = internalMutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     // Get the user to check their profile visibility
-    const user = await ctx.db.get(args.userId);
+    const user = await ctx.db.get("users", args.userId);
     if (!user) {
       return null;
     }
@@ -113,7 +113,7 @@ export const getFeed = query({
 
     // Batch fetch all followed users first
     const followingIdArray = Array.from(followingIds);
-    const users = await Promise.all(followingIdArray.map((id) => ctx.db.get(id)));
+    const users = await Promise.all(followingIdArray.map((id) => ctx.db.get("users", id)));
 
     // Build user map, filtering out private profiles
     const userMap = new Map<string, { displayName: string | undefined; avatarUrl: string | undefined; role: 'free' | 'pro' | 'moderator' | 'admin' | undefined }>();
@@ -132,18 +132,18 @@ export const getFeed = query({
     // Fetch activities with proper limits per user to avoid memory bloat
     const activitiesPerUser = Math.ceil((limit + 1) * 2 / userMap.size) || limit + 1;
     const activityPromises = Array.from(userMap.keys()).map(async (userId) => {
-      let query = ctx.db
+      const activityQuery = ctx.db
         .query('activityFeed')
         .withIndex('by_user_and_created', (q) => q.eq('userId', userId as Id<'users'>))
         .order('desc');
 
-      return query.take(activitiesPerUser);
+      return activityQuery.take(activitiesPerUser);
     });
 
     const activityResults = await Promise.all(activityPromises);
 
     // Flatten and filter activities
-    const allActivities: {
+    const allActivities: Array<{
       _id: Id<'activityFeed'>;
       userId: Id<'users'>;
       type: 'trip_created' | 'place_visited' | 'journal_posted' | 'place_added';
@@ -155,7 +155,7 @@ export const getFeed = query({
         avatarUrl: string | undefined;
         role: 'free' | 'pro' | 'moderator' | 'admin' | undefined;
       };
-    }[] = [];
+    }> = [];
 
     for (const activities of activityResults) {
       for (const activity of activities) {
@@ -221,7 +221,7 @@ export const getUserActivities = query({
     const limit = args.limit || 20;
 
     // Get target user
-    const targetUser = await ctx.db.get(args.userId);
+    const targetUser = await ctx.db.get("users", args.userId);
     if (!targetUser) {
       return [];
     }

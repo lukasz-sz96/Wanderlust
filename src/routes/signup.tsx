@@ -1,13 +1,9 @@
 import { useState } from 'react';
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, MapPin, Loader2, Compass, ArrowLeft, Eye, EyeOff } from 'lucide-react';
-import { Button, Input, Card, CardContent } from '../components/ui';
+import { ArrowLeft, Compass, Eye, EyeOff, Loader2, Lock, Mail, MapPin, User } from 'lucide-react';
+import { Button, Card, CardContent, Input } from '../components/ui';
 import { authClient } from '../lib/auth-client';
-
-export const Route = createFileRoute('/signup')({
-  component: SignupPage,
-});
 
 function SignupPage() {
   const navigate = useNavigate();
@@ -185,3 +181,7 @@ function SignupPage() {
     </div>
   );
 }
+
+export const Route = createFileRoute('/signup')({
+  component: SignupPage,
+});

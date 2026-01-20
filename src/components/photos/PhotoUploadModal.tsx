@@ -1,19 +1,19 @@
-import { useState, useRef, useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useMutation } from 'convex/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  Camera,
+  Check,
+  Globe,
+  ImagePlus,
+  Loader2,
+  Lock,
+  Upload,
+  Users,
+  X,
+} from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
 import type { Id } from '../../../convex/_generated/dataModel';
-import {
-  X,
-  Upload,
-  Loader2,
-  Globe,
-  Users,
-  Lock,
-  Camera,
-  ImagePlus,
-  Check,
-} from 'lucide-react';
 
 interface PhotoUploadModalProps {
   placeId: Id<'places'>;
@@ -39,7 +39,7 @@ interface UploadProgress {
   error?: string;
 }
 
-const visibilityOptions: { value: Visibility; label: string; description: string; icon: typeof Globe }[] = [
+const visibilityOptions: Array<{ value: Visibility; label: string; description: string; icon: typeof Globe }> = [
   {
     value: 'public',
     label: 'Public',
@@ -67,9 +67,9 @@ export const PhotoUploadModal = ({
   onClose,
   onUploadComplete,
 }: PhotoUploadModalProps) => {
-  const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
+  const [pendingPhotos, setPendingPhotos] = useState<Array<PendingPhoto>>([]);
   const [visibility, setVisibility] = useState<Visibility>('private');
-  const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<Array<UploadProgress>>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -86,7 +86,7 @@ export const PhotoUploadModal = ({
 
     if (validFiles.length === 0) return;
 
-    const newPhotos: PendingPhoto[] = validFiles.map((file) => ({
+    const newPhotos: Array<PendingPhoto> = validFiles.map((file) => ({
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       file,
       preview: URL.createObjectURL(file),

@@ -11,6 +11,9 @@ export default defineSchema({
       v.object({
         defaultMapStyle: v.optional(v.string()),
         temperatureUnit: v.optional(v.union(v.literal('celsius'), v.literal('fahrenheit'))),
+        distanceUnit: v.optional(v.union(v.literal('km'), v.literal('mi'))),
+        dateFormat: v.optional(v.union(v.literal('mdy'), v.literal('dmy'), v.literal('ymd'))),
+        profileVisibility: v.optional(v.union(v.literal('public'), v.literal('private'))),
       }),
     ),
     createdAt: v.number(),

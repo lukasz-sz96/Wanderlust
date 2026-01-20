@@ -79,7 +79,7 @@ export const updateStatus = mutation({
       throw new Error('Not authenticated');
     }
 
-    const item = await ctx.db.get(args.itemId);
+    const item = await ctx.db.get("bucketListItems", args.itemId);
     if (!item) {
       throw new Error('Item not found');
     }
@@ -116,11 +116,11 @@ export const updateStatus = mutation({
       }
     }
 
-    await ctx.db.patch(args.itemId, updates);
+    await ctx.db.patch("bucketListItems", args.itemId, updates);
 
     // Record activity to feed when marking as visited
     if (args.status === 'visited') {
-      const place = await ctx.db.get(item.placeId);
+      const place = await ctx.db.get("places", item.placeId);
       await ctx.runMutation(internal.feed.recordActivity, {
         userId: user._id,
         type: 'place_visited',
@@ -145,7 +145,7 @@ export const updatePriority = mutation({
       throw new Error('Not authenticated');
     }
 
-    const item = await ctx.db.get(args.itemId);
+    const item = await ctx.db.get("bucketListItems", args.itemId);
     if (!item) {
       throw new Error('Item not found');
     }
@@ -159,7 +159,7 @@ export const updatePriority = mutation({
       throw new Error('Not authorized');
     }
 
-    await ctx.db.patch(args.itemId, { priority: args.priority });
+    await ctx.db.patch("bucketListItems", args.itemId, { priority: args.priority });
 
     return null;
   },
@@ -177,7 +177,7 @@ export const updateNotes = mutation({
       throw new Error('Not authenticated');
     }
 
-    const item = await ctx.db.get(args.itemId);
+    const item = await ctx.db.get("bucketListItems", args.itemId);
     if (!item) {
       throw new Error('Item not found');
     }
@@ -191,7 +191,7 @@ export const updateNotes = mutation({
       throw new Error('Not authorized');
     }
 
-    await ctx.db.patch(args.itemId, { notes: args.notes });
+    await ctx.db.patch("bucketListItems", args.itemId, { notes: args.notes });
 
     return null;
   },
@@ -208,7 +208,7 @@ export const remove = mutation({
       throw new Error('Not authenticated');
     }
 
-    const item = await ctx.db.get(args.itemId);
+    const item = await ctx.db.get("bucketListItems", args.itemId);
     if (!item) {
       throw new Error('Item not found');
     }
@@ -222,7 +222,7 @@ export const remove = mutation({
       throw new Error('Not authorized');
     }
 
-    await ctx.db.delete(args.itemId);
+    await ctx.db.delete("bucketListItems", args.itemId);
 
     return null;
   },
@@ -300,7 +300,7 @@ export const list = query({
 
     const enrichedItems = await Promise.all(
       items.map(async (item) => {
-        const place = await ctx.db.get(item.placeId);
+        const place = await ctx.db.get("places", item.placeId);
         return {
           ...item,
           place: place
@@ -408,7 +408,7 @@ export const getStats = query({
     const countries = new Set<string>();
 
     for (const item of items) {
-      const place = await ctx.db.get(item.placeId);
+      const place = await ctx.db.get("places", item.placeId);
       if (place?.country) {
         countries.add(place.country);
       }
@@ -445,9 +445,9 @@ export const reorder = mutation({
     }
 
     for (let i = 0; i < args.itemIds.length; i++) {
-      const item = await ctx.db.get(args.itemIds[i]);
+      const item = await ctx.db.get("bucketListItems", args.itemIds[i]);
       if (item && item.userId === user._id) {
-        await ctx.db.patch(args.itemIds[i], { priority: i + 1 });
+        await ctx.db.patch("bucketListItems", args.itemIds[i], { priority: i + 1 });
       }
     }
 

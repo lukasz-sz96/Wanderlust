@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useMutation } from 'convex/react';
+import { Loader2, Plane, X } from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
 import { Button, Card, Input, Textarea } from '../ui';
-import { X, Plane, Loader2 } from 'lucide-react';
 import { geocodeLocation } from '../../lib/api/overpass';
 
 interface CreateTripModalProps {

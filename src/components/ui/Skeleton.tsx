@@ -3,11 +3,12 @@ import { motion } from 'framer-motion';
 interface SkeletonProps {
   className?: string;
   animate?: boolean;
+  style?: React.CSSProperties;
 }
 
-export const Skeleton = ({ className = '', animate = true }: SkeletonProps) => {
+export const Skeleton = ({ className = '', animate = true, style }: SkeletonProps) => {
   const baseClass = `bg-border-light rounded ${animate ? 'animate-pulse' : ''}`;
-  return <div className={`${baseClass} ${className}`} />;
+  return <div className={`${baseClass} ${className}`} style={style} />;
 };
 
 export const SkeletonText = ({ lines = 3, className = '' }: { lines?: number; className?: string }) => {

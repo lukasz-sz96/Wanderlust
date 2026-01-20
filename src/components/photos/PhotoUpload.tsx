@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useMutation } from 'convex/react';
+import { Image as ImageIcon, Loader2, Upload, X } from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
-import type { Id } from '../../../convex/_generated/dataModel';
 import { Button } from '../ui';
-import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 interface PhotoUploadProps {
   journalEntryId?: Id<'journalEntries'>;
@@ -30,7 +30,7 @@ export const PhotoUpload = ({
   maxFiles = 10,
   className = '',
 }: PhotoUploadProps) => {
-  const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
+  const [uploadingFiles, setUploadingFiles] = useState<Array<UploadingFile>>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -46,7 +46,7 @@ export const PhotoUpload = ({
 
     if (validFiles.length === 0) return;
 
-    const newUploadingFiles: UploadingFile[] = validFiles.map((file) => ({
+    const newUploadingFiles: Array<UploadingFile> = validFiles.map((file) => ({
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       file,
       preview: URL.createObjectURL(file),

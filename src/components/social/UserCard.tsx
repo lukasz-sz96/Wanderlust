@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
+import { MapPin } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { ProBadge } from './ProBadge';
 import { FollowButton } from './FollowButton';
-import { Id } from '../../../convex/_generated/dataModel';
-import { MapPin } from 'lucide-react';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 interface UserCardProps {
   user: {

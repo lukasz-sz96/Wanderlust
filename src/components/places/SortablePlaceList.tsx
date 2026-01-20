@@ -1,25 +1,26 @@
 import { useState } from 'react';
 import {
   DndContext,
-  closestCenter,
+  
   KeyboardSensor,
   PointerSensor,
+  closestCenter,
   useSensor,
-  useSensors,
-  type DragEndEvent,
+  useSensors
 } from '@dnd-kit/core';
 import {
-  arrayMove,
   SortableContext,
+  arrayMove,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Link } from '@tanstack/react-router';
-import { GripVertical, MapPin, Star, Cloud } from 'lucide-react';
-import { Card, Badge } from '../ui';
+import { Cloud, GripVertical, MapPin, Star } from 'lucide-react';
+import { Badge, Card } from '../ui';
 import { formatTemperature } from '../../lib/api/weather';
+import type {DragEndEvent} from '@dnd-kit/core';
 import type { Id } from '../../../convex/_generated/dataModel';
 
 interface BucketListItem {
@@ -43,8 +44,8 @@ interface BucketListItem {
 }
 
 interface SortablePlaceListProps {
-  items: BucketListItem[];
-  onReorder: (itemIds: Id<'bucketListItems'>[]) => void;
+  items: Array<BucketListItem>;
+  onReorder: (itemIds: Array<Id<'bucketListItems'>>) => void;
 }
 
 export const SortablePlaceList = ({ items, onReorder }: SortablePlaceListProps) => {

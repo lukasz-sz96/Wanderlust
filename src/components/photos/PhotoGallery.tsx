@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useMutation } from 'convex/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight, Loader2, Trash2, X } from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
 import type { Id } from '../../../convex/_generated/dataModel';
-import { X, Trash2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 
 interface Photo {
   _id: Id<'photos'>;
@@ -15,7 +15,7 @@ interface Photo {
 }
 
 interface PhotoGalleryProps {
-  photos: Photo[];
+  photos: Array<Photo>;
   onPhotoDeleted?: (photoId: Id<'photos'>) => void;
   editable?: boolean;
   className?: string;

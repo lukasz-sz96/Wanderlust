@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Droplets, Loader2, Thermometer, Wind } from 'lucide-react';
 import { Card, CardContent } from '../ui';
-import { fetchWeather, getWeatherInfo, formatTemperature, type WeatherData } from '../../lib/api/weather';
-import { Droplets, Wind, Thermometer, Loader2 } from 'lucide-react';
+import {  fetchWeather, formatTemperature, getWeatherInfo } from '../../lib/api/weather';
+import type {WeatherData} from '../../lib/api/weather';
 
 interface WeatherWidgetProps {
   latitude: number;

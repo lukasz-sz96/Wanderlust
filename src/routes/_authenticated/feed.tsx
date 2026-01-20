@@ -1,11 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { Rss } from 'lucide-react';
 import { AnimatedPage } from '../../components/ui/AnimatedPage';
 import { ActivityFeed } from '../../components/social/ActivityFeed';
-import { Rss } from 'lucide-react';
-
-export const Route = createFileRoute('/_authenticated/feed')({
-  component: FeedPage,
-});
 
 function FeedPage() {
   return (
@@ -30,3 +26,7 @@ function FeedPage() {
     </AnimatedPage>
   );
 }
+
+export const Route = createFileRoute('/_authenticated/feed')({
+  component: FeedPage,
+});

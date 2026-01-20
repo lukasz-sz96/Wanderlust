@@ -1,18 +1,9 @@
 import { useState } from 'react';
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { Lock, ArrowLeft, Compass, Loader2, CheckCircle, Eye, EyeOff } from 'lucide-react';
-import { Button, Input, Card, CardContent } from '../components/ui';
+import { ArrowLeft, CheckCircle, Compass, Eye, EyeOff, Loader2, Lock } from 'lucide-react';
+import { Button, Card, CardContent, Input } from '../components/ui';
 import { authClient } from '../lib/auth-client';
-
-export const Route = createFileRoute('/reset-password')({
-  component: ResetPasswordPage,
-  validateSearch: (search: Record<string, unknown>) => {
-    return {
-      token: search.token as string | undefined,
-    };
-  },
-});
 
 function ResetPasswordPage() {
   const navigate = useNavigate();
@@ -222,3 +213,12 @@ function ResetPasswordPage() {
     </div>
   );
 }
+
+export const Route = createFileRoute('/reset-password')({
+  component: ResetPasswordPage,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      token: search.token as string | undefined,
+    };
+  },
+});

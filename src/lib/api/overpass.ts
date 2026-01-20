@@ -35,8 +35,16 @@ export interface SearchResult {
   address?: string;
   city?: string;
   country?: string;
-  tags: string[];
-  metadata: Record<string, string>;
+  tags: Array<string>;
+  metadata: {
+    osmId?: string;
+    osmType?: string;
+    website?: string;
+    phone?: string;
+    openingHours?: string;
+    description?: string;
+    [key: string]: string | undefined;
+  };
 }
 
 const categoryMapping: Record<string, string> = {
@@ -100,7 +108,7 @@ const buildQuery = (
     lon?: number;
     radius?: number;
     name?: string;
-    categories?: string[];
+    categories?: Array<string>;
   },
 ): string => {
   const timeout = 25;
@@ -137,55 +145,58 @@ const buildQuery = (
   `;
 };
 
-const parseResults = (data: { elements: OverpassPlace[] }): SearchResult[] => {
-  return data.elements
-    .filter((el) => el.tags?.name || el.tags?.['name:en'])
-    .map((el) => {
-      const lat = el.lat || (el as any).center?.lat;
-      const lon = el.lon || (el as any).center?.lon;
+const parseResults = (data: { elements: Array<OverpassPlace> }): Array<SearchResult> => {
+  const results: Array<SearchResult> = [];
 
-      if (!lat || !lon) return null;
+  for (const el of data.elements) {
+    if (!el.tags.name && !el.tags['name:en']) continue;
 
-      const name = el.tags['name:en'] || el.tags.name || 'Unknown';
-      const category = getCategory(el.tags);
+    const lat = el.lat || (el as any).center?.lat;
+    const lon = el.lon || (el as any).center?.lon;
 
-      const tags: string[] = [];
-      if (el.tags.tourism) tags.push(el.tags.tourism);
-      if (el.tags.historic) tags.push(el.tags.historic);
-      if (el.tags.leisure) tags.push(el.tags.leisure);
-      if (el.tags.amenity) tags.push(el.tags.amenity);
+    if (!lat || !lon) continue;
 
-      const address = [el.tags['addr:housenumber'], el.tags['addr:street']].filter(Boolean).join(' ');
+    const name = el.tags['name:en'] || el.tags.name || 'Unknown';
+    const category = getCategory(el.tags);
 
-      return {
-        id: `osm-${el.type}-${el.id}`,
-        name,
-        latitude: lat,
-        longitude: lon,
-        category,
-        address: address || undefined,
-        city: el.tags['addr:city'],
-        country: el.tags['addr:country'],
-        tags: [...new Set(tags)],
-        metadata: {
-          osmId: String(el.id),
-          osmType: el.type,
-          ...(el.tags.website && { website: el.tags.website }),
-          ...(el.tags.phone && { phone: el.tags.phone }),
-          ...(el.tags.opening_hours && { openingHours: el.tags.opening_hours }),
-          ...(el.tags.description && { description: el.tags.description }),
-        },
-      };
-    })
-    .filter((r): r is SearchResult => r !== null);
+    const tags: Array<string> = [];
+    if (el.tags.tourism) tags.push(el.tags.tourism);
+    if (el.tags.historic) tags.push(el.tags.historic);
+    if (el.tags.leisure) tags.push(el.tags.leisure);
+    if (el.tags.amenity) tags.push(el.tags.amenity);
+
+    const address = [el.tags['addr:housenumber'], el.tags['addr:street']].filter(Boolean).join(' ');
+
+    results.push({
+      id: `osm-${el.type}-${el.id}`,
+      name,
+      latitude: lat,
+      longitude: lon,
+      category,
+      address: address || undefined,
+      city: el.tags['addr:city'],
+      country: el.tags['addr:country'],
+      tags: [...new Set(tags)],
+      metadata: {
+        osmId: String(el.id),
+        osmType: el.type,
+        ...(el.tags.website && { website: el.tags.website }),
+        ...(el.tags.phone && { phone: el.tags.phone }),
+        ...(el.tags.opening_hours && { openingHours: el.tags.opening_hours }),
+        ...(el.tags.description && { description: el.tags.description }),
+      },
+    });
+  }
+
+  return results;
 };
 
 export const searchByLocation = async (
   lat: number,
   lon: number,
   radiusMeters: number = 5000,
-  categories?: string[],
-): Promise<SearchResult[]> => {
+  categories?: Array<string>,
+): Promise<Array<SearchResult>> => {
   const query = buildQuery('around', { lat, lon, radius: radiusMeters, categories });
 
   const response = await fetch(OVERPASS_API_URL, {
@@ -209,8 +220,8 @@ export const searchByBoundingBox = async (
   west: number,
   north: number,
   east: number,
-  categories?: string[],
-): Promise<SearchResult[]> => {
+  categories?: Array<string>,
+): Promise<Array<SearchResult>> => {
   const query = buildQuery('bbox', { bbox: [south, west, north, east], categories });
 
   const response = await fetch(OVERPASS_API_URL, {
@@ -278,7 +289,7 @@ export const geocodeLocation = async (query: string): Promise<GeocodedLocation |
   }
 };
 
-export const searchByName = async (name: string): Promise<SearchResult[]> => {
+export const searchByName = async (name: string): Promise<Array<SearchResult>> => {
   const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 
   const params = new URLSearchParams({

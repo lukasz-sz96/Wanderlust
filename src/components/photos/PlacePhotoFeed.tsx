@@ -1,24 +1,24 @@
-import { useState, useCallback } from 'react';
-import { useQuery, useMutation } from 'convex/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useCallback, useState } from 'react';
+import { useMutation, useQuery } from 'convex/react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
-import { api } from '../../../convex/_generated/api';
-import type { Id } from '../../../convex/_generated/dataModel';
-import { Avatar } from '../ui/Avatar';
-import { ProBadge } from '../social/ProBadge';
 import {
-  X,
-  Trash2,
+  Camera,
   ChevronLeft,
   ChevronRight,
-  Loader2,
-  MoreHorizontal,
   Globe,
-  Users,
+  Loader2,
   Lock,
-  Camera,
+  MoreHorizontal,
+  Trash2,
+  Users,
+  X,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { api } from '../../../convex/_generated/api';
+import { Avatar } from '../ui/Avatar';
+import { ProBadge } from '../social/ProBadge';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 interface PlacePhoto {
   _id: Id<'photos'>;

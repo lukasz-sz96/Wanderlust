@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation } from 'convex/react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Star, Cloud, Loader2, CheckCircle } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Calendar, CheckCircle, Cloud, Loader2, Star, X } from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
-import type { Id } from '../../../convex/_generated/dataModel';
 import { Button, Card, CardContent, Input } from '../ui';
-import { fetchHistoricalWeather, formatTemperature, type HistoricalWeather } from '../../lib/api/weather';
+import {  fetchHistoricalWeather, formatTemperature } from '../../lib/api/weather';
+import type {HistoricalWeather} from '../../lib/api/weather';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 interface MarkVisitedModalProps {
   isOpen: boolean;

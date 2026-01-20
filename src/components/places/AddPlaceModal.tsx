@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useMutation } from 'convex/react';
+import { Loader2, MapPin, Plus, Search, X } from 'lucide-react';
 import { api } from '../../../convex/_generated/api';
 import { Button, Card, CardContent, Input, Textarea } from '../ui';
-import { X, MapPin, Search, Plus, Loader2 } from 'lucide-react';
-import { searchByName, type SearchResult } from '../../lib/api/overpass';
+import {  searchByName } from '../../lib/api/overpass';
+import type {SearchResult} from '../../lib/api/overpass';
 
 interface AddPlaceModalProps {
   isOpen: boolean;
@@ -15,7 +16,7 @@ type Step = 'search' | 'create' | 'confirm';
 export const AddPlaceModal = ({ isOpen, onClose }: AddPlaceModalProps) => {
   const [step, setStep] = useState<Step>('search');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<Array<SearchResult>>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<SearchResult | null>(null);
   const [status, setStatus] = useState<'want_to_visit' | 'visited'>('want_to_visit');

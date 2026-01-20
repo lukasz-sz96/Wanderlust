@@ -1,17 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useQuery, useMutation } from 'convex/react';
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useMutation, useQuery } from 'convex/react';
+import { useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { CheckCircle, Filter, Grid, Heart, List, MapPin, Plus, Search, SortAsc, X } from 'lucide-react';
 import { api } from '../../../../convex/_generated/api';
-import type { Id } from '../../../../convex/_generated/dataModel';
-import { PlaceCard, SortablePlaceList, AddPlaceModal } from '../../../components/places';
-import { Button, Card, CardContent, AnimatedPage, SkeletonPlaceCard, EmptyState, Input } from '../../../components/ui';
+import { AddPlaceModal, PlaceCard, SortablePlaceList } from '../../../components/places';
+import { AnimatedPage, Button, Card, CardContent, EmptyState, Input, SkeletonPlaceCard } from '../../../components/ui';
 import { staggerContainer, staggerItem } from '../../../lib/animations';
-import { MapPin, Plus, Heart, CheckCircle, List, Grid, Search, X, Filter, SortAsc } from 'lucide-react';
-
-export const Route = createFileRoute('/_authenticated/places/')({
-  component: PlacesPage,
-});
+import type { Id } from '../../../../convex/_generated/dataModel';
 
 type TabType = 'all' | 'want_to_visit' | 'visited';
 type ViewMode = 'grid' | 'list';
@@ -118,7 +114,7 @@ const PlacesPage = () => {
     { id: 'visited' as TabType, label: 'Visited', count: stats.visited, icon: CheckCircle },
   ];
 
-  const handleReorder = (itemIds: Id<'bucketListItems'>[]) => {
+  const handleReorder = (itemIds: Array<Id<'bucketListItems'>>) => {
     reorderItems({ itemIds });
   };
 
@@ -393,3 +389,7 @@ const StatBox = ({ label, value, icon }: { label: string; value: number; icon: R
     </CardContent>
   </Card>
 );
+
+export const Route = createFileRoute('/_authenticated/places/')({
+  component: PlacesPage,
+});

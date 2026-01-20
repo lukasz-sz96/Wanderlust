@@ -1,4 +1,4 @@
-import { type ImgHTMLAttributes } from 'react';
+import type {ImgHTMLAttributes} from 'react';
 
 type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 

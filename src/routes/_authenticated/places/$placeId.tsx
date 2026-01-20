@@ -1,33 +1,29 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useQuery, useMutation } from 'convex/react';
-import { api } from '../../../../convex/_generated/api';
-import type { Id } from '../../../../convex/_generated/dataModel';
-import { MapView } from '../../../components/maps';
-import { MarkVisitedModal } from '../../../components/places';
-import { WeatherWidget, WeatherSnapshotBadge } from '../../../components/weather';
-import { PlacePhotoFeed, PhotoUploadModal } from '../../../components/photos';
-import { Card, CardContent, Button, Badge, IconButton, PageLoading } from '../../../components/ui';
+import { Link, createFileRoute } from '@tanstack/react-router';
+import { useMutation, useQuery } from 'convex/react';
 import {
   ArrowLeft,
-  MapPin,
+  Calendar,
+  Camera,
+  CheckCircle,
+  Cloud,
+  Edit,
   Heart,
   HeartOff,
-  Star,
-  Edit,
-  Trash2,
-  Navigation,
-  CheckCircle,
-  Calendar,
-  Cloud,
-  Loader2,
-  Camera,
   ImagePlus,
+  Loader2,
+  MapPin,
+  Navigation,
+  Star,
+  Trash2,
 } from 'lucide-react';
 import { useState } from 'react';
-
-export const Route = createFileRoute('/_authenticated/places/$placeId')({
-  component: PlaceDetailPage,
-});
+import { api } from '../../../../convex/_generated/api';
+import { MapView } from '../../../components/maps';
+import { MarkVisitedModal } from '../../../components/places';
+import { WeatherSnapshotBadge, WeatherWidget } from '../../../components/weather';
+import { PhotoUploadModal, PlacePhotoFeed } from '../../../components/photos';
+import { Badge, Button, Card, CardContent, IconButton, PageLoading } from '../../../components/ui';
+import type { Id } from '../../../../convex/_generated/dataModel';
 
 const PlaceDetailPage = () => {
   const { placeId } = Route.useParams();
@@ -362,3 +358,7 @@ const PlaceDetailPage = () => {
     </div>
   );
 };
+
+export const Route = createFileRoute('/_authenticated/places/$placeId')({
+  component: PlaceDetailPage,
+});

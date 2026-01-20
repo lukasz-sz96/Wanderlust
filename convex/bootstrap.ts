@@ -17,7 +17,7 @@ export const setFirstAdmin = internalMutation({
       return `User with email ${args.email} not found`;
     }
 
-    await ctx.db.patch(user._id, {
+    await ctx.db.patch("users", user._id, {
       role: 'admin',
       roleUpdatedAt: Date.now(),
     });

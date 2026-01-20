@@ -19,6 +19,7 @@ import type * as journal from "../journal.js";
 import type * as photos from "../photos.js";
 import type * as places from "../places.js";
 import type * as roles from "../roles.js";
+import type * as seed from "../seed.js";
 import type * as sharing from "../sharing.js";
 import type * as social from "../social.js";
 import type * as trips from "../trips.js";
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   photos: typeof photos;
   places: typeof places;
   roles: typeof roles;
+  seed: typeof seed;
   sharing: typeof sharing;
   social: typeof social;
   trips: typeof trips;

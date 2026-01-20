@@ -1,22 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
-import { Id } from '../../../convex/_generated/dataModel';
 import { motion } from 'framer-motion';
+import {
+  Check,
+  Copy,
+  Crown,
+  Eye,
+  Globe,
+  Link2,
+  Lock,
+  Trash2,
+  X,
+} from 'lucide-react';
+import { api } from '../../../convex/_generated/api';
 import { AnimatedModal } from '../ui/AnimatedModal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import {
-  Link2,
-  Copy,
-  Check,
-  Eye,
-  Globe,
-  Lock,
-  Crown,
-  X,
-  Trash2,
-} from 'lucide-react';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 interface ShareTripModalProps {
   tripId: Id<'trips'>;

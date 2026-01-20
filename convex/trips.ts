@@ -82,7 +82,7 @@ export const update = mutation({
       throw new Error('Not authenticated');
     }
 
-    const trip = await ctx.db.get(args.tripId);
+    const trip = await ctx.db.get("trips", args.tripId);
     if (!trip) {
       throw new Error('Trip not found');
     }
@@ -104,7 +104,7 @@ export const update = mutation({
     if (args.endDate !== undefined) updates.endDate = args.endDate;
     if (args.status !== undefined) updates.status = args.status;
 
-    await ctx.db.patch(args.tripId, updates);
+    await ctx.db.patch("trips", args.tripId, updates);
 
     return null;
   },
@@ -121,7 +121,7 @@ export const remove = mutation({
       throw new Error('Not authenticated');
     }
 
-    const trip = await ctx.db.get(args.tripId);
+    const trip = await ctx.db.get("trips", args.tripId);
     if (!trip) {
       throw new Error('Trip not found');
     }
@@ -141,10 +141,10 @@ export const remove = mutation({
       .collect();
 
     for (const item of itineraryItems) {
-      await ctx.db.delete(item._id);
+      await ctx.db.delete("itineraryItems", item._id);
     }
 
-    await ctx.db.delete(args.tripId);
+    await ctx.db.delete("trips", args.tripId);
 
     return null;
   },
@@ -184,7 +184,7 @@ export const get = query({
       return null;
     }
 
-    const trip = await ctx.db.get(args.tripId);
+    const trip = await ctx.db.get("trips", args.tripId);
     if (!trip) {
       return null;
     }

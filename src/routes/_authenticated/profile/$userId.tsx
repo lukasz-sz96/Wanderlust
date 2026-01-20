@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
-import { api } from '../../../../convex/_generated/api';
-import { Id } from '../../../../convex/_generated/dataModel';
 import { motion } from 'framer-motion';
+import { UserCircle } from 'lucide-react';
+import { api } from '../../../../convex/_generated/api';
 import {
   AnimatedPage,
   Card,
@@ -11,11 +11,7 @@ import {
 } from '../../../components/ui';
 import { ProfileHeader } from '../../../components/social/ProfileHeader';
 import { TravelStatsCard } from '../../../components/social/TravelStatsCard';
-import { UserCircle } from 'lucide-react';
-
-export const Route = createFileRoute('/_authenticated/profile/$userId')({
-  component: ProfilePage,
-});
+import type { Id } from '../../../../convex/_generated/dataModel';
 
 function ProfilePage() {
   const { userId } = Route.useParams();
@@ -139,3 +135,7 @@ function ProfilePage() {
     </AnimatedPage>
   );
 }
+
+export const Route = createFileRoute('/_authenticated/profile/$userId')({
+  component: ProfilePage,
+});

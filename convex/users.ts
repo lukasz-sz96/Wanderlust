@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { Doc } from './_generated/dataModel';
+import type { Doc } from './_generated/dataModel';
 
 /**
  * Get or create a user based on their auth identity.
@@ -37,7 +37,7 @@ export const getOrCreateUser = mutation({
       }
 
       if (Object.keys(updates).length > 1) {
-        await ctx.db.patch(existingUser._id, updates);
+        await ctx.db.patch("users", existingUser._id, updates);
       }
 
       return existingUser._id;
@@ -75,6 +75,9 @@ export const getCurrentUser = query({
         v.object({
           defaultMapStyle: v.optional(v.string()),
           temperatureUnit: v.optional(v.union(v.literal('celsius'), v.literal('fahrenheit'))),
+          distanceUnit: v.optional(v.union(v.literal('km'), v.literal('mi'))),
+          dateFormat: v.optional(v.union(v.literal('mdy'), v.literal('dmy'), v.literal('ymd'))),
+          profileVisibility: v.optional(v.union(v.literal('public'), v.literal('private'))),
         }),
       ),
       role: v.optional(v.union(v.literal('free'), v.literal('pro'), v.literal('moderator'), v.literal('admin'))),
@@ -116,6 +119,9 @@ export const getUser = query({
         v.object({
           defaultMapStyle: v.optional(v.string()),
           temperatureUnit: v.optional(v.union(v.literal('celsius'), v.literal('fahrenheit'))),
+          distanceUnit: v.optional(v.union(v.literal('km'), v.literal('mi'))),
+          dateFormat: v.optional(v.union(v.literal('mdy'), v.literal('dmy'), v.literal('ymd'))),
+          profileVisibility: v.optional(v.union(v.literal('public'), v.literal('private'))),
         }),
       ),
       role: v.optional(v.union(v.literal('free'), v.literal('pro'), v.literal('moderator'), v.literal('admin'))),
@@ -126,7 +132,7 @@ export const getUser = query({
     v.null(),
   ),
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.userId);
+    return await ctx.db.get("users", args.userId);
   },
 });
 
@@ -167,7 +173,7 @@ export const updatePreferences = mutation({
       ...(args.profileVisibility !== undefined && { profileVisibility: args.profileVisibility }),
     };
 
-    await ctx.db.patch(user._id, {
+    await ctx.db.patch("users", user._id, {
       preferences: newPreferences,
       updatedAt: Date.now(),
     });
@@ -202,7 +208,7 @@ export const updateProfile = mutation({
       throw new Error('User not found');
     }
 
-    await ctx.db.patch(user._id, {
+    await ctx.db.patch("users", user._id, {
       ...(args.displayName !== undefined && { displayName: args.displayName }),
       ...(args.avatarUrl !== undefined && { avatarUrl: args.avatarUrl }),
       ...(args.bio !== undefined && { bio: args.bio }),

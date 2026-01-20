@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
+import { BookOpen, ChevronRight, MapPin, MapPinPlus, Plane, Star } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 import { Avatar } from '../ui/Avatar';
 import { ProBadge } from './ProBadge';
-import { Id } from '../../../convex/_generated/dataModel';
-import { Plane, MapPin, BookOpen, MapPinPlus, Star, LucideIcon, ChevronRight } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import type { Id } from '../../../convex/_generated/dataModel';
+import type { LucideIcon} from 'lucide-react';
 
 type ActivityType = 'trip_created' | 'place_visited' | 'journal_posted' | 'place_added';
 
