@@ -25,7 +25,8 @@ export default defineSchema({
     roleUpdatedAt: v.optional(v.number()),
   })
     .index('by_auth_id', ['authUserId'])
-    .index('by_email', ['email']),
+    .index('by_email', ['email'])
+    .index('by_role', ['role']),
 
   places: defineTable({
     userId: v.id('users'),
@@ -182,6 +183,7 @@ export default defineSchema({
 
   sharedTrips: defineTable({
     tripId: v.id('trips'),
+    ownerId: v.id('users'), // Denormalized for efficient counting
     shareCode: v.string(),
     isPublic: v.boolean(),
     customSlug: v.optional(v.string()),
@@ -190,5 +192,6 @@ export default defineSchema({
   })
     .index('by_trip', ['tripId'])
     .index('by_code', ['shareCode'])
-    .index('by_slug', ['customSlug']),
+    .index('by_slug', ['customSlug'])
+    .index('by_owner', ['ownerId']),
 });

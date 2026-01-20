@@ -134,21 +134,27 @@ export const listUsers = query({
   args: {
     role: v.optional(v.union(v.literal('free'), v.literal('pro'), v.literal('moderator'), v.literal('admin'))),
     search: v.optional(v.string()),
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.id('users')),
   },
-  returns: v.array(
-    v.object({
-      _id: v.id('users'),
-      email: v.string(),
-      displayName: v.optional(v.string()),
-      avatarUrl: v.optional(v.string()),
-      role: v.string(),
-      createdAt: v.number(),
-    }),
-  ),
+  returns: v.object({
+    users: v.array(
+      v.object({
+        _id: v.id('users'),
+        email: v.string(),
+        displayName: v.optional(v.string()),
+        avatarUrl: v.optional(v.string()),
+        role: v.string(),
+        createdAt: v.number(),
+      }),
+    ),
+    nextCursor: v.optional(v.id('users')),
+    hasMore: v.boolean(),
+  }),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      return [];
+      return { users: [], nextCursor: undefined, hasMore: false };
     }
 
     const currentUser = await ctx.db
@@ -157,29 +163,56 @@ export const listUsers = query({
       .unique();
 
     if (!currentUser || !checkPermission(currentUser.role, 'admin_panel')) {
-      return [];
+      return { users: [], nextCursor: undefined, hasMore: false };
     }
 
-    let users = await ctx.db.query('users').collect();
+    const limit = args.limit || 50;
 
-    if (args.role) {
-      users = users.filter((u) => (u.role || 'free') === args.role);
+    // Use role index if filtering by role, otherwise get all
+    let query = args.role
+      ? ctx.db.query('users').withIndex('by_role', (q) => q.eq('role', args.role))
+      : ctx.db.query('users');
+
+    // Collect with a reasonable limit to avoid memory issues
+    const maxFetch = args.search ? 500 : limit + 1; // Fetch more if searching
+    let users = await query.take(maxFetch);
+
+    // Apply cursor manually (skip users until we find cursor)
+    if (args.cursor) {
+      const cursorIndex = users.findIndex((u) => u._id === args.cursor);
+      if (cursorIndex !== -1) {
+        users = users.slice(cursorIndex + 1);
+      }
     }
 
+    // Apply search filter if provided
     if (args.search) {
-      const search = args.search.toLowerCase();
+      const search = args.search.toLowerCase().trim();
       users = users.filter(
         (u) => u.email.toLowerCase().includes(search) || u.displayName?.toLowerCase().includes(search),
       );
     }
 
-    return users.map((u) => ({
-      _id: u._id,
-      email: u.email,
-      displayName: u.displayName,
-      avatarUrl: u.avatarUrl,
-      role: u.role || 'free',
-      createdAt: u.createdAt,
-    }));
+    // Handle role filter for users without role field (they're 'free')
+    if (args.role === 'free') {
+      users = users.filter((u) => !u.role || u.role === 'free');
+    }
+
+    // Apply pagination
+    const hasMore = users.length > limit;
+    const resultUsers = users.slice(0, limit);
+
+    return {
+      users: resultUsers.map((u) => ({
+        _id: u._id,
+        email: u.email,
+        displayName: u.displayName,
+        avatarUrl: u.avatarUrl,
+        role: u.role || 'free',
+        createdAt: u.createdAt,
+      })),
+      nextCursor: hasMore ? resultUsers[resultUsers.length - 1]?._id : undefined,
+      hasMore,
+    };
   },
 });

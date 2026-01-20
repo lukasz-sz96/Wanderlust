@@ -111,7 +111,38 @@ export const getFeed = query({
       cutoffTime = Date.now() - FREE_LIMITS.feedHistoryDays * 24 * 60 * 60 * 1000;
     }
 
-    // Collect activities from all followed users
+    // Batch fetch all followed users first
+    const followingIdArray = Array.from(followingIds);
+    const users = await Promise.all(followingIdArray.map((id) => ctx.db.get(id)));
+
+    // Build user map, filtering out private profiles
+    const userMap = new Map<string, { displayName: string | undefined; avatarUrl: string | undefined; role: 'free' | 'pro' | 'moderator' | 'admin' | undefined }>();
+    for (let i = 0; i < followingIdArray.length; i++) {
+      const user = users[i];
+      if (!user) continue;
+      const visibility = user.profileVisibility || 'public';
+      if (visibility === 'private') continue;
+      userMap.set(followingIdArray[i], {
+        displayName: user.displayName,
+        avatarUrl: user.avatarUrl,
+        role: user.role,
+      });
+    }
+
+    // Fetch activities with proper limits per user to avoid memory bloat
+    const activitiesPerUser = Math.ceil((limit + 1) * 2 / userMap.size) || limit + 1;
+    const activityPromises = Array.from(userMap.keys()).map(async (userId) => {
+      let query = ctx.db
+        .query('activityFeed')
+        .withIndex('by_user_and_created', (q) => q.eq('userId', userId as Id<'users'>))
+        .order('desc');
+
+      return query.take(activitiesPerUser);
+    });
+
+    const activityResults = await Promise.all(activityPromises);
+
+    // Flatten and filter activities
     const allActivities: {
       _id: Id<'activityFeed'>;
       userId: Id<'users'>;
@@ -126,29 +157,12 @@ export const getFeed = query({
       };
     }[] = [];
 
-    // For each followed user, get their activities
-    for (const followingId of followingIds) {
-      const userActivities = await ctx.db
-        .query('activityFeed')
-        .withIndex('by_user_and_created', (q) => q.eq('userId', followingId))
-        .order('desc')
-        .collect();
+    for (const activities of activityResults) {
+      for (const activity of activities) {
+        const userInfo = userMap.get(activity.userId);
+        if (!userInfo) continue;
 
-      // Get user info for these activities
-      const user = await ctx.db.get(followingId);
-      if (!user) {
-        continue;
-      }
-
-      // Check user visibility
-      const visibility = user.profileVisibility || 'public';
-      if (visibility === 'private') {
-        continue;
-      }
-
-      // Add activities that pass the filters
-      for (const activity of userActivities) {
-        // Apply cursor filter
+        // Apply cursor filter (use > not >= to avoid duplicates)
         if (args.cursor && activity.createdAt >= args.cursor) {
           continue;
         }
@@ -165,11 +179,7 @@ export const getFeed = query({
           referenceId: activity.referenceId,
           metadata: activity.metadata,
           createdAt: activity.createdAt,
-          user: {
-            displayName: user.displayName,
-            avatarUrl: user.avatarUrl,
-            role: user.role,
-          },
+          user: userInfo,
         });
       }
     }

@@ -86,25 +86,13 @@ export const createShareLink = mutation({
     const hasUnlimitedShares = checkPermission(currentUser.role, 'unlimited_shares');
 
     if (!hasUnlimitedShares) {
-      // Get all trips owned by user
-      const userTrips = await ctx.db
-        .query('trips')
-        .withIndex('by_user', (q) => q.eq('userId', currentUser._id))
+      // Count shares directly using the by_owner index
+      const userShares = await ctx.db
+        .query('sharedTrips')
+        .withIndex('by_owner', (q) => q.eq('ownerId', currentUser._id))
         .collect();
 
-      // Count how many are already shared
-      let sharedCount = 0;
-      for (const userTrip of userTrips) {
-        const shared = await ctx.db
-          .query('sharedTrips')
-          .withIndex('by_trip', (q) => q.eq('tripId', userTrip._id))
-          .unique();
-        if (shared) {
-          sharedCount++;
-        }
-      }
-
-      if (sharedCount >= FREE_LIMITS.maxSharedTrips) {
+      if (userShares.length >= FREE_LIMITS.maxSharedTrips) {
         throw new Error(
           `Free users can share up to ${FREE_LIMITS.maxSharedTrips} trips. Upgrade to Pro for unlimited shares.`,
         );
@@ -130,6 +118,7 @@ export const createShareLink = mutation({
     // Insert share record
     await ctx.db.insert('sharedTrips', {
       tripId: args.tripId,
+      ownerId: currentUser._id,
       shareCode,
       isPublic: true,
       viewCount: 0,

@@ -103,50 +103,45 @@ export const getProfile = query({
       return null;
     }
 
-    // Count followers
-    const followers = await ctx.db
-      .query('follows')
-      .withIndex('by_following', (q) => q.eq('followingId', targetUserId))
-      .collect();
+    // Fetch all counts in parallel to reduce latency
+    const [followers, following, trips, places, journals, visitedItems] = await Promise.all([
+      ctx.db
+        .query('follows')
+        .withIndex('by_following', (q) => q.eq('followingId', targetUserId))
+        .collect(),
+      ctx.db
+        .query('follows')
+        .withIndex('by_follower', (q) => q.eq('followerId', targetUserId))
+        .collect(),
+      ctx.db
+        .query('trips')
+        .withIndex('by_user', (q) => q.eq('userId', targetUserId))
+        .collect(),
+      ctx.db
+        .query('places')
+        .withIndex('by_user', (q) => q.eq('userId', targetUserId))
+        .collect(),
+      ctx.db
+        .query('journalEntries')
+        .withIndex('by_user', (q) => q.eq('userId', targetUserId))
+        .collect(),
+      ctx.db
+        .query('bucketListItems')
+        .withIndex('by_user_and_status', (q) => q.eq('userId', targetUserId).eq('status', 'visited'))
+        .collect(),
+    ]);
+
     const followersCount = followers.length;
-
-    // Count following
-    const following = await ctx.db
-      .query('follows')
-      .withIndex('by_follower', (q) => q.eq('followerId', targetUserId))
-      .collect();
     const followingCount = following.length;
-
-    // Count trips
-    const trips = await ctx.db
-      .query('trips')
-      .withIndex('by_user', (q) => q.eq('userId', targetUserId))
-      .collect();
     const tripsCount = trips.length;
-
-    // Count places
-    const places = await ctx.db
-      .query('places')
-      .withIndex('by_user', (q) => q.eq('userId', targetUserId))
-      .collect();
     const placesCount = places.length;
-
-    // Count journals
-    const journals = await ctx.db
-      .query('journalEntries')
-      .withIndex('by_user', (q) => q.eq('userId', targetUserId))
-      .collect();
     const journalsCount = journals.length;
 
-    // Count unique countries from visited bucket list items
-    const visitedItems = await ctx.db
-      .query('bucketListItems')
-      .withIndex('by_user_and_status', (q) => q.eq('userId', targetUserId).eq('status', 'visited'))
-      .collect();
-
+    // Batch fetch places for visited items to avoid N+1
+    const placeIds = [...new Set(visitedItems.map((item) => item.placeId))];
+    const placeDocs = await Promise.all(placeIds.map((id) => ctx.db.get(id)));
     const countriesSet = new Set<string>();
-    for (const item of visitedItems) {
-      const place = await ctx.db.get(item.placeId);
+    for (const place of placeDocs) {
       if (place?.countryCode) {
         countriesSet.add(place.countryCode);
       }
@@ -186,6 +181,12 @@ export const getProfile = query({
   },
 });
 
+// String length limits
+const MAX_BIO_LENGTH = 500;
+const MAX_HOME_LOCATION_LENGTH = 100;
+const MAX_TRAVEL_STYLES = 10;
+const MAX_LANGUAGES = 20;
+
 // Update user profile
 export const updateProfile = mutation({
   args: {
@@ -211,6 +212,20 @@ export const updateProfile = mutation({
       throw new Error('User not found');
     }
 
+    // Validate string lengths
+    if (args.bio !== undefined && args.bio.length > MAX_BIO_LENGTH) {
+      throw new Error(`Bio must be ${MAX_BIO_LENGTH} characters or less`);
+    }
+    if (args.homeLocation !== undefined && args.homeLocation.length > MAX_HOME_LOCATION_LENGTH) {
+      throw new Error(`Home location must be ${MAX_HOME_LOCATION_LENGTH} characters or less`);
+    }
+    if (args.travelStyles !== undefined && args.travelStyles.length > MAX_TRAVEL_STYLES) {
+      throw new Error(`Maximum ${MAX_TRAVEL_STYLES} travel styles allowed`);
+    }
+    if (args.languages !== undefined && args.languages.length > MAX_LANGUAGES) {
+      throw new Error(`Maximum ${MAX_LANGUAGES} languages allowed`);
+    }
+
     const updates: {
       updatedAt: number;
       bio?: string;
@@ -223,7 +238,7 @@ export const updateProfile = mutation({
     };
 
     if (args.bio !== undefined) {
-      updates.bio = args.bio;
+      updates.bio = args.bio.trim();
     }
     if (args.travelStyles !== undefined) {
       updates.travelStyles = args.travelStyles;
@@ -232,7 +247,7 @@ export const updateProfile = mutation({
       updates.languages = args.languages;
     }
     if (args.homeLocation !== undefined) {
-      updates.homeLocation = args.homeLocation;
+      updates.homeLocation = args.homeLocation.trim();
     }
     if (args.profileVisibility !== undefined) {
       updates.profileVisibility = args.profileVisibility;
@@ -475,7 +490,27 @@ export const getFollowers = query({
     const hasMore = paginatedFollows.length > limit;
     const resultFollows = paginatedFollows.slice(0, limit);
 
-    // Get follower user details
+    // Batch fetch all follower users
+    const followerIds = resultFollows.map((f) => f.followerId);
+    const users = await Promise.all(followerIds.map((id) => ctx.db.get(id)));
+
+    // Batch check follow status if current user exists
+    let followStatusMap = new Map<string, boolean>();
+    if (currentUser) {
+      const followChecks = await Promise.all(
+        followerIds.map((id) =>
+          ctx.db
+            .query('follows')
+            .withIndex('by_pair', (q) => q.eq('followerId', currentUser._id).eq('followingId', id))
+            .unique()
+        )
+      );
+      followerIds.forEach((id, index) => {
+        followStatusMap.set(id, !!followChecks[index]);
+      });
+    }
+
+    // Build result
     const followers: {
       _id: Id<'users'>;
       displayName: string | undefined;
@@ -485,29 +520,17 @@ export const getFollowers = query({
       followedAt: number;
     }[] = [];
 
-    for (const follow of resultFollows) {
-      const user = await ctx.db.get(follow.followerId);
-      if (!user) {
-        continue;
-      }
-
-      // Check if current user follows this follower
-      let isFollowingThem = false;
-      if (currentUser) {
-        const followRecord = await ctx.db
-          .query('follows')
-          .withIndex('by_pair', (q) => q.eq('followerId', currentUser._id).eq('followingId', user._id))
-          .unique();
-        isFollowingThem = !!followRecord;
-      }
+    for (let i = 0; i < resultFollows.length; i++) {
+      const user = users[i];
+      if (!user) continue;
 
       followers.push({
         _id: user._id,
         displayName: user.displayName,
         avatarUrl: user.avatarUrl,
         bio: user.bio,
-        isFollowing: isFollowingThem,
-        followedAt: follow.createdAt,
+        isFollowing: followStatusMap.get(user._id) || false,
+        followedAt: resultFollows[i].createdAt,
       });
     }
 
@@ -583,7 +606,29 @@ export const getFollowing = query({
     const hasMore = paginatedFollows.length > limit;
     const resultFollows = paginatedFollows.slice(0, limit);
 
-    // Get following user details
+    // Batch fetch all following users
+    const followingIds = resultFollows.map((f) => f.followingId);
+    const users = await Promise.all(followingIds.map((id) => ctx.db.get(id)));
+
+    // Batch check follow status if current user exists
+    let followStatusMap = new Map<string, boolean>();
+    if (currentUser) {
+      const followChecks = await Promise.all(
+        followingIds.map((id) =>
+          id === currentUser._id
+            ? Promise.resolve(null) // Can't follow yourself
+            : ctx.db
+                .query('follows')
+                .withIndex('by_pair', (q) => q.eq('followerId', currentUser._id).eq('followingId', id))
+                .unique()
+        )
+      );
+      followingIds.forEach((id, index) => {
+        followStatusMap.set(id, !!followChecks[index]);
+      });
+    }
+
+    // Build result
     const following: {
       _id: Id<'users'>;
       displayName: string | undefined;
@@ -593,34 +638,17 @@ export const getFollowing = query({
       followedAt: number;
     }[] = [];
 
-    for (const follow of resultFollows) {
-      const user = await ctx.db.get(follow.followingId);
-      if (!user) {
-        continue;
-      }
-
-      // Check if current user follows this user
-      let isFollowingThem = false;
-      if (currentUser) {
-        if (currentUser._id === user._id) {
-          // Can't follow yourself
-          isFollowingThem = false;
-        } else {
-          const followRecord = await ctx.db
-            .query('follows')
-            .withIndex('by_pair', (q) => q.eq('followerId', currentUser._id).eq('followingId', user._id))
-            .unique();
-          isFollowingThem = !!followRecord;
-        }
-      }
+    for (let i = 0; i < resultFollows.length; i++) {
+      const user = users[i];
+      if (!user) continue;
 
       following.push({
         _id: user._id,
         displayName: user.displayName,
         avatarUrl: user.avatarUrl,
         bio: user.bio,
-        isFollowing: isFollowingThem,
-        followedAt: follow.createdAt,
+        isFollowing: followStatusMap.get(user._id) || false,
+        followedAt: resultFollows[i].createdAt,
       });
     }
 
@@ -656,30 +684,22 @@ export const searchUsers = query({
           .withIndex('by_auth_id', (q) => q.eq('authUserId', identity.subject))
           .unique()
       : null;
-    const limit = args.limit || 20;
+    const limit = Math.min(args.limit || 20, 50); // Cap at 50 results
     const searchQuery = args.query.toLowerCase().trim();
 
-    if (!searchQuery) {
+    if (!searchQuery || searchQuery.length < 2) {
       return [];
     }
 
-    // Get all users (in production, you'd want a search index)
-    const allUsers = await ctx.db.query('users').collect();
+    // Fetch limited users to avoid memory issues (in production, use a search index)
+    const allUsers = await ctx.db.query('users').take(500);
 
     // Filter to only public profiles and match search query
     const matchingUsers = allUsers.filter((user) => {
-      // Only include public profiles
       const visibility = user.profileVisibility || 'public';
-      if (visibility !== 'public') {
-        return false;
-      }
+      if (visibility !== 'public') return false;
+      if (currentUser && user._id === currentUser._id) return false;
 
-      // Exclude current user from search results
-      if (currentUser && user._id === currentUser._id) {
-        return false;
-      }
-
-      // Search in displayName, bio, and homeLocation
       const displayName = user.displayName?.toLowerCase() || '';
       const bio = user.bio?.toLowerCase() || '';
       const homeLocation = user.homeLocation?.toLowerCase() || '';
@@ -690,36 +710,29 @@ export const searchUsers = query({
     // Limit results
     const limitedUsers = matchingUsers.slice(0, limit);
 
-    // Get follow status for each user
-    const results: {
-      _id: Id<'users'>;
-      displayName: string | undefined;
-      avatarUrl: string | undefined;
-      bio: string | undefined;
-      homeLocation: string | undefined;
-      isFollowing: boolean;
-    }[] = [];
-
-    for (const user of limitedUsers) {
-      let isFollowingUser = false;
-      if (currentUser) {
-        const followRecord = await ctx.db
-          .query('follows')
-          .withIndex('by_pair', (q) => q.eq('followerId', currentUser._id).eq('followingId', user._id))
-          .unique();
-        isFollowingUser = !!followRecord;
-      }
-
-      results.push({
-        _id: user._id,
-        displayName: user.displayName,
-        avatarUrl: user.avatarUrl,
-        bio: user.bio,
-        homeLocation: user.homeLocation,
-        isFollowing: isFollowingUser,
+    // Batch check follow status
+    let followStatusMap = new Map<string, boolean>();
+    if (currentUser && limitedUsers.length > 0) {
+      const followChecks = await Promise.all(
+        limitedUsers.map((user) =>
+          ctx.db
+            .query('follows')
+            .withIndex('by_pair', (q) => q.eq('followerId', currentUser._id).eq('followingId', user._id))
+            .unique()
+        )
+      );
+      limitedUsers.forEach((user, index) => {
+        followStatusMap.set(user._id, !!followChecks[index]);
       });
     }
 
-    return results;
+    return limitedUsers.map((user) => ({
+      _id: user._id,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      homeLocation: user.homeLocation,
+      isFollowing: followStatusMap.get(user._id) || false,
+    }));
   },
 });

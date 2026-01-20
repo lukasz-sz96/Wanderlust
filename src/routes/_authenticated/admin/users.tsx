@@ -21,7 +21,8 @@ function AdminUsersPage() {
   const [error, setError] = useState<string | null>(null);
 
   const role = useQuery(api.roles.getCurrentRole);
-  const users = useQuery(api.roles.listUsers, { search: search || undefined });
+  const usersResult = useQuery(api.roles.listUsers, { search: search || undefined, limit: 100 });
+  const users = usersResult?.users ?? [];
   const setUserRole = useMutation(api.roles.setUserRole);
 
   // Redirect if not admin
@@ -31,7 +32,7 @@ function AdminUsersPage() {
     }
   }, [role, navigate]);
 
-  if (role === undefined || users === undefined) {
+  if (role === undefined || usersResult === undefined) {
     return <PageLoading />;
   }
 
