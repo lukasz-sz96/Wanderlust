@@ -345,6 +345,8 @@ export const listCommunityPlaces = query({
       country: v.optional(v.string()),
       category: v.optional(v.string()),
       photoCount: v.number(),
+      journalCount: v.number(),
+      visitCount: v.number(),
       previewUrl: v.optional(v.string()),
       contributors: v.array(
         v.object({
@@ -358,47 +360,120 @@ export const listCommunityPlaces = query({
   handler: async (ctx, args) => {
     const limit = args.limit || 100;
 
+    const placeDataMap = new Map<
+      Id<'places'>,
+      {
+        photoCount: number;
+        journalCount: number;
+        visitCount: number;
+        userIds: Set<string>;
+        previewStorageId?: Id<'_storage'>;
+      }
+    >();
+
     const publicPhotos = await ctx.db
       .query('photos')
       .withIndex('by_visibility', (q) => q.eq('visibility', 'public'))
       .collect();
 
-    const placePhotoMap = new Map<
-      Id<'places'>,
-      { photos: typeof publicPhotos; userIds: Set<string> }
-    >();
-
     for (const photo of publicPhotos) {
       if (!photo.placeId) continue;
 
-      if (!placePhotoMap.has(photo.placeId)) {
-        placePhotoMap.set(photo.placeId, { photos: [], userIds: new Set() });
+      if (!placeDataMap.has(photo.placeId)) {
+        placeDataMap.set(photo.placeId, {
+          photoCount: 0,
+          journalCount: 0,
+          visitCount: 0,
+          userIds: new Set()
+        });
       }
 
-      const entry = placePhotoMap.get(photo.placeId)!;
-      entry.photos.push(photo);
+      const entry = placeDataMap.get(photo.placeId)!;
+      entry.photoCount++;
       entry.userIds.add(photo.userId);
+      if (!entry.previewStorageId) {
+        entry.previewStorageId = photo.storageId;
+      }
     }
 
-    const placeIds = Array.from(placePhotoMap.keys()).slice(0, limit);
+    const publicUsers = await ctx.db
+      .query('users')
+      .filter((q) => q.eq(q.field('profileVisibility'), 'public'))
+      .collect();
+    const publicUserIds = new Set(publicUsers.map(u => u._id));
+
+    const visitedItems = await ctx.db
+      .query('bucketListItems')
+      .filter((q) => q.eq(q.field('status'), 'visited'))
+      .collect();
+
+    for (const item of visitedItems) {
+      if (!publicUserIds.has(item.userId)) continue;
+
+      if (!placeDataMap.has(item.placeId)) {
+        placeDataMap.set(item.placeId, {
+          photoCount: 0,
+          journalCount: 0,
+          visitCount: 0,
+          userIds: new Set()
+        });
+      }
+
+      const entry = placeDataMap.get(item.placeId)!;
+      entry.visitCount++;
+      entry.userIds.add(item.userId);
+    }
+
+    const journalEntries = await ctx.db
+      .query('journalEntries')
+      .filter((q) => q.neq(q.field('placeId'), undefined))
+      .collect();
+
+    for (const entry of journalEntries) {
+      if (!entry.placeId) continue;
+      if (!publicUserIds.has(entry.userId)) continue;
+
+      if (!placeDataMap.has(entry.placeId)) {
+        placeDataMap.set(entry.placeId, {
+          photoCount: 0,
+          journalCount: 0,
+          visitCount: 0,
+          userIds: new Set()
+        });
+      }
+
+      const data = placeDataMap.get(entry.placeId)!;
+      data.journalCount++;
+      data.userIds.add(entry.userId);
+    }
+
+    const sortedPlaceIds = Array.from(placeDataMap.entries())
+      .sort((a, b) => {
+        const scoreA = a[1].photoCount * 3 + a[1].journalCount * 2 + a[1].visitCount;
+        const scoreB = b[1].photoCount * 3 + b[1].journalCount * 2 + b[1].visitCount;
+        return scoreB - scoreA;
+      })
+      .slice(0, limit)
+      .map(([id]) => id);
 
     const communityPlaces = await Promise.all(
-      placeIds.map(async (placeId) => {
+      sortedPlaceIds.map(async (placeId) => {
         const place = await ctx.db.get("places", placeId);
         if (!place) return null;
 
-        const entry = placePhotoMap.get(placeId)!;
-        const sortedPhotos = entry.photos.sort((a, b) => b.createdAt - a.createdAt);
-        const previewPhoto = sortedPhotos[0];
+        const data = placeDataMap.get(placeId)!;
 
-        const previewUrl = await ctx.storage.getUrl(previewPhoto.storageId);
+        let previewUrl: string | undefined;
+        if (data.previewStorageId) {
+          previewUrl = await ctx.storage.getUrl(data.previewStorageId) || undefined;
+        }
 
-        const contributorIds = Array.from(entry.userIds).slice(0, 3);
+        const contributorIds = Array.from(data.userIds).slice(0, 3);
         const contributors = await Promise.all(
-          contributorIds.map(async (userId) => {
-            const user = await ctx.db.get("users", userId as Id<'users'>);
+          contributorIds.map(async (odlUserId) => {
+            const user = await ctx.db.get("users", odlUserId as Id<'users'>);
             return {
-              _id: userId as Id<'users'>,
+              _id: odlUserId as Id<'users'>,
               displayName: user?.displayName,
               avatarUrl: user?.avatarUrl,
             };
@@ -413,8 +488,10 @@ export const listCommunityPlaces = query({
           city: place.city,
           country: place.country,
           category: place.category,
-          photoCount: entry.photos.length,
-          previewUrl: previewUrl || undefined,
+          photoCount: data.photoCount,
+          journalCount: data.journalCount,
+          visitCount: data.visitCount,
+          previewUrl,
           contributors,
         };
       }),
