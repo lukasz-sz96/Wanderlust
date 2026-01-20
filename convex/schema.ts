@@ -10,10 +10,8 @@ export default defineSchema({
     preferences: v.optional(
       v.object({
         defaultMapStyle: v.optional(v.string()),
-        temperatureUnit: v.optional(
-          v.union(v.literal('celsius'), v.literal('fahrenheit'))
-        ),
-      })
+        temperatureUnit: v.optional(v.union(v.literal('celsius'), v.literal('fahrenheit'))),
+      }),
     ),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -22,17 +20,8 @@ export default defineSchema({
     languages: v.optional(v.array(v.string())),
     homeLocation: v.optional(v.string()),
     coverPhotoId: v.optional(v.id('_storage')),
-    profileVisibility: v.optional(
-      v.union(v.literal('public'), v.literal('friends'), v.literal('private'))
-    ),
-    role: v.optional(
-      v.union(
-        v.literal('free'),
-        v.literal('pro'),
-        v.literal('moderator'),
-        v.literal('admin')
-      )
-    ),
+    profileVisibility: v.optional(v.union(v.literal('public'), v.literal('friends'), v.literal('private'))),
+    role: v.optional(v.union(v.literal('free'), v.literal('pro'), v.literal('moderator'), v.literal('admin'))),
     roleUpdatedAt: v.optional(v.number()),
   })
     .index('by_auth_id', ['authUserId'])
@@ -41,11 +30,7 @@ export default defineSchema({
   places: defineTable({
     userId: v.id('users'),
     externalId: v.optional(v.string()),
-    source: v.union(
-      v.literal('osm'),
-      v.literal('ai_generated'),
-      v.literal('user_created')
-    ),
+    source: v.union(v.literal('osm'), v.literal('ai_generated'), v.literal('user_created')),
     name: v.string(),
     description: v.optional(v.string()),
     aiDescription: v.optional(v.string()),
@@ -68,11 +53,7 @@ export default defineSchema({
   bucketListItems: defineTable({
     userId: v.id('users'),
     placeId: v.id('places'),
-    status: v.union(
-      v.literal('want_to_visit'),
-      v.literal('visited'),
-      v.literal('skipped')
-    ),
+    status: v.union(v.literal('want_to_visit'), v.literal('visited'), v.literal('skipped')),
     priority: v.number(),
     notes: v.optional(v.string()),
     visitedAt: v.optional(v.number()),
@@ -83,7 +64,7 @@ export default defineSchema({
         temperature: v.number(),
         condition: v.string(),
         icon: v.string(),
-      })
+      }),
     ),
     createdAt: v.number(),
   })
@@ -101,15 +82,11 @@ export default defineSchema({
         name: v.string(),
         latitude: v.number(),
         longitude: v.number(),
-      })
+      }),
     ),
     startDate: v.optional(v.string()),
     endDate: v.optional(v.string()),
-    status: v.union(
-      v.literal('planning'),
-      v.literal('active'),
-      v.literal('completed')
-    ),
+    status: v.union(v.literal('planning'), v.literal('active'), v.literal('completed')),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -129,7 +106,7 @@ export default defineSchema({
       v.literal('meal'),
       v.literal('transport'),
       v.literal('accommodation'),
-      v.literal('other')
+      v.literal('other'),
     ),
     aiGenerated: v.boolean(),
     createdAt: v.number(),
@@ -143,20 +120,13 @@ export default defineSchema({
     placeId: v.optional(v.id('places')),
     title: v.optional(v.string()),
     content: v.any(), // Tiptap JSON
-    mood: v.optional(
-      v.union(
-        v.literal('amazing'),
-        v.literal('good'),
-        v.literal('neutral'),
-        v.literal('challenging')
-      )
-    ),
+    mood: v.optional(v.union(v.literal('amazing'), v.literal('good'), v.literal('neutral'), v.literal('challenging'))),
     weatherSnapshot: v.optional(
       v.object({
         temperature: v.number(),
         condition: v.string(),
         icon: v.string(),
-      })
+      }),
     ),
     entryDate: v.string(),
     createdAt: v.number(),
@@ -200,7 +170,7 @@ export default defineSchema({
       v.literal('trip_created'),
       v.literal('place_visited'),
       v.literal('journal_posted'),
-      v.literal('place_added')
+      v.literal('place_added'),
     ),
     referenceId: v.string(),
     metadata: v.optional(v.any()),

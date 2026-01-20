@@ -41,17 +41,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           <div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mb-4">
             <AlertTriangle className="text-error" size={32} />
           </div>
-          <h2 className="text-xl font-semibold text-foreground mb-2">
-            Something went wrong
-          </h2>
-          <p className="text-muted mb-6 max-w-md">
-            {this.state.error?.message || 'An unexpected error occurred'}
-          </p>
-          <Button
-            variant="primary"
-            leftIcon={<RefreshCw size={18} />}
-            onClick={this.handleRetry}
-          >
+          <h2 className="text-xl font-semibold text-foreground mb-2">Something went wrong</h2>
+          <p className="text-muted mb-6 max-w-md">{this.state.error?.message || 'An unexpected error occurred'}</p>
+          <Button variant="primary" leftIcon={<RefreshCw size={18} />} onClick={this.handleRetry}>
             Try Again
           </Button>
         </div>

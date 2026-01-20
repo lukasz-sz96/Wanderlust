@@ -4,16 +4,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../../../convex/_generated/api';
 import { useCurrentUser } from '../../lib/hooks/useUserSync';
 import { useOnboarding } from '../../lib/hooks/useOnboarding';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  Button,
-  Input,
-  Avatar,
-  useToast,
-} from '../../components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Button, Input, Avatar, useToast } from '../../components/ui';
 import { RefreshCw } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated/settings')({
@@ -77,15 +68,9 @@ const SettingsPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-4">
-              <Avatar
-                src={user?.avatarUrl || undefined}
-                alt={user?.displayName || user?.email || 'User'}
-                size="xl"
-              />
+              <Avatar src={user?.avatarUrl || undefined} alt={user?.displayName || user?.email || 'User'} size="xl" />
               <div>
-                <p className="font-medium text-foreground">
-                  {user?.displayName || 'No display name'}
-                </p>
+                <p className="font-medium text-foreground">{user?.displayName || 'No display name'}</p>
                 <p className="text-sm text-muted">{user?.email}</p>
               </div>
             </div>
@@ -109,9 +94,7 @@ const SettingsPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Temperature Unit
-              </label>
+              <label className="block text-sm font-medium text-foreground mb-2">Temperature Unit</label>
               <div className="flex gap-2">
                 <Button
                   variant={temperatureUnit === 'celsius' ? 'primary' : 'ghost'}
@@ -141,14 +124,8 @@ const SettingsPage = () => {
           <CardContent className="space-y-4">
             <div>
               <p className="text-sm font-medium text-foreground mb-1">Onboarding Tour</p>
-              <p className="text-sm text-muted mb-3">
-                View the welcome tour again to learn about Wanderlust features.
-              </p>
-              <Button
-                variant="ghost"
-                leftIcon={<RefreshCw size={16} />}
-                onClick={resetOnboarding}
-              >
+              <p className="text-sm text-muted mb-3">View the welcome tour again to learn about Wanderlust features.</p>
+              <Button variant="ghost" leftIcon={<RefreshCw size={16} />} onClick={resetOnboarding}>
                 Restart Onboarding
               </Button>
             </div>

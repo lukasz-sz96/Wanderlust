@@ -207,11 +207,7 @@ export const AddPlaceModal = ({ isOpen, onClose }: AddPlaceModalProps) => {
                 </div>
               )}
 
-              {searchError && (
-                <p className="text-sm text-error text-center py-4">
-                  {searchError}
-                </p>
-              )}
+              {searchError && <p className="text-sm text-error text-center py-4">{searchError}</p>}
 
               {searchQuery && searchResults.length === 0 && !isSearching && !searchError && (
                 <p className="text-sm text-muted text-center py-4">

@@ -1,4 +1,4 @@
-import { convexBetterAuthReactStart } from "@convex-dev/better-auth/react-start";
+import { convexBetterAuthReactStart } from '@convex-dev/better-auth/react-start';
 
 // Lazy initialization to avoid running on client
 let _authUtils: ReturnType<typeof convexBetterAuthReactStart> | null = null;
@@ -17,15 +17,21 @@ export const getToken = async () => {
   return getAuthUtils().getToken();
 };
 
-export const fetchAuthQuery = async (...args: Parameters<ReturnType<typeof convexBetterAuthReactStart>['fetchAuthQuery']>) => {
+export const fetchAuthQuery = async (
+  ...args: Parameters<ReturnType<typeof convexBetterAuthReactStart>['fetchAuthQuery']>
+) => {
   return getAuthUtils().fetchAuthQuery(...args);
 };
 
-export const fetchAuthMutation = async (...args: Parameters<ReturnType<typeof convexBetterAuthReactStart>['fetchAuthMutation']>) => {
+export const fetchAuthMutation = async (
+  ...args: Parameters<ReturnType<typeof convexBetterAuthReactStart>['fetchAuthMutation']>
+) => {
   return getAuthUtils().fetchAuthMutation(...args);
 };
 
-export const fetchAuthAction = async (...args: Parameters<ReturnType<typeof convexBetterAuthReactStart>['fetchAuthAction']>) => {
+export const fetchAuthAction = async (
+  ...args: Parameters<ReturnType<typeof convexBetterAuthReactStart>['fetchAuthAction']>
+) => {
   return getAuthUtils().fetchAuthAction(...args);
 };
 

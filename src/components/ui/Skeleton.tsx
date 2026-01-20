@@ -10,33 +10,17 @@ export const Skeleton = ({ className = '', animate = true }: SkeletonProps) => {
   return <div className={`${baseClass} ${className}`} />;
 };
 
-export const SkeletonText = ({
-  lines = 3,
-  className = '',
-}: {
-  lines?: number;
-  className?: string;
-}) => {
+export const SkeletonText = ({ lines = 3, className = '' }: { lines?: number; className?: string }) => {
   return (
     <div className={`space-y-2 ${className}`}>
       {Array.from({ length: lines }).map((_, i) => (
-        <Skeleton
-          key={i}
-          className="h-4"
-          style={{ width: i === lines - 1 ? '60%' : '100%' } as React.CSSProperties}
-        />
+        <Skeleton key={i} className="h-4" style={{ width: i === lines - 1 ? '60%' : '100%' } as React.CSSProperties} />
       ))}
     </div>
   );
 };
 
-export const SkeletonAvatar = ({
-  size = 'md',
-  className = '',
-}: {
-  size?: 'sm' | 'md' | 'lg';
-  className?: string;
-}) => {
+export const SkeletonAvatar = ({ size = 'md', className = '' }: { size?: 'sm' | 'md' | 'lg'; className?: string }) => {
   const sizes = {
     sm: 'w-8 h-8',
     md: 'w-10 h-10',

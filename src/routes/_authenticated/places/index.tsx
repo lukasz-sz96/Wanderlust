@@ -22,10 +22,7 @@ const PlacesPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const reorderItems = useMutation(api.bucketList.reorder);
 
-  const bucketListItems = useQuery(
-    api.bucketList.list,
-    activeTab === 'all' ? {} : { status: activeTab }
-  );
+  const bucketListItems = useQuery(api.bucketList.list, activeTab === 'all' ? {} : { status: activeTab });
 
   const stats = useQuery(api.bucketList.getStats);
 
@@ -69,9 +66,7 @@ const PlacesPage = () => {
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-md transition-colors ${
-                viewMode === 'grid'
-                  ? 'bg-primary text-white'
-                  : 'text-muted hover:text-foreground'
+                viewMode === 'grid' ? 'bg-primary text-white' : 'text-muted hover:text-foreground'
               }`}
               aria-label="Grid view"
             >
@@ -80,16 +75,16 @@ const PlacesPage = () => {
             <button
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-md transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-primary text-white'
-                  : 'text-muted hover:text-foreground'
+                viewMode === 'list' ? 'bg-primary text-white' : 'text-muted hover:text-foreground'
               }`}
               aria-label="List view"
             >
               <List size={18} />
             </button>
           </div>
-          <Button leftIcon={<Plus size={18} />} onClick={() => setShowAddModal(true)}>Add Place</Button>
+          <Button leftIcon={<Plus size={18} />} onClick={() => setShowAddModal(true)}>
+            Add Place
+          </Button>
         </div>
       </div>
 
@@ -104,9 +99,10 @@ const PlacesPage = () => {
               className={`
                 flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap
                 font-medium transition-colors duration-200
-                ${isActive
-                  ? 'bg-primary text-white'
-                  : 'bg-surface border border-border text-muted hover:text-foreground hover:border-muted'
+                ${
+                  isActive
+                    ? 'bg-primary text-white'
+                    : 'bg-surface border border-border text-muted hover:text-foreground hover:border-muted'
                 }
               `}
             >
@@ -178,7 +174,7 @@ const PlacesPage = () => {
                     rating={item.rating}
                   />
                 </motion.div>
-              ) : null
+              ) : null,
             )}
           </AnimatePresence>
         </motion.div>
@@ -186,26 +182,14 @@ const PlacesPage = () => {
 
       {stats.visited > 0 && (
         <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatBox
-            label="Total Places"
-            value={stats.total}
-            icon={<MapPin className="text-primary" size={20} />}
-          />
+          <StatBox label="Total Places" value={stats.total} icon={<MapPin className="text-primary" size={20} />} />
           <StatBox
             label="Want to Visit"
             value={stats.wantToVisit}
             icon={<Heart className="text-primary" size={20} />}
           />
-          <StatBox
-            label="Visited"
-            value={stats.visited}
-            icon={<CheckCircle className="text-secondary" size={20} />}
-          />
-          <StatBox
-            label="Countries"
-            value={stats.countries}
-            icon={<MapPin className="text-accent" size={20} />}
-          />
+          <StatBox label="Visited" value={stats.visited} icon={<CheckCircle className="text-secondary" size={20} />} />
+          <StatBox label="Countries" value={stats.countries} icon={<MapPin className="text-accent" size={20} />} />
         </div>
       )}
 
@@ -214,20 +198,10 @@ const PlacesPage = () => {
   );
 };
 
-const StatBox = ({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: number;
-  icon: React.ReactNode;
-}) => (
+const StatBox = ({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) => (
   <Card>
     <CardContent className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-lg bg-border-light flex items-center justify-center">
-        {icon}
-      </div>
+      <div className="w-10 h-10 rounded-lg bg-border-light flex items-center justify-center">{icon}</div>
       <div>
         <p className="text-2xl font-bold text-foreground">{value}</p>
         <p className="text-sm text-muted">{label}</p>

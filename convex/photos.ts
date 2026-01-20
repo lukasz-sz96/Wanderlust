@@ -147,7 +147,7 @@ export const listByJournalEntry = query({
       caption: v.optional(v.string()),
       createdAt: v.number(),
       url: v.string(),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -178,7 +178,7 @@ export const listByJournalEntry = query({
           ...photo,
           url: url || '',
         };
-      })
+      }),
     );
 
     return enrichedPhotos;
@@ -206,7 +206,7 @@ export const listByTrip = query({
       caption: v.optional(v.string()),
       createdAt: v.number(),
       url: v.string(),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -237,7 +237,7 @@ export const listByTrip = query({
           ...photo,
           url: url || '',
         };
-      })
+      }),
     );
 
     return enrichedPhotos;
@@ -263,7 +263,7 @@ export const listAll = query({
       caption: v.optional(v.string()),
       createdAt: v.number(),
       url: v.string(),
-    })
+    }),
   ),
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -294,7 +294,7 @@ export const listAll = query({
           ...photo,
           url: url || '',
         };
-      })
+      }),
     );
 
     return enrichedPhotos;

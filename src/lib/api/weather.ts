@@ -59,10 +59,7 @@ export const getWeatherInfo = (code: number): { condition: string; icon: string 
   return weatherCodeToCondition[code] || { condition: 'Unknown', icon: '❓' };
 };
 
-export const fetchWeather = async (
-  latitude: number,
-  longitude: number
-): Promise<WeatherData | null> => {
+export const fetchWeather = async (latitude: number, longitude: number): Promise<WeatherData | null> => {
   try {
     const params = new URLSearchParams({
       latitude: latitude.toString(),
@@ -75,12 +72,7 @@ export const fetchWeather = async (
         'wind_speed_10m',
         'is_day',
       ].join(','),
-      daily: [
-        'weather_code',
-        'temperature_2m_max',
-        'temperature_2m_min',
-        'precipitation_probability_max',
-      ].join(','),
+      daily: ['weather_code', 'temperature_2m_max', 'temperature_2m_min', 'precipitation_probability_max'].join(','),
       timezone: 'auto',
       forecast_days: '7',
     });
@@ -119,7 +111,7 @@ export const fetchWeather = async (
 
 export const formatTemperature = (temp: number, unit: 'celsius' | 'fahrenheit' = 'celsius'): string => {
   if (unit === 'fahrenheit') {
-    return `${Math.round(temp * 9 / 5 + 32)}°F`;
+    return `${Math.round((temp * 9) / 5 + 32)}°F`;
   }
   return `${Math.round(temp)}°C`;
 };
@@ -137,7 +129,7 @@ export interface HistoricalWeather {
 export const fetchHistoricalWeather = async (
   latitude: number,
   longitude: number,
-  date: string
+  date: string,
 ): Promise<HistoricalWeather | null> => {
   try {
     const params = new URLSearchParams({

@@ -18,10 +18,7 @@ const TripsPage = () => {
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const trips = useQuery(
-    api.trips.list,
-    activeTab === 'all' ? {} : { status: activeTab }
-  );
+  const trips = useQuery(api.trips.list, activeTab === 'all' ? {} : { status: activeTab });
   const stats = useQuery(api.trips.getStats);
 
   if (trips === undefined || stats === undefined) {
@@ -84,9 +81,10 @@ const TripsPage = () => {
               className={`
                 flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap
                 font-medium transition-colors duration-200
-                ${isActive
-                  ? 'bg-secondary text-white'
-                  : 'bg-surface border border-border text-muted hover:text-foreground hover:border-muted'
+                ${
+                  isActive
+                    ? 'bg-secondary text-white'
+                    : 'bg-surface border border-border text-muted hover:text-foreground hover:border-muted'
                 }
               `}
             >
@@ -148,11 +146,7 @@ const TripsPage = () => {
                   <div className="p-0">
                     {trip.coverImageUrl ? (
                       <div className="h-40 bg-border-light rounded-t-xl overflow-hidden">
-                        <img
-                          src={trip.coverImageUrl}
-                          alt={trip.title}
-                          className="w-full h-full object-cover"
-                        />
+                        <img src={trip.coverImageUrl} alt={trip.title} className="w-full h-full object-cover" />
                       </div>
                     ) : (
                       <div className="h-40 bg-gradient-to-br from-secondary/20 to-secondary/5 rounded-t-xl flex items-center justify-center">
@@ -161,23 +155,13 @@ const TripsPage = () => {
                     )}
                     <div className="p-4">
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <h3 className="font-semibold text-foreground text-lg line-clamp-1">
-                          {trip.title}
-                        </h3>
+                        <h3 className="font-semibold text-foreground text-lg line-clamp-1">{trip.title}</h3>
                         <Badge
                           variant={
-                            trip.status === 'completed'
-                              ? 'success'
-                              : trip.status === 'active'
-                                ? 'primary'
-                                : 'default'
+                            trip.status === 'completed' ? 'success' : trip.status === 'active' ? 'primary' : 'default'
                           }
                         >
-                          {trip.status === 'planning'
-                            ? 'Planning'
-                            : trip.status === 'active'
-                              ? 'Active'
-                              : 'Completed'}
+                          {trip.status === 'planning' ? 'Planning' : trip.status === 'active' ? 'Active' : 'Completed'}
                         </Badge>
                       </div>
 
@@ -195,11 +179,7 @@ const TripsPage = () => {
                         </p>
                       )}
 
-                      {trip.description && (
-                        <p className="text-sm text-muted line-clamp-2 mb-3">
-                          {trip.description}
-                        </p>
-                      )}
+                      {trip.description && <p className="text-sm text-muted line-clamp-2 mb-3">{trip.description}</p>}
 
                       <div className="flex items-center justify-between pt-3 border-t border-border-light">
                         <span className="text-sm text-muted">

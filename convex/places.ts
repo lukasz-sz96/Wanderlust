@@ -2,11 +2,7 @@ import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import { Id } from './_generated/dataModel';
 
-const placeSourceValidator = v.union(
-  v.literal('osm'),
-  v.literal('ai_generated'),
-  v.literal('user_created')
-);
+const placeSourceValidator = v.union(v.literal('osm'), v.literal('ai_generated'), v.literal('user_created'));
 
 export const create = mutation({
   args: {
@@ -99,9 +95,7 @@ export const update = mutation({
     }
 
     const { placeId, ...updates } = args;
-    const filteredUpdates = Object.fromEntries(
-      Object.entries(updates).filter(([_, v]) => v !== undefined)
-    );
+    const filteredUpdates = Object.fromEntries(Object.entries(updates).filter(([_, v]) => v !== undefined));
 
     if (Object.keys(filteredUpdates).length > 0) {
       await ctx.db.patch(placeId, filteredUpdates);
@@ -178,7 +172,7 @@ export const get = query({
       metadata: v.optional(v.any()),
       createdAt: v.number(),
     }),
-    v.null()
+    v.null(),
   ),
   handler: async (ctx, args) => {
     return await ctx.db.get(args.placeId);
@@ -212,7 +206,7 @@ export const list = query({
       coverPhotoId: v.optional(v.id('photos')),
       metadata: v.optional(v.any()),
       createdAt: v.number(),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -233,13 +227,9 @@ export const list = query({
     if (args.category) {
       query = ctx.db
         .query('places')
-        .withIndex('by_user_and_category', (q) =>
-          q.eq('userId', user._id).eq('category', args.category)
-        );
+        .withIndex('by_user_and_category', (q) => q.eq('userId', user._id).eq('category', args.category));
     } else {
-      query = ctx.db
-        .query('places')
-        .withIndex('by_user', (q) => q.eq('userId', user._id));
+      query = ctx.db.query('places').withIndex('by_user', (q) => q.eq('userId', user._id));
     }
 
     const places = await query.order('desc').take(args.limit || 100);
@@ -273,7 +263,7 @@ export const search = query({
       coverPhotoId: v.optional(v.id('photos')),
       metadata: v.optional(v.any()),
       createdAt: v.number(),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -301,7 +291,7 @@ export const search = query({
         place.name.toLowerCase().includes(searchLower) ||
         place.city?.toLowerCase().includes(searchLower) ||
         place.country?.toLowerCase().includes(searchLower) ||
-        place.description?.toLowerCase().includes(searchLower)
+        place.description?.toLowerCase().includes(searchLower),
     );
   },
 });

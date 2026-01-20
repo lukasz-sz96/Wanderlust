@@ -13,10 +13,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className="w-full">
         {label && (
-          <label
-            htmlFor={textareaId}
-            className="block text-sm font-medium text-foreground mb-1.5"
-          >
+          <label htmlFor={textareaId} className="block text-sm font-medium text-foreground mb-1.5">
             {label}
           </label>
         )}
@@ -34,16 +31,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           `}
           {...props}
         />
-        {(error || hint) && (
-          <p
-            className={`mt-1.5 text-sm ${error ? 'text-error' : 'text-muted'}`}
-          >
-            {error || hint}
-          </p>
-        )}
+        {(error || hint) && <p className={`mt-1.5 text-sm ${error ? 'text-error' : 'text-muted'}`}>{error || hint}</p>}
       </div>
     );
-  }
+  },
 );
 
 Textarea.displayName = 'Textarea';

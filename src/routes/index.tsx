@@ -40,12 +40,11 @@ const LandingPage = () => {
         <section className="py-20 px-6">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-              Your travel dreams,{' '}
-              <span className="text-primary">beautifully organized</span>
+              Your travel dreams, <span className="text-primary">beautifully organized</span>
             </h1>
             <p className="text-xl text-muted mb-10 max-w-2xl mx-auto">
-              Plan trips, track your bucket list, write travel journals, and discover
-              new destinations — all in one cozy place.
+              Plan trips, track your bucket list, write travel journals, and discover new destinations — all in one cozy
+              place.
             </p>
             <div className="flex items-center justify-center gap-4">
               <Link to="/signup">
@@ -94,12 +93,8 @@ const LandingPage = () => {
 
         <section className="py-20 px-6">
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-foreground mb-6">
-              Ready to start your journey?
-            </h2>
-            <p className="text-lg text-muted mb-8">
-              Join travelers who use Wanderlust to plan their perfect trips.
-            </p>
+            <h2 className="text-3xl font-bold text-foreground mb-6">Ready to start your journey?</h2>
+            <p className="text-lg text-muted mb-8">Join travelers who use Wanderlust to plan their perfect trips.</p>
             <Link to="/signup">
               <Button variant="primary" size="lg" rightIcon={<ArrowRight size={20} />}>
                 Create Free Account
@@ -124,20 +119,10 @@ const LandingPage = () => {
   );
 };
 
-const FeatureCard = ({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) => (
+const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => (
   <Card hoverable className="text-center">
     <div className="p-6">
-      <div className="w-14 h-14 rounded-xl bg-border-light flex items-center justify-center mx-auto mb-4">
-        {icon}
-      </div>
+      <div className="w-14 h-14 rounded-xl bg-border-light flex items-center justify-center mx-auto mb-4">{icon}</div>
       <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
       <p className="text-sm text-muted">{description}</p>
     </div>

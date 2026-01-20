@@ -3,14 +3,7 @@ import { useQuery, useMutation } from 'convex/react';
 import { useState } from 'react';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
-import {
-  Card,
-  CardContent,
-  Button,
-  Badge,
-  IconButton,
-  PageLoading,
-} from '../../../components/ui';
+import { Card, CardContent, Button, Badge, IconButton, PageLoading } from '../../../components/ui';
 import {
   ArrowLeft,
   BookOpen,
@@ -178,21 +171,14 @@ const JournalEntryPage = () => {
         <CardContent className="space-y-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-foreground mb-2">
-                {entry.title || 'Untitled Entry'}
-              </h1>
+              <h1 className="text-2xl font-bold text-foreground mb-2">{entry.title || 'Untitled Entry'}</h1>
               <p className="text-muted flex items-center gap-2">
                 <Calendar size={16} />
                 {formatDate(entry.entryDate)}
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <IconButton
-                variant="danger"
-                size="sm"
-                label="Delete entry"
-                onClick={() => setShowDeleteConfirm(true)}
-              >
+              <IconButton variant="danger" size="sm" label="Delete entry" onClick={() => setShowDeleteConfirm(true)}>
                 <Trash2 size={16} />
               </IconButton>
             </div>
@@ -236,9 +222,7 @@ const JournalEntryPage = () => {
           </div>
 
           <div className="prose prose-slate max-w-none">
-            <p className="text-foreground whitespace-pre-wrap leading-relaxed">
-              {getContentText(entry.content)}
-            </p>
+            <p className="text-foreground whitespace-pre-wrap leading-relaxed">{getContentText(entry.content)}</p>
           </div>
 
           <div className="border-t border-border-light pt-6">
@@ -292,11 +276,7 @@ const JournalEntryPage = () => {
                     className="aspect-square rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-opacity relative group"
                     onClick={() => setSelectedPhoto(photo.url)}
                   >
-                    <img
-                      src={photo.url}
-                      alt={photo.caption || 'Photo'}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={photo.url} alt={photo.caption || 'Photo'} className="w-full h-full object-cover" />
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -336,19 +316,14 @@ const JournalEntryPage = () => {
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setShowDeleteConfirm(false)}
-          />
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowDeleteConfirm(false)} />
           <Card className="relative z-10 w-full max-w-md">
             <CardContent className="text-center">
               <div className="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-4">
                 <Trash2 className="text-error" size={24} />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">Delete Entry?</h3>
-              <p className="text-muted mb-6">
-                This will permanently delete this journal entry and all its photos.
-              </p>
+              <p className="text-muted mb-6">This will permanently delete this journal entry and all its photos.</p>
               <div className="flex gap-3 justify-center">
                 <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>
                   Cancel

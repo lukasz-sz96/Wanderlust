@@ -55,30 +55,22 @@ export function ToastProvider({ children }: ToastProviderProps) {
         }, duration);
       }
     },
-    [removeToast]
+    [removeToast],
   );
 
   const success = useCallback(
     (message: string, duration?: number) => addToast(message, 'success', duration),
-    [addToast]
+    [addToast],
   );
-  const error = useCallback(
-    (message: string, duration?: number) => addToast(message, 'error', duration),
-    [addToast]
-  );
+  const error = useCallback((message: string, duration?: number) => addToast(message, 'error', duration), [addToast]);
   const warning = useCallback(
     (message: string, duration?: number) => addToast(message, 'warning', duration),
-    [addToast]
+    [addToast],
   );
-  const info = useCallback(
-    (message: string, duration?: number) => addToast(message, 'info', duration),
-    [addToast]
-  );
+  const info = useCallback((message: string, duration?: number) => addToast(message, 'info', duration), [addToast]);
 
   return (
-    <ToastContext.Provider
-      value={{ toasts, addToast, removeToast, success, error, warning, info }}
-    >
+    <ToastContext.Provider value={{ toasts, addToast, removeToast, success, error, warning, info }}>
       {children}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </ToastContext.Provider>

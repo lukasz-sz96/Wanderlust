@@ -11,11 +11,15 @@
 import type * as ai from "../ai.js";
 import type * as auth from "../auth.js";
 import type * as bucketList from "../bucketList.js";
+import type * as feed from "../feed.js";
 import type * as http from "../http.js";
 import type * as itinerary from "../itinerary.js";
 import type * as journal from "../journal.js";
 import type * as photos from "../photos.js";
 import type * as places from "../places.js";
+import type * as roles from "../roles.js";
+import type * as sharing from "../sharing.js";
+import type * as social from "../social.js";
 import type * as trips from "../trips.js";
 import type * as users from "../users.js";
 
@@ -29,11 +33,15 @@ declare const fullApi: ApiFromModules<{
   ai: typeof ai;
   auth: typeof auth;
   bucketList: typeof bucketList;
+  feed: typeof feed;
   http: typeof http;
   itinerary: typeof itinerary;
   journal: typeof journal;
   photos: typeof photos;
   places: typeof places;
+  roles: typeof roles;
+  sharing: typeof sharing;
+  social: typeof social;
   trips: typeof trips;
   users: typeof users;
 }>;

@@ -14,16 +14,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary:
-    'bg-primary text-white hover:bg-primary-hover active:bg-primary-hover shadow-sm',
-  secondary:
-    'bg-secondary text-white hover:bg-secondary-hover active:bg-secondary-hover shadow-sm',
-  outline:
-    'bg-transparent text-foreground border-2 border-border hover:bg-border-light active:bg-border',
-  ghost:
-    'bg-transparent text-foreground hover:bg-border-light active:bg-border',
-  danger:
-    'bg-error text-white hover:bg-red-600 active:bg-red-700 shadow-sm',
+  primary: 'bg-primary text-white hover:bg-primary-hover active:bg-primary-hover shadow-sm',
+  secondary: 'bg-secondary text-white hover:bg-secondary-hover active:bg-secondary-hover shadow-sm',
+  outline: 'bg-transparent text-foreground border-2 border-border hover:bg-border-light active:bg-border',
+  ghost: 'bg-transparent text-foreground hover:bg-border-light active:bg-border',
+  danger: 'bg-error text-white hover:bg-red-600 active:bg-red-700 shadow-sm',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -45,7 +40,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       className = '',
       ...props
     },
-    ref
+    ref,
   ) => {
     const isDisabled = disabled || isLoading;
 
@@ -76,7 +71,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
       </motion.button>
     );
-  }
+  },
 );
 
 Button.displayName = 'Button';
@@ -84,20 +79,8 @@ Button.displayName = 'Button';
 function Spinner({ size }: { size: ButtonSize }) {
   const sizeMap = { sm: 'w-4 h-4', md: 'w-5 h-5', lg: 'w-6 h-6' };
   return (
-    <svg
-      className={`animate-spin ${sizeMap[size]}`}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
+    <svg className={`animate-spin ${sizeMap[size]}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path
         className="opacity-75"
         fill="currentColor"

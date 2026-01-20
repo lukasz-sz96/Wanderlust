@@ -35,20 +35,12 @@ export const PlaceCard = ({
   const location = [city, country].filter(Boolean).join(', ');
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-    >
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
       <Card hoverable padding="none" className="overflow-hidden">
         <Link to="/places/$placeId" params={{ placeId: id }} className="block">
           <div className="relative h-40 bg-border-light overflow-hidden">
             {coverPhotoUrl ? (
-              <img
-                src={coverPhotoUrl}
-                alt={name}
-                className="w-full h-full object-cover"
-              />
+              <img src={coverPhotoUrl} alt={name} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-light/20 to-secondary-light/20">
                 <MapPin className="text-primary" size={40} />
@@ -73,9 +65,7 @@ export const PlaceCard = ({
         <div className="p-4">
           <div className="flex items-start justify-between gap-2 mb-2">
             <Link to="/places/$placeId" params={{ placeId: id }} className="flex-1 min-w-0">
-              <h3 className="font-semibold text-foreground truncate hover:text-primary transition-colors">
-                {name}
-              </h3>
+              <h3 className="font-semibold text-foreground truncate hover:text-primary transition-colors">{name}</h3>
             </Link>
             <div className="flex items-center gap-1">
               {onAddToBucketList && !status && (
@@ -106,9 +96,7 @@ export const PlaceCard = ({
             </p>
           )}
 
-          {description && (
-            <p className="text-sm text-muted line-clamp-2">{description}</p>
-          )}
+          {description && <p className="text-sm text-muted line-clamp-2">{description}</p>}
 
           {status && (
             <div className="mt-3 pt-3 border-t border-border-light">

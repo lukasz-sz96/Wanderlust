@@ -44,7 +44,7 @@ function SignupPage() {
           onError: (ctx) => {
             setError(ctx.error.message || 'Failed to create account');
           },
-        }
+        },
       );
     } catch (err) {
       setError('An unexpected error occurred');
@@ -57,10 +57,7 @@ function SignupPage() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header with home link */}
       <header className="p-4">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-muted hover:text-foreground transition-colors"
-        >
+        <Link to="/" className="inline-flex items-center gap-2 text-muted hover:text-foreground transition-colors">
           <ArrowLeft size={18} />
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
@@ -91,98 +88,87 @@ function SignupPage() {
             <p className="text-muted">Create an account to plan your adventures</p>
           </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="p-3 rounded-lg bg-error/10 border border-error/20 text-error text-sm"
-                >
-                  {error}
-                </motion.div>
-              )}
-
-              <Input
-                label="Name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Your name"
-                leftIcon={<User size={18} />}
-                required
-                autoComplete="name"
-              />
-
-              <Input
-                label="Email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                leftIcon={<Mail size={18} />}
-                required
-                autoComplete="email"
-              />
-
-              <Input
-                label="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 8 characters"
-                leftIcon={<Lock size={18} />}
-                required
-                autoComplete="new-password"
-              />
-
-              <Input
-                label="Confirm Password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your password"
-                leftIcon={<Lock size={18} />}
-                required
-                autoComplete="new-password"
-              />
-
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 size={20} className="animate-spin mr-2" />
-                    Creating account...
-                  </>
-                ) : (
-                  'Create Account'
+          <Card>
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="p-3 rounded-lg bg-error/10 border border-error/20 text-error text-sm"
+                  >
+                    {error}
+                  </motion.div>
                 )}
-              </Button>
-            </form>
 
-            <div className="mt-6 text-center">
-              <p className="text-muted">
-                Already have an account?{' '}
-                <Link
-                  to="/login"
-                  className="text-primary hover:text-primary-hover font-medium transition-colors"
-                >
-                  Sign in
-                </Link>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+                <Input
+                  label="Name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your name"
+                  leftIcon={<User size={18} />}
+                  required
+                  autoComplete="name"
+                />
 
-        <p className="text-center text-sm text-muted mt-6">
-          Your adventure awaits
-        </p>
+                <Input
+                  label="Email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  leftIcon={<Mail size={18} />}
+                  required
+                  autoComplete="email"
+                />
+
+                <Input
+                  label="Password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="At least 8 characters"
+                  leftIcon={<Lock size={18} />}
+                  required
+                  autoComplete="new-password"
+                />
+
+                <Input
+                  label="Confirm Password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm your password"
+                  leftIcon={<Lock size={18} />}
+                  required
+                  autoComplete="new-password"
+                />
+
+                <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin mr-2" />
+                      Creating account...
+                    </>
+                  ) : (
+                    'Create Account'
+                  )}
+                </Button>
+              </form>
+
+              <div className="mt-6 text-center">
+                <p className="text-muted">
+                  Already have an account?{' '}
+                  <Link to="/login" className="text-primary hover:text-primary-hover font-medium transition-colors">
+                    Sign in
+                  </Link>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <p className="text-center text-sm text-muted mt-6">Your adventure awaits</p>
         </motion.div>
       </div>
     </div>

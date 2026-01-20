@@ -6,22 +6,22 @@ export interface OverpassPlace {
   lat: number;
   lon: number;
   tags: {
-    name?: string;
+    'name'?: string;
     'name:en'?: string;
-    tourism?: string;
-    amenity?: string;
-    historic?: string;
-    leisure?: string;
-    natural?: string;
-    shop?: string;
+    'tourism'?: string;
+    'amenity'?: string;
+    'historic'?: string;
+    'leisure'?: string;
+    'natural'?: string;
+    'shop'?: string;
     'addr:street'?: string;
     'addr:housenumber'?: string;
     'addr:city'?: string;
     'addr:country'?: string;
-    description?: string;
-    website?: string;
-    phone?: string;
-    opening_hours?: string;
+    'description'?: string;
+    'website'?: string;
+    'phone'?: string;
+    'opening_hours'?: string;
     [key: string]: string | undefined;
   };
 }
@@ -101,7 +101,7 @@ const buildQuery = (
     radius?: number;
     name?: string;
     categories?: string[];
-  }
+  },
 ): string => {
   const timeout = 25;
   const limit = 50;
@@ -109,9 +109,7 @@ const buildQuery = (
   const categoryFilters = params.categories?.length
     ? params.categories
         .map((cat) => {
-          const osmTag = Object.entries(categoryMapping).find(
-            ([_, v]) => v.toLowerCase() === cat.toLowerCase()
-          )?.[0];
+          const osmTag = Object.entries(categoryMapping).find(([_, v]) => v.toLowerCase() === cat.toLowerCase())?.[0];
           return osmTag || cat.toLowerCase();
         })
         .join('|')
@@ -157,9 +155,7 @@ const parseResults = (data: { elements: OverpassPlace[] }): SearchResult[] => {
       if (el.tags.leisure) tags.push(el.tags.leisure);
       if (el.tags.amenity) tags.push(el.tags.amenity);
 
-      const address = [el.tags['addr:housenumber'], el.tags['addr:street']]
-        .filter(Boolean)
-        .join(' ');
+      const address = [el.tags['addr:housenumber'], el.tags['addr:street']].filter(Boolean).join(' ');
 
       return {
         id: `osm-${el.type}-${el.id}`,
@@ -188,7 +184,7 @@ export const searchByLocation = async (
   lat: number,
   lon: number,
   radiusMeters: number = 5000,
-  categories?: string[]
+  categories?: string[],
 ): Promise<SearchResult[]> => {
   const query = buildQuery('around', { lat, lon, radius: radiusMeters, categories });
 
@@ -213,7 +209,7 @@ export const searchByBoundingBox = async (
   west: number,
   north: number,
   east: number,
-  categories?: string[]
+  categories?: string[],
 ): Promise<SearchResult[]> => {
   const query = buildQuery('bbox', { bbox: [south, west, north, east], categories });
 
@@ -233,9 +229,7 @@ export const searchByBoundingBox = async (
   return parseResults(data);
 };
 
-export const searchByName = async (
-  name: string,
-): Promise<SearchResult[]> => {
+export const searchByName = async (name: string): Promise<SearchResult[]> => {
   const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 
   const params = new URLSearchParams({
@@ -248,7 +242,7 @@ export const searchByName = async (
   try {
     const response = await fetch(`${NOMINATIM_URL}?${params.toString()}`, {
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
 

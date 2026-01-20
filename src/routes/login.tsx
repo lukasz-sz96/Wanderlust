@@ -31,7 +31,7 @@ function LoginPage() {
           onError: (ctx) => {
             setError(ctx.error.message || 'Invalid email or password');
           },
-        }
+        },
       );
     } catch (err) {
       setError('An unexpected error occurred');
@@ -44,10 +44,7 @@ function LoginPage() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header with home link */}
       <header className="p-4">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-muted hover:text-foreground transition-colors"
-        >
+        <Link to="/" className="inline-flex items-center gap-2 text-muted hover:text-foreground transition-colors">
           <ArrowLeft size={18} />
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
@@ -78,76 +75,65 @@ function LoginPage() {
             <p className="text-muted">Sign in to continue your journey</p>
           </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="p-3 rounded-lg bg-error/10 border border-error/20 text-error text-sm"
-                >
-                  {error}
-                </motion.div>
-              )}
-
-              <Input
-                label="Email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                leftIcon={<Mail size={18} />}
-                required
-                autoComplete="email"
-              />
-
-              <Input
-                label="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                leftIcon={<Lock size={18} />}
-                required
-                autoComplete="current-password"
-              />
-
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 size={20} className="animate-spin mr-2" />
-                    Signing in...
-                  </>
-                ) : (
-                  'Sign In'
+          <Card>
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="p-3 rounded-lg bg-error/10 border border-error/20 text-error text-sm"
+                  >
+                    {error}
+                  </motion.div>
                 )}
-              </Button>
-            </form>
 
-            <div className="mt-6 text-center">
-              <p className="text-muted">
-                Don't have an account?{' '}
-                <Link
-                  to="/signup"
-                  className="text-primary hover:text-primary-hover font-medium transition-colors"
-                >
-                  Sign up
-                </Link>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+                <Input
+                  label="Email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  leftIcon={<Mail size={18} />}
+                  required
+                  autoComplete="email"
+                />
 
-        <p className="text-center text-sm text-muted mt-6">
-          Ready to explore the world?
-        </p>
+                <Input
+                  label="Password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  leftIcon={<Lock size={18} />}
+                  required
+                  autoComplete="current-password"
+                />
+
+                <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin mr-2" />
+                      Signing in...
+                    </>
+                  ) : (
+                    'Sign In'
+                  )}
+                </Button>
+              </form>
+
+              <div className="mt-6 text-center">
+                <p className="text-muted">
+                  Don't have an account?{' '}
+                  <Link to="/signup" className="text-primary hover:text-primary-hover font-medium transition-colors">
+                    Sign up
+                  </Link>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <p className="text-center text-sm text-muted mt-6">Ready to explore the world?</p>
         </motion.div>
       </div>
     </div>

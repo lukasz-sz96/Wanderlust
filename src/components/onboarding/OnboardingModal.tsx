@@ -83,10 +83,7 @@ export const OnboardingModal = ({ isOpen, onComplete }: OnboardingModalProps) =>
             <div className="relative overflow-hidden">
               <div className="absolute top-4 right-4 z-10">
                 {!isLastStep && (
-                  <button
-                    onClick={handleSkip}
-                    className="text-sm text-muted hover:text-foreground transition-colors"
-                  >
+                  <button onClick={handleSkip} className="text-sm text-muted hover:text-foreground transition-colors">
                     Skip
                   </button>
                 )}
@@ -193,7 +190,9 @@ const WelcomeIllustration = () => (
   >
     <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <motion.circle
-        cx="60" cy="45" r="35"
+        cx="60"
+        cy="45"
+        r="35"
         className="fill-primary-light/30"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -250,7 +249,9 @@ const ReadyIllustration = () => (
   >
     <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <motion.circle
-        cx="60" cy="50" r="40"
+        cx="60"
+        cy="50"
+        r="40"
         className="fill-secondary/20"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -275,28 +276,36 @@ const ReadyIllustration = () => (
         />
       </motion.g>
       <motion.circle
-        cx="25" cy="30" r="6"
+        cx="25"
+        cy="30"
+        r="6"
         className="fill-primary"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ delay: 0.6, type: 'spring' }}
       />
       <motion.circle
-        cx="95" cy="35" r="4"
+        cx="95"
+        cy="35"
+        r="4"
         className="fill-accent"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ delay: 0.7, type: 'spring' }}
       />
       <motion.circle
-        cx="90" cy="75" r="5"
+        cx="90"
+        cy="75"
+        r="5"
         className="fill-warning"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ delay: 0.8, type: 'spring' }}
       />
       <motion.circle
-        cx="30" cy="70" r="4"
+        cx="30"
+        cy="70"
+        r="4"
         className="fill-primary-light"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}

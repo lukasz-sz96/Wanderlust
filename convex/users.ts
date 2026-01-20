@@ -74,15 +74,13 @@ export const getCurrentUser = query({
       preferences: v.optional(
         v.object({
           defaultMapStyle: v.optional(v.string()),
-          temperatureUnit: v.optional(
-            v.union(v.literal('celsius'), v.literal('fahrenheit'))
-          ),
-        })
+          temperatureUnit: v.optional(v.union(v.literal('celsius'), v.literal('fahrenheit'))),
+        }),
       ),
       createdAt: v.number(),
       updatedAt: v.number(),
     }),
-    v.null()
+    v.null(),
   ),
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -115,15 +113,13 @@ export const getUser = query({
       preferences: v.optional(
         v.object({
           defaultMapStyle: v.optional(v.string()),
-          temperatureUnit: v.optional(
-            v.union(v.literal('celsius'), v.literal('fahrenheit'))
-          ),
-        })
+          temperatureUnit: v.optional(v.union(v.literal('celsius'), v.literal('fahrenheit'))),
+        }),
       ),
       createdAt: v.number(),
       updatedAt: v.number(),
     }),
-    v.null()
+    v.null(),
   ),
   handler: async (ctx, args) => {
     return await ctx.db.get(args.userId);
@@ -136,9 +132,7 @@ export const getUser = query({
 export const updatePreferences = mutation({
   args: {
     defaultMapStyle: v.optional(v.string()),
-    temperatureUnit: v.optional(
-      v.union(v.literal('celsius'), v.literal('fahrenheit'))
-    ),
+    temperatureUnit: v.optional(v.union(v.literal('celsius'), v.literal('fahrenheit'))),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -220,7 +214,7 @@ export async function requireUser(ctx: {
     query: (table: 'users') => {
       withIndex: (
         name: 'by_auth_id',
-        fn: (q: { eq: (field: 'authUserId', value: string) => unknown }) => unknown
+        fn: (q: { eq: (field: 'authUserId', value: string) => unknown }) => unknown,
       ) => { unique: () => Promise<Doc<'users'> | null> };
     };
   };

@@ -12,14 +12,10 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<IconButtonVariant, string> = {
-  default:
-    'bg-surface border border-border text-foreground hover:bg-border-light active:bg-border',
-  ghost:
-    'bg-transparent text-muted hover:text-foreground hover:bg-border-light active:bg-border',
-  primary:
-    'bg-primary text-white hover:bg-primary-hover active:bg-primary-hover shadow-sm',
-  danger:
-    'bg-transparent text-muted hover:text-error hover:bg-red-50 active:bg-red-100',
+  default: 'bg-surface border border-border text-foreground hover:bg-border-light active:bg-border',
+  ghost: 'bg-transparent text-muted hover:text-foreground hover:bg-border-light active:bg-border',
+  primary: 'bg-primary text-white hover:bg-primary-hover active:bg-primary-hover shadow-sm',
+  danger: 'bg-transparent text-muted hover:text-error hover:bg-red-50 active:bg-red-100',
 };
 
 const sizeStyles: Record<IconButtonSize, string> = {
@@ -29,18 +25,7 @@ const sizeStyles: Record<IconButtonSize, string> = {
 };
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
-  (
-    {
-      variant = 'default',
-      size = 'md',
-      label,
-      children,
-      disabled,
-      className = '',
-      ...props
-    },
-    ref
-  ) => {
+  ({ variant = 'default', size = 'md', label, children, disabled, className = '', ...props }, ref) => {
     return (
       <motion.button
         ref={ref}
@@ -62,7 +47,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         {children}
       </motion.button>
     );
-  }
+  },
 );
 
 IconButton.displayName = 'IconButton';

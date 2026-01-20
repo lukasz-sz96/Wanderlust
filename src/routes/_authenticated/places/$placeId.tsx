@@ -5,14 +5,7 @@ import type { Id } from '../../../../convex/_generated/dataModel';
 import { MapView } from '../../../components/maps';
 import { MarkVisitedModal } from '../../../components/places';
 import { WeatherWidget, WeatherSnapshotBadge } from '../../../components/weather';
-import {
-  Card,
-  CardContent,
-  Button,
-  Badge,
-  IconButton,
-  PageLoading,
-} from '../../../components/ui';
+import { Card, CardContent, Button, Badge, IconButton, PageLoading } from '../../../components/ui';
 import {
   ArrowLeft,
   MapPin,
@@ -85,12 +78,8 @@ const PlaceDetailPage = () => {
           <div className="w-20 h-20 rounded-full bg-border-light flex items-center justify-center mx-auto mb-4">
             <MapPin className="text-muted" size={40} />
           </div>
-          <h2 className="text-xl font-semibold text-foreground mb-2">
-            Place not found
-          </h2>
-          <p className="text-muted mb-6">
-            This place may have been deleted or doesn't exist.
-          </p>
+          <h2 className="text-xl font-semibold text-foreground mb-2">Place not found</h2>
+          <p className="text-muted mb-6">This place may have been deleted or doesn't exist.</p>
           <Link to="/places">
             <Button variant="primary">Back to Places</Button>
           </Link>
@@ -107,10 +96,7 @@ const PlaceDetailPage = () => {
   };
 
   const openInMaps = () => {
-    window.open(
-      `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`,
-      '_blank'
-    );
+    window.open(`https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`, '_blank');
   };
 
   return (
@@ -175,9 +161,7 @@ const PlaceDetailPage = () => {
             <CardContent className="space-y-4">
               <div>
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <h1 className="text-2xl font-bold text-foreground">
-                    {place.name}
-                  </h1>
+                  <h1 className="text-2xl font-bold text-foreground">{place.name}</h1>
                   {bucketListItem ? (
                     <IconButton
                       variant="ghost"
@@ -200,11 +184,7 @@ const PlaceDetailPage = () => {
                       onClick={handleAddToBucketList}
                       disabled={isAddingToBucketList}
                     >
-                      {isAddingToBucketList ? (
-                        <Loader2 size={20} className="animate-spin" />
-                      ) : (
-                        <Heart size={20} />
-                      )}
+                      {isAddingToBucketList ? <Loader2 size={20} className="animate-spin" /> : <Heart size={20} />}
                     </IconButton>
                   )}
                 </div>
@@ -226,10 +206,7 @@ const PlaceDetailPage = () => {
               {bucketListItem && (
                 <div className="p-3 rounded-xl bg-border-light/50">
                   <div className="flex items-center justify-between mb-2">
-                    <Badge
-                      variant={bucketListItem.status === 'visited' ? 'success' : 'primary'}
-                      dot
-                    >
+                    <Badge variant={bucketListItem.status === 'visited' ? 'success' : 'primary'} dot>
                       {bucketListItem.status === 'visited' ? 'Visited' : 'Want to visit'}
                     </Badge>
                     {bucketListItem.rating && (
@@ -238,11 +215,7 @@ const PlaceDetailPage = () => {
                           <Star
                             key={star}
                             size={14}
-                            className={
-                              star <= bucketListItem.rating!
-                                ? 'text-warning fill-warning'
-                                : 'text-muted'
-                            }
+                            className={star <= bucketListItem.rating! ? 'text-warning fill-warning' : 'text-muted'}
                           />
                         ))}
                       </div>
@@ -264,12 +237,7 @@ const PlaceDetailPage = () => {
               )}
 
               <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="primary"
-                  leftIcon={<Navigation size={16} />}
-                  onClick={openInMaps}
-                  className="flex-1"
-                >
+                <Button variant="primary" leftIcon={<Navigation size={16} />} onClick={openInMaps} className="flex-1">
                   Directions
                 </Button>
                 {bucketListItem && bucketListItem.status !== 'visited' && (
@@ -288,12 +256,7 @@ const PlaceDetailPage = () => {
                 <IconButton variant="ghost" size="sm" label="Edit place">
                   <Edit size={16} />
                 </IconButton>
-                <IconButton
-                  variant="danger"
-                  size="sm"
-                  label="Delete place"
-                  onClick={() => setShowDeleteConfirm(true)}
-                >
+                <IconButton variant="danger" size="sm" label="Delete place" onClick={() => setShowDeleteConfirm(true)}>
                   <Trash2 size={16} />
                 </IconButton>
               </div>
@@ -315,12 +278,7 @@ const PlaceDetailPage = () => {
             </Card>
           )}
 
-          <WeatherWidget
-            latitude={place.latitude}
-            longitude={place.longitude}
-            compact={false}
-            showForecast={true}
-          />
+          <WeatherWidget latitude={place.latitude} longitude={place.longitude} compact={false} showForecast={true} />
 
           <Card>
             <CardContent>
@@ -346,27 +304,18 @@ const PlaceDetailPage = () => {
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setShowDeleteConfirm(false)}
-          />
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowDeleteConfirm(false)} />
           <Card className="relative z-10 w-full max-w-md">
             <CardContent className="text-center">
               <div className="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-4">
                 <Trash2 className="text-error" size={24} />
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                Delete Place?
-              </h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Delete Place?</h3>
               <p className="text-muted mb-6">
-                This will permanently delete "{place.name}" and remove it from
-                your bucket list.
+                This will permanently delete "{place.name}" and remove it from your bucket list.
               </p>
               <div className="flex gap-3 justify-center">
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowDeleteConfirm(false)}
-                >
+                <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>
                   Cancel
                 </Button>
                 <Button variant="danger" onClick={handleDelete}>

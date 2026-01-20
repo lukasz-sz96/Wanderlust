@@ -39,9 +39,7 @@ const NotFoundPage = () => (
       </div>
       <h1 className="text-4xl font-bold text-foreground mb-2">404</h1>
       <p className="text-xl text-muted mb-6">Page not found</p>
-      <p className="text-muted mb-8 max-w-md">
-        Looks like you've wandered off the map. Let's get you back on track.
-      </p>
+      <p className="text-muted mb-8 max-w-md">Looks like you've wandered off the map. Let's get you back on track.</p>
       <a
         href="/"
         className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors"
@@ -59,12 +57,8 @@ const ErrorPage = ({ error }: { error: Error }) => (
       <div className="w-20 h-20 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-6">
         <AlertTriangle className="text-error" size={40} />
       </div>
-      <h1 className="text-2xl font-bold text-foreground mb-2">
-        Something went wrong
-      </h1>
-      <p className="text-muted mb-6 max-w-md">
-        {error.message || 'An unexpected error occurred'}
-      </p>
+      <h1 className="text-2xl font-bold text-foreground mb-2">Something went wrong</h1>
+      <p className="text-muted mb-6 max-w-md">{error.message || 'An unexpected error occurred'}</p>
       <a
         href="/"
         className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors"

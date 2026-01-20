@@ -97,12 +97,7 @@ export const CreateTripModal = ({ isOpen, onClose }: CreateTripModalProps) => {
             />
 
             <div className="grid grid-cols-2 gap-4">
-              <Input
-                label="Start Date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
+              <Input label="Start Date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
               <Input
                 label="End Date"
                 type="date"

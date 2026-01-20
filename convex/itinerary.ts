@@ -6,7 +6,7 @@ const categoryValidator = v.union(
   v.literal('meal'),
   v.literal('transport'),
   v.literal('accommodation'),
-  v.literal('other')
+  v.literal('other'),
 );
 
 export const add = mutation({
@@ -42,9 +42,7 @@ export const add = mutation({
 
     const existingItems = await ctx.db
       .query('itineraryItems')
-      .withIndex('by_trip_and_day', (q) =>
-        q.eq('tripId', args.tripId).eq('dayNumber', args.dayNumber)
-      )
+      .withIndex('by_trip_and_day', (q) => q.eq('tripId', args.tripId).eq('dayNumber', args.dayNumber))
       .collect();
 
     const maxOrder = existingItems.reduce((max, item) => Math.max(max, item.orderIndex), 0);
@@ -225,9 +223,9 @@ export const listByTrip = query({
           latitude: v.number(),
           longitude: v.number(),
         }),
-        v.null()
+        v.null(),
       ),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -276,7 +274,7 @@ export const listByTrip = query({
               }
             : null,
         };
-      })
+      }),
     );
 
     return enrichedItems;
@@ -312,9 +310,9 @@ export const listByDay = query({
           latitude: v.number(),
           longitude: v.number(),
         }),
-        v.null()
+        v.null(),
       ),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -338,9 +336,7 @@ export const listByDay = query({
 
     const items = await ctx.db
       .query('itineraryItems')
-      .withIndex('by_trip_and_day', (q) =>
-        q.eq('tripId', args.tripId).eq('dayNumber', args.dayNumber)
-      )
+      .withIndex('by_trip_and_day', (q) => q.eq('tripId', args.tripId).eq('dayNumber', args.dayNumber))
       .collect();
 
     items.sort((a, b) => a.orderIndex - b.orderIndex);
@@ -362,7 +358,7 @@ export const listByDay = query({
               }
             : null,
         };
-      })
+      }),
     );
 
     return enrichedItems;

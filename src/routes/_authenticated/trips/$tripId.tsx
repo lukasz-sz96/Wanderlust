@@ -4,15 +4,7 @@ import { useState } from 'react';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
 import { MapView } from '../../../components/maps';
-import {
-  Card,
-  CardContent,
-  Button,
-  Badge,
-  IconButton,
-  PageLoading,
-  Input,
-} from '../../../components/ui';
+import { Card, CardContent, Button, Badge, IconButton, PageLoading, Input } from '../../../components/ui';
 import {
   ArrowLeft,
   Plane,
@@ -28,7 +20,9 @@ import {
   MoreHorizontal,
   GripVertical,
   CheckCircle,
+  Share2,
 } from 'lucide-react';
+import { ShareTripModal } from '../../../components/social/ShareTripModal';
 
 export const Route = createFileRoute('/_authenticated/trips/$tripId')({
   component: TripDetailPage,
@@ -47,6 +41,7 @@ const TripDetailPage = () => {
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAddPlace, setShowAddPlace] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [selectedDay, setSelectedDay] = useState(1);
 
   if (trip === undefined || itineraryItems === undefined) {
@@ -104,8 +99,7 @@ const TripDetailPage = () => {
   const daysCount = getDaysCount();
   const days = Array.from({ length: daysCount }, (_, i) => i + 1);
 
-  const getItemsByDay = (day: number) =>
-    itineraryItems.filter((item) => item.dayNumber === day);
+  const getItemsByDay = (day: number) => itineraryItems.filter((item) => item.dayNumber === day);
 
   const markers = itineraryItems
     .filter((item) => item.place)
@@ -138,10 +132,7 @@ const TripDetailPage = () => {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-6">
-        <Link
-          to="/trips"
-          className="inline-flex items-center gap-2 text-muted hover:text-foreground transition-colors"
-        >
+        <Link to="/trips" className="inline-flex items-center gap-2 text-muted hover:text-foreground transition-colors">
           <ArrowLeft size={18} />
           Back to Trips
         </Link>
@@ -163,13 +154,7 @@ const TripDetailPage = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge
-                    variant={
-                      trip.status === 'completed'
-                        ? 'success'
-                        : trip.status === 'active'
-                          ? 'primary'
-                          : 'default'
-                    }
+                    variant={trip.status === 'completed' ? 'success' : trip.status === 'active' ? 'primary' : 'default'}
                   >
                     {trip.status}
                   </Badge>
@@ -209,12 +194,10 @@ const TripDetailPage = () => {
                   Completed
                 </Button>
                 <div className="flex-1" />
-                <IconButton
-                  variant="danger"
-                  size="sm"
-                  label="Delete trip"
-                  onClick={() => setShowDeleteConfirm(true)}
-                >
+                <IconButton variant="ghost" size="sm" label="Share trip" onClick={() => setShowShareModal(true)}>
+                  <Share2 size={16} />
+                </IconButton>
+                <IconButton variant="danger" size="sm" label="Delete trip" onClick={() => setShowDeleteConfirm(true)}>
                   <Trash2 size={16} />
                 </IconButton>
               </div>
@@ -236,17 +219,16 @@ const TripDetailPage = () => {
                   onClick={() => setSelectedDay(day)}
                   className={`
                     px-4 py-2 rounded-lg whitespace-nowrap font-medium transition-colors
-                    ${selectedDay === day
-                      ? 'bg-secondary text-white'
-                      : 'bg-surface border border-border-light text-muted hover:text-foreground'
+                    ${
+                      selectedDay === day
+                        ? 'bg-secondary text-white'
+                        : 'bg-surface border border-border-light text-muted hover:text-foreground'
                     }
                   `}
                 >
                   Day {day}
                   {trip.startDate && (
-                    <span className="block text-xs opacity-75">
-                      {formatDate(trip.startDate, day)}
-                    </span>
+                    <span className="block text-xs opacity-75">{formatDate(trip.startDate, day)}</span>
                   )}
                 </button>
               ))}
@@ -280,9 +262,7 @@ const TripDetailPage = () => {
                           {getCategoryIcon(item.category)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground truncate">
-                            {item.place?.name || 'Unknown place'}
-                          </p>
+                          <p className="font-medium text-foreground truncate">{item.place?.name || 'Unknown place'}</p>
                           <div className="flex items-center gap-2 text-sm text-muted">
                             {item.startTime && (
                               <span className="flex items-center gap-1">
@@ -293,12 +273,7 @@ const TripDetailPage = () => {
                             {item.place?.city && <span>{item.place.city}</span>}
                           </div>
                         </div>
-                        <IconButton
-                          variant="ghost"
-                          size="sm"
-                          label="Remove"
-                          onClick={() => handleRemoveItem(item._id)}
-                        >
+                        <IconButton variant="ghost" size="sm" label="Remove" onClick={() => handleRemoveItem(item._id)}>
                           <Trash2 size={14} />
                         </IconButton>
                       </div>
@@ -362,9 +337,7 @@ const TripDetailPage = () => {
             </div>
             <div className="flex-1 overflow-y-auto p-4">
               {bucketListItems.length === 0 ? (
-                <p className="text-center text-muted py-8">
-                  No places in your bucket list. Add some places first!
-                </p>
+                <p className="text-center text-muted py-8">No places in your bucket list. Add some places first!</p>
               ) : (
                 <div className="space-y-2">
                   {bucketListItems.map((item) =>
@@ -379,7 +352,7 @@ const TripDetailPage = () => {
                           {[item.place.city, item.place.country].filter(Boolean).join(', ')}
                         </p>
                       </button>
-                    ) : null
+                    ) : null,
                   )}
                 </div>
               )}
@@ -390,10 +363,7 @@ const TripDetailPage = () => {
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setShowDeleteConfirm(false)}
-          />
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowDeleteConfirm(false)} />
           <Card className="relative z-10 w-full max-w-md">
             <CardContent className="text-center">
               <div className="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-4">
@@ -415,6 +385,12 @@ const TripDetailPage = () => {
           </Card>
         </div>
       )}
+
+      <ShareTripModal
+        tripId={trip._id}
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+      />
     </div>
   );
 };

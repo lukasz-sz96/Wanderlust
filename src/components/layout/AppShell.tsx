@@ -15,10 +15,7 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       <div className="hidden md:block">
-        <Sidebar
-          collapsed={sidebarCollapsed}
-          onCollapsedChange={setSidebarCollapsed}
-        />
+        <Sidebar collapsed={sidebarCollapsed} onCollapsedChange={setSidebarCollapsed} />
       </div>
 
       {mobileMenuOpen && (
@@ -44,19 +41,13 @@ export function AppShell({ children }: AppShellProps) {
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="md:hidden flex items-center gap-4 px-4 py-3 bg-surface border-b border-border-light">
-          <IconButton
-            variant="ghost"
-            label="Open menu"
-            onClick={() => setMobileMenuOpen(true)}
-          >
+          <IconButton variant="ghost" label="Open menu" onClick={() => setMobileMenuOpen(true)}>
             <Menu size={20} />
           </IconButton>
           <span className="font-semibold text-foreground">Wanderlust</span>
         </header>
 
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

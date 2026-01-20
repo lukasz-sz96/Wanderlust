@@ -8,13 +8,7 @@ interface AnimatedPageProps {
 
 export const AnimatedPage = ({ children, className = '' }: AnimatedPageProps) => {
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      variants={fadeInUp}
-      className={className}
-    >
+    <motion.div initial="hidden" animate="visible" exit="exit" variants={fadeInUp} className={className}>
       {children}
     </motion.div>
   );

@@ -8,12 +8,7 @@ interface AnimatedListProps {
 
 export const AnimatedList = ({ children, className = '' }: AnimatedListProps) => {
   return (
-    <motion.div
-      variants={staggerContainer}
-      initial="hidden"
-      animate="visible"
-      className={className}
-    >
+    <motion.div variants={staggerContainer} initial="hidden" animate="visible" className={className}>
       {children}
     </motion.div>
   );

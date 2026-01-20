@@ -45,11 +45,7 @@ export const EmptyState = ({ illustration, title, description, action }: EmptySt
         {description}
       </motion.p>
       {action && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
           {action}
         </motion.div>
       )}
@@ -94,14 +90,18 @@ const PlacesIllustration = () => (
       transition={{ duration: 1.5, delay: 0.8 }}
     />
     <motion.circle
-      cx="30" cy="90" r="5"
+      cx="30"
+      cy="90"
+      r="5"
       className="fill-secondary"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{ delay: 0.3 }}
     />
     <motion.circle
-      cx="130" cy="88" r="5"
+      cx="130"
+      cy="88"
+      r="5"
       className="fill-accent"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
@@ -133,16 +133,14 @@ const TripsIllustration = () => (
       <path d="M25 70L15 85L35 85L25 70Z" className="fill-accent" />
       <rect x="22" y="85" width="6" height="20" className="fill-accent" />
     </motion.g>
-    <motion.g
-      initial={{ x: 20, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ delay: 0.6, duration: 0.5 }}
-    >
+    <motion.g initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.6, duration: 0.5 }}>
       <path d="M135 65L120 90L150 90L135 65Z" className="fill-primary" />
       <path d="M135 75L125 90L145 90L135 75Z" className="fill-primary-light" />
     </motion.g>
     <motion.circle
-      cx="140" cy="35" r="12"
+      cx="140"
+      cy="35"
+      r="12"
       className="fill-warning"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
@@ -162,20 +160,12 @@ const JournalIllustration = () => (
       <rect x="40" y="25" width="80" height="95" rx="4" className="fill-accent" />
       <rect x="48" y="25" width="72" height="95" rx="2" className="fill-surface" />
       <rect x="44" y="35" width="4" height="75" className="fill-accent-dark" />
-      <motion.g
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ delay: 0.5, duration: 0.3 }}
-      >
+      <motion.g initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.5, duration: 0.3 }}>
         <rect x="58" y="40" width="50" height="4" rx="2" className="fill-border-light" />
         <rect x="58" y="52" width="40" height="4" rx="2" className="fill-border-light" />
         <rect x="58" y="64" width="45" height="4" rx="2" className="fill-border-light" />
       </motion.g>
-      <motion.g
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.8, type: 'spring' }}
-      >
+      <motion.g initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.8, type: 'spring' }}>
         <rect x="58" y="80" width="30" height="25" rx="2" className="fill-secondary" opacity="0.3" />
         <circle cx="73" cy="92" r="6" className="fill-secondary" />
       </motion.g>
@@ -191,7 +181,9 @@ const JournalIllustration = () => (
       transition={{ delay: 1, duration: 0.5 }}
     />
     <motion.circle
-      cx="140" cy="62" r="4"
+      cx="140"
+      cy="62"
+      r="4"
       className="fill-primary"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
@@ -203,17 +195,11 @@ const JournalIllustration = () => (
 const PhotosIllustration = () => (
   <svg width="160" height="140" viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="80" cy="130" rx="60" ry="8" className="fill-border-light" />
-    <motion.g
-      initial={{ rotate: 8, x: 10 }}
-      animate={{ rotate: 8, x: 10 }}
-    >
+    <motion.g initial={{ rotate: 8, x: 10 }} animate={{ rotate: 8, x: 10 }}>
       <rect x="50" y="35" width="70" height="55" rx="4" className="fill-border" />
       <rect x="54" y="39" width="62" height="47" rx="2" className="fill-surface" />
     </motion.g>
-    <motion.g
-      initial={{ rotate: -5 }}
-      animate={{ rotate: -5 }}
-    >
+    <motion.g initial={{ rotate: -5 }} animate={{ rotate: -5 }}>
       <rect x="45" y="40" width="70" height="55" rx="4" className="fill-secondary" />
       <rect x="49" y="44" width="62" height="47" rx="2" className="fill-surface" />
       <motion.path
@@ -225,18 +211,16 @@ const PhotosIllustration = () => (
         transition={{ delay: 0.6 }}
       />
       <motion.circle
-        cx="100" cy="56" r="6"
+        cx="100"
+        cy="56"
+        r="6"
         className="fill-warning"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ delay: 0.4, type: 'spring' }}
       />
     </motion.g>
-    <motion.g
-      initial={{ y: 10, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.3 }}
-    >
+    <motion.g initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
       <rect x="35" y="50" width="70" height="55" rx="4" className="fill-primary" />
       <rect x="39" y="54" width="62" height="47" rx="2" className="fill-surface" />
       <motion.path
@@ -248,7 +232,9 @@ const PhotosIllustration = () => (
         transition={{ delay: 0.8 }}
       />
       <motion.circle
-        cx="90" cy="66" r="6"
+        cx="90"
+        cy="66"
+        r="6"
         className="fill-warning"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -270,7 +256,10 @@ const SearchIllustration = () => (
       <circle cx="70" cy="60" r="25" className="fill-primary" opacity="0.1" />
     </motion.g>
     <motion.line
-      x1="95" y1="85" x2="125" y2="115"
+      x1="95"
+      y1="85"
+      x2="125"
+      y2="115"
       className="stroke-primary"
       strokeWidth="8"
       strokeLinecap="round"

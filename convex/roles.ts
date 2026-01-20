@@ -103,12 +103,7 @@ export const hasPermission = query({
 export const setUserRole = mutation({
   args: {
     userId: v.id('users'),
-    role: v.union(
-      v.literal('free'),
-      v.literal('pro'),
-      v.literal('moderator'),
-      v.literal('admin')
-    ),
+    role: v.union(v.literal('free'), v.literal('pro'), v.literal('moderator'), v.literal('admin')),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -137,14 +132,7 @@ export const setUserRole = mutation({
 
 export const listUsers = query({
   args: {
-    role: v.optional(
-      v.union(
-        v.literal('free'),
-        v.literal('pro'),
-        v.literal('moderator'),
-        v.literal('admin')
-      )
-    ),
+    role: v.optional(v.union(v.literal('free'), v.literal('pro'), v.literal('moderator'), v.literal('admin'))),
     search: v.optional(v.string()),
   },
   returns: v.array(
@@ -155,7 +143,7 @@ export const listUsers = query({
       avatarUrl: v.optional(v.string()),
       role: v.string(),
       createdAt: v.number(),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -181,9 +169,7 @@ export const listUsers = query({
     if (args.search) {
       const search = args.search.toLowerCase();
       users = users.filter(
-        (u) =>
-          u.email.toLowerCase().includes(search) ||
-          u.displayName?.toLowerCase().includes(search)
+        (u) => u.email.toLowerCase().includes(search) || u.displayName?.toLowerCase().includes(search),
       );
     }
 

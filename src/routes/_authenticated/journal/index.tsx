@@ -2,20 +2,17 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
 import { motion } from 'framer-motion';
 import { api } from '../../../../convex/_generated/api';
-import { Button, Card, CardContent, Badge, AnimatedPage, SkeletonJournalEntry, EmptyState } from '../../../components/ui';
-import { staggerContainer, staggerItem } from '../../../lib/animations';
 import {
-  BookOpen,
-  Plus,
-  Calendar,
-  MapPin,
-  Plane,
-  Image,
-  Smile,
-  Meh,
-  Frown,
-  Star,
-} from 'lucide-react';
+  Button,
+  Card,
+  CardContent,
+  Badge,
+  AnimatedPage,
+  SkeletonJournalEntry,
+  EmptyState,
+} from '../../../components/ui';
+import { staggerContainer, staggerItem } from '../../../lib/animations';
+import { BookOpen, Plus, Calendar, MapPin, Plane, Image, Smile, Meh, Frown, Star } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated/journal/')({
   component: JournalPage,
@@ -161,12 +158,7 @@ const JournalPage = () => {
           </CardContent>
         </Card>
       ) : (
-        <motion.div
-          className="space-y-4"
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-        >
+        <motion.div className="space-y-4" variants={staggerContainer} initial="hidden" animate="visible">
           {entries.map((entry) => (
             <motion.div key={entry._id} variants={staggerItem}>
               <Link to="/journal/$entryId" params={{ entryId: entry._id }}>
@@ -178,9 +170,7 @@ const JournalPage = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="font-semibold text-foreground text-lg">
-                            {entry.title || 'Untitled Entry'}
-                          </h3>
+                          <h3 className="font-semibold text-foreground text-lg">{entry.title || 'Untitled Entry'}</h3>
                           {entry.mood && (
                             <div className="flex items-center gap-1">
                               {getMoodIcon(entry.mood)}
@@ -195,9 +185,7 @@ const JournalPage = () => {
                         </p>
 
                         {getContentPreview(entry.content) && (
-                          <p className="text-muted text-sm line-clamp-2 mb-3">
-                            {getContentPreview(entry.content)}...
-                          </p>
+                          <p className="text-muted text-sm line-clamp-2 mb-3">{getContentPreview(entry.content)}...</p>
                         )}
 
                         <div className="flex flex-wrap items-center gap-2">

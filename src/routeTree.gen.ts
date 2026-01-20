@@ -13,17 +13,23 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SharedShareCodeRouteImport } from './routes/shared/$shareCode'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedProRouteImport } from './routes/_authenticated/pro'
+import { Route as AuthenticatedFeedRouteImport } from './routes/_authenticated/feed'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedTripsIndexRouteImport } from './routes/_authenticated/trips/index'
+import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile/index'
 import { Route as AuthenticatedPlacesIndexRouteImport } from './routes/_authenticated/places/index'
 import { Route as AuthenticatedJournalIndexRouteImport } from './routes/_authenticated/journal/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthenticatedTripsTripIdRouteImport } from './routes/_authenticated/trips/$tripId'
+import { Route as AuthenticatedProfileUserIdRouteImport } from './routes/_authenticated/profile/$userId'
 import { Route as AuthenticatedPlacesDiscoverRouteImport } from './routes/_authenticated/places/discover'
 import { Route as AuthenticatedPlacesPlaceIdRouteImport } from './routes/_authenticated/places/$placeId'
 import { Route as AuthenticatedJournalNewRouteImport } from './routes/_authenticated/journal/new'
 import { Route as AuthenticatedJournalEntryIdRouteImport } from './routes/_authenticated/journal/$entryId'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -44,9 +50,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SharedShareCodeRoute = SharedShareCodeRouteImport.update({
+  id: '/shared/$shareCode',
+  path: '/shared/$shareCode',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedProRoute = AuthenticatedProRouteImport.update({
+  id: '/pro',
+  path: '/pro',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedFeedRoute = AuthenticatedFeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -59,6 +80,12 @@ const AuthenticatedTripsIndexRoute = AuthenticatedTripsIndexRouteImport.update({
   path: '/trips/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedProfileIndexRoute =
+  AuthenticatedProfileIndexRouteImport.update({
+    id: '/profile/',
+    path: '/profile/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedPlacesIndexRoute =
   AuthenticatedPlacesIndexRouteImport.update({
     id: '/places/',
@@ -80,6 +107,12 @@ const AuthenticatedTripsTripIdRoute =
   AuthenticatedTripsTripIdRouteImport.update({
     id: '/trips/$tripId',
     path: '/trips/$tripId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedProfileUserIdRoute =
+  AuthenticatedProfileUserIdRouteImport.update({
+    id: '/profile/$userId',
+    path: '/profile/$userId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedPlacesDiscoverRoute =
@@ -105,21 +138,32 @@ const AuthenticatedJournalEntryIdRoute =
     path: '/journal/$entryId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/feed': typeof AuthenticatedFeedRoute
+  '/pro': typeof AuthenticatedProRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/shared/$shareCode': typeof SharedShareCodeRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
   '/journal/new': typeof AuthenticatedJournalNewRoute
   '/places/$placeId': typeof AuthenticatedPlacesPlaceIdRoute
   '/places/discover': typeof AuthenticatedPlacesDiscoverRoute
+  '/profile/$userId': typeof AuthenticatedProfileUserIdRoute
   '/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/journal/': typeof AuthenticatedJournalIndexRoute
   '/places/': typeof AuthenticatedPlacesIndexRoute
+  '/profile/': typeof AuthenticatedProfileIndexRoute
   '/trips/': typeof AuthenticatedTripsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -127,15 +171,21 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/feed': typeof AuthenticatedFeedRoute
+  '/pro': typeof AuthenticatedProRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/shared/$shareCode': typeof SharedShareCodeRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
   '/journal/new': typeof AuthenticatedJournalNewRoute
   '/places/$placeId': typeof AuthenticatedPlacesPlaceIdRoute
   '/places/discover': typeof AuthenticatedPlacesDiscoverRoute
+  '/profile/$userId': typeof AuthenticatedProfileUserIdRoute
   '/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/journal': typeof AuthenticatedJournalIndexRoute
   '/places': typeof AuthenticatedPlacesIndexRoute
+  '/profile': typeof AuthenticatedProfileIndexRoute
   '/trips': typeof AuthenticatedTripsIndexRoute
 }
 export interface FileRoutesById {
@@ -145,15 +195,21 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/feed': typeof AuthenticatedFeedRoute
+  '/_authenticated/pro': typeof AuthenticatedProRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/shared/$shareCode': typeof SharedShareCodeRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/journal/$entryId': typeof AuthenticatedJournalEntryIdRoute
   '/_authenticated/journal/new': typeof AuthenticatedJournalNewRoute
   '/_authenticated/places/$placeId': typeof AuthenticatedPlacesPlaceIdRoute
   '/_authenticated/places/discover': typeof AuthenticatedPlacesDiscoverRoute
+  '/_authenticated/profile/$userId': typeof AuthenticatedProfileUserIdRoute
   '/_authenticated/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authenticated/journal/': typeof AuthenticatedJournalIndexRoute
   '/_authenticated/places/': typeof AuthenticatedPlacesIndexRoute
+  '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
   '/_authenticated/trips/': typeof AuthenticatedTripsIndexRoute
 }
 export interface FileRouteTypes {
@@ -163,15 +219,21 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard'
+    | '/feed'
+    | '/pro'
     | '/settings'
+    | '/shared/$shareCode'
+    | '/admin/users'
     | '/journal/$entryId'
     | '/journal/new'
     | '/places/$placeId'
     | '/places/discover'
+    | '/profile/$userId'
     | '/trips/$tripId'
     | '/api/auth/$'
     | '/journal/'
     | '/places/'
+    | '/profile/'
     | '/trips/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -179,15 +241,21 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard'
+    | '/feed'
+    | '/pro'
     | '/settings'
+    | '/shared/$shareCode'
+    | '/admin/users'
     | '/journal/$entryId'
     | '/journal/new'
     | '/places/$placeId'
     | '/places/discover'
+    | '/profile/$userId'
     | '/trips/$tripId'
     | '/api/auth/$'
     | '/journal'
     | '/places'
+    | '/profile'
     | '/trips'
   id:
     | '__root__'
@@ -196,15 +264,21 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/_authenticated/dashboard'
+    | '/_authenticated/feed'
+    | '/_authenticated/pro'
     | '/_authenticated/settings'
+    | '/shared/$shareCode'
+    | '/_authenticated/admin/users'
     | '/_authenticated/journal/$entryId'
     | '/_authenticated/journal/new'
     | '/_authenticated/places/$placeId'
     | '/_authenticated/places/discover'
+    | '/_authenticated/profile/$userId'
     | '/_authenticated/trips/$tripId'
     | '/api/auth/$'
     | '/_authenticated/journal/'
     | '/_authenticated/places/'
+    | '/_authenticated/profile/'
     | '/_authenticated/trips/'
   fileRoutesById: FileRoutesById
 }
@@ -213,6 +287,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  SharedShareCodeRoute: typeof SharedShareCodeRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -246,11 +321,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shared/$shareCode': {
+      id: '/shared/$shareCode'
+      path: '/shared/$shareCode'
+      fullPath: '/shared/$shareCode'
+      preLoaderRoute: typeof SharedShareCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pro': {
+      id: '/_authenticated/pro'
+      path: '/pro'
+      fullPath: '/pro'
+      preLoaderRoute: typeof AuthenticatedProRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/feed': {
+      id: '/_authenticated/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof AuthenticatedFeedRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
@@ -265,6 +361,13 @@ declare module '@tanstack/react-router' {
       path: '/trips'
       fullPath: '/trips/'
       preLoaderRoute: typeof AuthenticatedTripsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/profile/': {
+      id: '/_authenticated/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof AuthenticatedProfileIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/places/': {
@@ -295,6 +398,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTripsTripIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/profile/$userId': {
+      id: '/_authenticated/profile/$userId'
+      path: '/profile/$userId'
+      fullPath: '/profile/$userId'
+      preLoaderRoute: typeof AuthenticatedProfileUserIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/places/discover': {
       id: '/_authenticated/places/discover'
       path: '/places/discover'
@@ -323,32 +433,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJournalEntryIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFeedRoute: typeof AuthenticatedFeedRoute
+  AuthenticatedProRoute: typeof AuthenticatedProRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedJournalEntryIdRoute: typeof AuthenticatedJournalEntryIdRoute
   AuthenticatedJournalNewRoute: typeof AuthenticatedJournalNewRoute
   AuthenticatedPlacesPlaceIdRoute: typeof AuthenticatedPlacesPlaceIdRoute
   AuthenticatedPlacesDiscoverRoute: typeof AuthenticatedPlacesDiscoverRoute
+  AuthenticatedProfileUserIdRoute: typeof AuthenticatedProfileUserIdRoute
   AuthenticatedTripsTripIdRoute: typeof AuthenticatedTripsTripIdRoute
   AuthenticatedJournalIndexRoute: typeof AuthenticatedJournalIndexRoute
   AuthenticatedPlacesIndexRoute: typeof AuthenticatedPlacesIndexRoute
+  AuthenticatedProfileIndexRoute: typeof AuthenticatedProfileIndexRoute
   AuthenticatedTripsIndexRoute: typeof AuthenticatedTripsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFeedRoute: AuthenticatedFeedRoute,
+  AuthenticatedProRoute: AuthenticatedProRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedJournalEntryIdRoute: AuthenticatedJournalEntryIdRoute,
   AuthenticatedJournalNewRoute: AuthenticatedJournalNewRoute,
   AuthenticatedPlacesPlaceIdRoute: AuthenticatedPlacesPlaceIdRoute,
   AuthenticatedPlacesDiscoverRoute: AuthenticatedPlacesDiscoverRoute,
+  AuthenticatedProfileUserIdRoute: AuthenticatedProfileUserIdRoute,
   AuthenticatedTripsTripIdRoute: AuthenticatedTripsTripIdRoute,
   AuthenticatedJournalIndexRoute: AuthenticatedJournalIndexRoute,
   AuthenticatedPlacesIndexRoute: AuthenticatedPlacesIndexRoute,
+  AuthenticatedProfileIndexRoute: AuthenticatedProfileIndexRoute,
   AuthenticatedTripsIndexRoute: AuthenticatedTripsIndexRoute,
 }
 
@@ -361,6 +488,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  SharedShareCodeRoute: SharedShareCodeRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

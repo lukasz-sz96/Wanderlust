@@ -110,10 +110,7 @@ export const MarkVisitedModal = ({
                     <p className="text-sm text-muted">{placeName}</p>
                   </div>
                 </div>
-                <button
-                  onClick={onClose}
-                  className="p-2 rounded-full hover:bg-border-light transition-colors"
-                >
+                <button onClick={onClose} className="p-2 rounded-full hover:bg-border-light transition-colors">
                   <X size={20} className="text-muted" />
                 </button>
               </div>
@@ -181,11 +178,7 @@ export const MarkVisitedModal = ({
                       >
                         <Star
                           size={28}
-                          className={
-                            rating && rating >= star
-                              ? 'text-warning fill-warning'
-                              : 'text-muted'
-                          }
+                          className={rating && rating >= star ? 'text-warning fill-warning' : 'text-muted'}
                         />
                       </button>
                     ))}

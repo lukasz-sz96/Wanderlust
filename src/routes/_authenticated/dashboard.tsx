@@ -8,17 +8,7 @@ import { MapView } from '../../components/maps';
 import { Card, Badge, Button } from '../../components/ui';
 import { AddPlaceModal } from '../../components/places';
 import { OnboardingModal } from '../../components/onboarding';
-import {
-  MapPin,
-  Plane,
-  BookOpen,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  Heart,
-  CheckCircle,
-  Star,
-} from 'lucide-react';
+import { MapPin, Plane, BookOpen, ChevronLeft, ChevronRight, Plus, Heart, CheckCircle, Star } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated/dashboard')({
   component: DashboardPage,
@@ -47,9 +37,8 @@ const DashboardPage = () => {
         color: item.status === 'visited' ? '#81B29A' : '#E07A5F',
       })) ?? [];
 
-  const defaultCenter = markers.length > 0
-    ? { lat: markers[0].latitude, lng: markers[0].longitude }
-    : { lat: 48.8566, lng: 2.3522 };
+  const defaultCenter =
+    markers.length > 0 ? { lat: markers[0].latitude, lng: markers[0].longitude } : { lat: 48.8566, lng: 2.3522 };
 
   return (
     <div className="h-[calc(100vh-4rem)] flex relative">
@@ -70,12 +59,7 @@ const DashboardPage = () => {
 
           <div className="p-4 border-b border-border-light">
             <div className="grid grid-cols-2 gap-3">
-              <StatMini
-                icon={<MapPin size={16} />}
-                value={stats?.total ?? 0}
-                label="Places"
-                color="primary"
-              />
+              <StatMini icon={<MapPin size={16} />} value={stats?.total ?? 0} label="Places" color="primary" />
               <StatMini
                 icon={<CheckCircle size={16} />}
                 value={stats?.visited ?? 0}
@@ -88,12 +72,7 @@ const DashboardPage = () => {
                 label="Want to visit"
                 color="primary"
               />
-              <StatMini
-                icon={<MapPin size={16} />}
-                value={stats?.countries ?? 0}
-                label="Countries"
-                color="accent"
-              />
+              <StatMini icon={<MapPin size={16} />} value={stats?.countries ?? 0} label="Countries" color="accent" />
             </div>
           </div>
 
@@ -101,12 +80,7 @@ const DashboardPage = () => {
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-medium text-foreground">Your Places</h3>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  leftIcon={<Plus size={14} />}
-                  onClick={() => setShowAddModal(true)}
-                >
+                <Button size="sm" variant="ghost" leftIcon={<Plus size={14} />} onClick={() => setShowAddModal(true)}>
                   Add
                 </Button>
               </div>
@@ -136,32 +110,21 @@ const DashboardPage = () => {
                 <div className="space-y-2">
                   {bucketListItems.map((item) =>
                     item.place ? (
-                      <Link
-                        key={item._id}
-                        to="/places/$placeId"
-                        params={{ placeId: item.place._id }}
-                        className="block"
-                      >
+                      <Link key={item._id} to="/places/$placeId" params={{ placeId: item.place._id }} className="block">
                         <div className="p-3 rounded-lg border border-border-light hover:border-primary hover:bg-primary-light/5 transition-colors">
                           <div className="flex items-start gap-3">
                             <div
                               className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                                item.status === 'visited'
-                                  ? 'bg-secondary/20'
-                                  : 'bg-primary-light/20'
+                                item.status === 'visited' ? 'bg-secondary/20' : 'bg-primary-light/20'
                               }`}
                             >
                               <MapPin
                                 size={16}
-                                className={
-                                  item.status === 'visited' ? 'text-secondary' : 'text-primary'
-                                }
+                                className={item.status === 'visited' ? 'text-secondary' : 'text-primary'}
                               />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-foreground text-sm truncate">
-                                {item.place.name}
-                              </p>
+                              <p className="font-medium text-foreground text-sm truncate">{item.place.name}</p>
                               <p className="text-xs text-muted truncate">
                                 {[item.place.city, item.place.country].filter(Boolean).join(', ')}
                               </p>
@@ -175,7 +138,7 @@ const DashboardPage = () => {
                           </div>
                         </div>
                       </Link>
-                    ) : null
+                    ) : null,
                   )}
                 </div>
               )}
@@ -264,9 +227,7 @@ const StatMini = ({
 
   return (
     <div className="flex items-center gap-2 p-2 rounded-lg bg-border-light/50">
-      <div className={`w-7 h-7 rounded-md flex items-center justify-center ${colorClasses[color]}`}>
-        {icon}
-      </div>
+      <div className={`w-7 h-7 rounded-md flex items-center justify-center ${colorClasses[color]}`}>{icon}</div>
       <div>
         <p className="text-lg font-bold text-foreground leading-none">{value}</p>
         <p className="text-xs text-muted">{label}</p>

@@ -58,7 +58,7 @@ export const SortablePlaceList = ({ items, onReorder }: SortablePlaceListProps) 
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -84,11 +84,7 @@ export const SortablePlaceList = ({ items, onReorder }: SortablePlaceListProps) 
       <SortableContext items={items.map((i) => i._id)} strategy={verticalListSortingStrategy}>
         <div className="space-y-2">
           {items.map((item) => (
-            <SortablePlaceItem
-              key={item._id}
-              item={item}
-              isDragging={activeId === item._id}
-            />
+            <SortablePlaceItem key={item._id} item={item} isDragging={activeId === item._id} />
           ))}
         </div>
       </SortableContext>
@@ -96,20 +92,8 @@ export const SortablePlaceList = ({ items, onReorder }: SortablePlaceListProps) 
   );
 };
 
-const SortablePlaceItem = ({
-  item,
-  isDragging,
-}: {
-  item: BucketListItem;
-  isDragging: boolean;
-}) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: item._id });
+const SortablePlaceItem = ({ item, isDragging }: { item: BucketListItem; isDragging: boolean }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item._id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -121,11 +105,7 @@ const SortablePlaceItem = ({
   const location = [item.place.city, item.place.country].filter(Boolean).join(', ');
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`${isDragging ? 'z-50 relative' : ''}`}
-    >
+    <div ref={setNodeRef} style={style} className={`${isDragging ? 'z-50 relative' : ''}`}>
       <Card
         className={`
           transition-shadow duration-200
@@ -141,11 +121,7 @@ const SortablePlaceItem = ({
             <GripVertical size={20} />
           </button>
 
-          <Link
-            to="/places/$placeId"
-            params={{ placeId: item.place._id }}
-            className="flex-1 min-w-0"
-          >
+          <Link to="/places/$placeId" params={{ placeId: item.place._id }} className="flex-1 min-w-0">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-lg bg-primary-light/20 flex items-center justify-center flex-shrink-0">
                 <MapPin className="text-primary" size={20} />
@@ -154,9 +130,7 @@ const SortablePlaceItem = ({
                 <h4 className="font-medium text-foreground truncate hover:text-primary transition-colors">
                   {item.place.name}
                 </h4>
-                {location && (
-                  <p className="text-sm text-muted truncate">{location}</p>
-                )}
+                {location && <p className="text-sm text-muted truncate">{location}</p>}
               </div>
             </div>
           </Link>
@@ -182,20 +156,10 @@ const SortablePlaceItem = ({
               </div>
             )}
             <Badge
-              variant={
-                item.status === 'visited'
-                  ? 'success'
-                  : item.status === 'want_to_visit'
-                    ? 'primary'
-                    : 'default'
-              }
+              variant={item.status === 'visited' ? 'success' : item.status === 'want_to_visit' ? 'primary' : 'default'}
               className="hidden sm:inline-flex"
             >
-              {item.status === 'visited'
-                ? 'Visited'
-                : item.status === 'want_to_visit'
-                  ? 'Want to visit'
-                  : 'Skipped'}
+              {item.status === 'visited' ? 'Visited' : item.status === 'want_to_visit' ? 'Want to visit' : 'Skipped'}
             </Badge>
           </div>
         </div>

@@ -3,27 +3,8 @@ import { useMutation, useQuery } from 'convex/react';
 import { useState, useEffect } from 'react';
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
-import {
-  Button,
-  Card,
-  CardContent,
-  Input,
-  Textarea,
-  PageLoading,
-} from '../../../components/ui';
-import {
-  ArrowLeft,
-  Save,
-  Calendar,
-  MapPin,
-  Plane,
-  Star,
-  Smile,
-  Meh,
-  Frown,
-  Loader2,
-  Cloud,
-} from 'lucide-react';
+import { Button, Card, CardContent, Input, Textarea, PageLoading } from '../../../components/ui';
+import { ArrowLeft, Save, Calendar, MapPin, Plane, Star, Smile, Meh, Frown, Loader2, Cloud } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { fetchHistoricalWeather, formatTemperature, type HistoricalWeather } from '../../../lib/api/weather';
 
@@ -65,11 +46,7 @@ const NewJournalEntryPage = () => {
 
     const loadWeather = async () => {
       setIsLoadingWeather(true);
-      const data = await fetchHistoricalWeather(
-        selectedPlace.latitude,
-        selectedPlace.longitude,
-        entryDate
-      );
+      const data = await fetchHistoricalWeather(selectedPlace.latitude, selectedPlace.longitude, entryDate);
       setWeather(data);
       setIsLoadingWeather(false);
     };
@@ -116,7 +93,12 @@ const NewJournalEntryPage = () => {
     { id: 'amazing', label: 'Amazing', icon: <Star size={20} />, color: 'text-warning bg-warning/10 border-warning' },
     { id: 'good', label: 'Good', icon: <Smile size={20} />, color: 'text-secondary bg-secondary/10 border-secondary' },
     { id: 'neutral', label: 'Neutral', icon: <Meh size={20} />, color: 'text-muted bg-border-light border-border' },
-    { id: 'challenging', label: 'Challenging', icon: <Frown size={20} />, color: 'text-primary bg-primary-light/10 border-primary' },
+    {
+      id: 'challenging',
+      label: 'Challenging',
+      icon: <Frown size={20} />,
+      color: 'text-primary bg-primary-light/10 border-primary',
+    },
   ];
 
   return (
@@ -146,17 +128,10 @@ const NewJournalEntryPage = () => {
               onChange={(e) => setTitle(e.target.value)}
             />
 
-            <Input
-              label="Date"
-              type="date"
-              value={entryDate}
-              onChange={(e) => setEntryDate(e.target.value)}
-            />
+            <Input label="Date" type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} />
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                How are you feeling?
-              </label>
+              <label className="block text-sm font-medium text-foreground mb-2">How are you feeling?</label>
               <div className="flex flex-wrap gap-2">
                 {moods.map((m) => (
                   <button
@@ -191,7 +166,7 @@ const NewJournalEntryPage = () => {
                 </label>
                 <select
                   value={tripId || ''}
-                  onChange={(e) => setTripId(e.target.value ? e.target.value as Id<'trips'> : undefined)}
+                  onChange={(e) => setTripId(e.target.value ? (e.target.value as Id<'trips'>) : undefined)}
                   className="w-full px-3 py-2 rounded-lg border border-border-light bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">No trip</option>
@@ -210,7 +185,7 @@ const NewJournalEntryPage = () => {
                 </label>
                 <select
                   value={placeId || ''}
-                  onChange={(e) => setPlaceId(e.target.value ? e.target.value as Id<'places'> : undefined)}
+                  onChange={(e) => setPlaceId(e.target.value ? (e.target.value as Id<'places'>) : undefined)}
                   className="w-full px-3 py-2 rounded-lg border border-border-light bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">No place</option>
@@ -219,7 +194,7 @@ const NewJournalEntryPage = () => {
                       <option key={item.place._id} value={item.place._id}>
                         {item.place.name}
                       </option>
-                    ) : null
+                    ) : null,
                   )}
                 </select>
               </div>
@@ -240,9 +215,7 @@ const NewJournalEntryPage = () => {
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">{weather.icon}</span>
                     <div>
-                      <p className="font-semibold text-foreground">
-                        {formatTemperature(weather.temperature)}
-                      </p>
+                      <p className="font-semibold text-foreground">{formatTemperature(weather.temperature)}</p>
                       <p className="text-sm text-muted">{weather.condition}</p>
                     </div>
                   </div>

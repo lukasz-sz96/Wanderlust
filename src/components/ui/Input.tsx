@@ -9,37 +9,18 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      label,
-      error,
-      hint,
-      leftIcon,
-      rightIcon,
-      className = '',
-      id,
-      ...props
-    },
-    ref
-  ) => {
+  ({ label, error, hint, leftIcon, rightIcon, className = '', id, ...props }, ref) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
 
     return (
       <div className="w-full">
         {label && (
-          <label
-            htmlFor={inputId}
-            className="block text-sm font-medium text-foreground mb-1.5"
-          >
+          <label htmlFor={inputId} className="block text-sm font-medium text-foreground mb-1.5">
             {label}
           </label>
         )}
         <div className="relative">
-          {leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted">
-              {leftIcon}
-            </div>
-          )}
+          {leftIcon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted">{leftIcon}</div>}
           <input
             ref={ref}
             id={inputId}
@@ -56,22 +37,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             `}
             {...props}
           />
-          {rightIcon && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted">
-              {rightIcon}
-            </div>
-          )}
+          {rightIcon && <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted">{rightIcon}</div>}
         </div>
-        {(error || hint) && (
-          <p
-            className={`mt-1.5 text-sm ${error ? 'text-error' : 'text-muted'}`}
-          >
-            {error || hint}
-          </p>
-        )}
+        {(error || hint) && <p className={`mt-1.5 text-sm ${error ? 'text-error' : 'text-muted'}`}>{error || hint}</p>}
       </div>
     );
-  }
+  },
 );
 
 Input.displayName = 'Input';

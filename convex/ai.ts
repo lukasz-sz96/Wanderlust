@@ -12,7 +12,7 @@ export const generatePlaceRecommendations = action({
         categories: v.optional(v.array(v.string())),
         mood: v.optional(v.string()),
         budget: v.optional(v.string()),
-      })
+      }),
     ),
   },
   returns: v.array(
@@ -27,7 +27,7 @@ export const generatePlaceRecommendations = action({
       whyVisit: v.string(),
       bestTimeToVisit: v.optional(v.string()),
       estimatedDuration: v.optional(v.string()),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -68,7 +68,7 @@ Provide 3-5 recommendations. Focus on unique, memorable places that match the us
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'HTTP-Referer': 'https://wanderlust.app',
         'X-Title': 'Wanderlust Travel App',
       },
@@ -169,9 +169,9 @@ export const generateItinerary = action({
           startTime: v.optional(v.string()),
           duration: v.optional(v.string()),
           location: v.optional(v.string()),
-        })
+        }),
       ),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -206,7 +206,7 @@ Create a balanced itinerary with a mix of sightseeing, meals, and rest time.`;
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'HTTP-Referer': 'https://wanderlust.app',
         'X-Title': 'Wanderlust Travel App',
       },
@@ -282,7 +282,7 @@ export const generatePlaceDescription = action({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'HTTP-Referer': 'https://wanderlust.app',
         'X-Title': 'Wanderlust Travel App',
       },
@@ -318,7 +318,7 @@ export const surpriseMe = action({
       v.object({
         latitude: v.number(),
         longitude: v.number(),
-      })
+      }),
     ),
     travelStyle: v.optional(v.string()),
   },
@@ -338,7 +338,7 @@ export const surpriseMe = action({
       throw new Error('OPENROUTER_API_KEY not configured');
     }
 
-    let prompt = 'Suggest a random, surprising travel destination that most people haven\'t heard of. ';
+    let prompt = "Suggest a random, surprising travel destination that most people haven't heard of. ";
     if (args.travelStyle) {
       prompt += `The traveler enjoys: ${args.travelStyle}. `;
     }
@@ -357,7 +357,7 @@ Respond with JSON containing:
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'HTTP-Referer': 'https://wanderlust.app',
         'X-Title': 'Wanderlust Travel App',
       },

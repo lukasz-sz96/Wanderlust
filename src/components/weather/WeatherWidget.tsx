@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '../ui';
-import {
-  fetchWeather,
-  getWeatherInfo,
-  formatTemperature,
-  type WeatherData,
-} from '../../lib/api/weather';
+import { fetchWeather, getWeatherInfo, formatTemperature, type WeatherData } from '../../lib/api/weather';
 import { Droplets, Wind, Thermometer, Loader2 } from 'lucide-react';
 
 interface WeatherWidgetProps {
@@ -15,12 +10,7 @@ interface WeatherWidgetProps {
   showForecast?: boolean;
 }
 
-export const WeatherWidget = ({
-  latitude,
-  longitude,
-  compact = false,
-  showForecast = true,
-}: WeatherWidgetProps) => {
+export const WeatherWidget = ({ latitude, longitude, compact = false, showForecast = true }: WeatherWidgetProps) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -62,9 +52,7 @@ export const WeatherWidget = ({
       <div className="flex items-center gap-3 p-3 rounded-lg bg-border-light/50">
         <span className="text-2xl">{currentInfo.icon}</span>
         <div>
-          <p className="font-semibold text-foreground">
-            {formatTemperature(weather.current.temperature)}
-          </p>
+          <p className="font-semibold text-foreground">{formatTemperature(weather.current.temperature)}</p>
           <p className="text-xs text-muted">{currentInfo.condition}</p>
         </div>
       </div>
@@ -82,9 +70,7 @@ export const WeatherWidget = ({
         <div className="flex items-center gap-4">
           <span className="text-5xl">{currentInfo.icon}</span>
           <div>
-            <p className="text-3xl font-bold text-foreground">
-              {formatTemperature(weather.current.temperature)}
-            </p>
+            <p className="text-3xl font-bold text-foreground">{formatTemperature(weather.current.temperature)}</p>
             <p className="text-muted">{currentInfo.condition}</p>
           </div>
         </div>
@@ -94,9 +80,7 @@ export const WeatherWidget = ({
             <Thermometer size={16} className="text-primary" />
             <div>
               <p className="text-muted text-xs">Feels like</p>
-              <p className="text-foreground font-medium">
-                {formatTemperature(weather.current.apparentTemperature)}
-              </p>
+              <p className="text-foreground font-medium">{formatTemperature(weather.current.apparentTemperature)}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 text-sm">
@@ -125,16 +109,11 @@ export const WeatherWidget = ({
                 const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
 
                 return (
-                  <div
-                    key={day.date}
-                    className="flex-shrink-0 w-16 text-center p-2 rounded-lg bg-border-light/50"
-                  >
+                  <div key={day.date} className="flex-shrink-0 w-16 text-center p-2 rounded-lg bg-border-light/50">
                     <p className="text-xs text-muted mb-1">{dayName}</p>
                     <span className="text-xl">{dayInfo.icon}</span>
                     <div className="mt-1">
-                      <p className="text-xs font-medium text-foreground">
-                        {Math.round(day.temperatureMax)}°
-                      </p>
+                      <p className="text-xs font-medium text-foreground">{Math.round(day.temperatureMax)}°</p>
                       <p className="text-xs text-muted">{Math.round(day.temperatureMin)}°</p>
                     </div>
                   </div>

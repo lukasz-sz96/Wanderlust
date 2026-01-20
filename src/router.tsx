@@ -36,10 +36,7 @@ export function getRouter() {
     defaultNotFoundComponent: () => <p>not found</p>,
     context: { queryClient, convexClient: convex, convexQueryClient },
     Wrap: ({ children }) => (
-      <ConvexBetterAuthProvider
-        client={convexQueryClient.convexClient}
-        authClient={authClient}
-      >
+      <ConvexBetterAuthProvider client={convexQueryClient.convexClient} authClient={authClient}>
         <ToastProvider>{children}</ToastProvider>
       </ConvexBetterAuthProvider>
     ),

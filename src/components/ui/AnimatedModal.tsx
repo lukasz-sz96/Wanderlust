@@ -8,12 +8,7 @@ interface AnimatedModalProps {
   className?: string;
 }
 
-export const AnimatedModal = ({
-  isOpen,
-  onClose,
-  children,
-  className = '',
-}: AnimatedModalProps) => {
+export const AnimatedModal = ({ isOpen, onClose, children, className = '' }: AnimatedModalProps) => {
   return (
     <AnimatePresence>
       {isOpen && (

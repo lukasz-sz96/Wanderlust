@@ -4,28 +4,28 @@
 
 :root {
   /* Warm colors */
-  --color-primary: #E07A5F;
-  --color-primary-hover: #D16A4F;
-  --color-primary-light: #F0A090;
-  --color-secondary: #81B29A;
-  --color-secondary-hover: #71A28A;
-  --color-secondary-light: #A8D4BE;
-  --color-accent: #F2CC8F;
-  --color-accent-hover: #E5BC7F;
-  --color-background: #FDF6EC;
-  --color-surface: #FFFFFF;
-  --color-surface-elevated: #FFFFFF;
-  --color-text: #3D405B;
-  --color-text-muted: #6B7280;
-  --color-text-light: #9CA3AF;
-  --color-border: #E5E7EB;
-  --color-border-light: #F3F4F6;
+  --color-primary: #e07a5f;
+  --color-primary-hover: #d16a4f;
+  --color-primary-light: #f0a090;
+  --color-secondary: #81b29a;
+  --color-secondary-hover: #71a28a;
+  --color-secondary-light: #a8d4be;
+  --color-accent: #f2cc8f;
+  --color-accent-hover: #e5bc7f;
+  --color-background: #fdf6ec;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #ffffff;
+  --color-text: #3d405b;
+  --color-text-muted: #6b7280;
+  --color-text-light: #9ca3af;
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
 
   /* Status colors */
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
-  --color-info: #3B82F6;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
 
   /* Playful radii */
   --radius-sm: 8px;
@@ -59,16 +59,16 @@
 /* Dark mode - warmer dark theme */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-background: #1F2028;
-    --color-surface: #2A2B36;
+    --color-background: #1f2028;
+    --color-surface: #2a2b36;
     --color-surface-elevated: #353642;
-    --color-text: #F5F5F5;
-    --color-text-muted: #A1A1AA;
-    --color-text-light: #71717A;
-    --color-border: #3F4050;
-    --color-border-light: #2E2F3A;
-    --color-primary-light: #E8968A;
-    --color-secondary-light: #5D8A74;
+    --color-text: #f5f5f5;
+    --color-text-muted: #a1a1aa;
+    --color-text-light: #71717a;
+    --color-border: #3f4050;
+    --color-border-light: #2e2f3a;
+    --color-primary-light: #e8968a;
+    --color-secondary-light: #5d8a74;
   }
 }
 
@@ -176,8 +176,12 @@ body {
 
 /* Animation utilities */
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slide-up {
@@ -203,8 +207,13 @@ body {
 }
 
 @keyframes pulse-soft {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .animate-fade-in {

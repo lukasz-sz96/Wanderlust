@@ -61,7 +61,7 @@ export const MapView = ({
         onMapClick(evt.lngLat.lat, evt.lngLat.lng);
       }
     },
-    [onMapClick]
+    [onMapClick],
   );
 
   return (
@@ -76,9 +76,7 @@ export const MapView = ({
         interactive={interactive}
         attributionControl={true}
       >
-        {showNavigation && (
-          <NavigationControl position="top-right" showCompass showZoom />
-        )}
+        {showNavigation && <NavigationControl position="top-right" showCompass showZoom />}
 
         {markers.map((marker) => (
           <Marker
@@ -88,10 +86,7 @@ export const MapView = ({
             anchor="bottom"
             onClick={() => onMarkerClick?.(marker.id)}
           >
-            <div
-              className="cursor-pointer transform hover:scale-110 transition-transform"
-              title={marker.label}
-            >
+            <div className="cursor-pointer transform hover:scale-110 transition-transform" title={marker.label}>
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
                 style={{ backgroundColor: marker.color || 'var(--color-primary)' }}

@@ -2,26 +2,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useAction, useMutation } from 'convex/react';
 import { useState } from 'react';
 import { api } from '../../../../convex/_generated/api';
-import {
-  Button,
-  Card,
-  CardContent,
-  Input,
-  Badge,
-  useToast,
-} from '../../../components/ui';
-import {
-  Compass,
-  Sparkles,
-  Search,
-  MapPin,
-  Clock,
-  Calendar,
-  Plus,
-  Loader2,
-  Shuffle,
-  ArrowRight,
-} from 'lucide-react';
+import { Button, Card, CardContent, Input, Badge, useToast } from '../../../components/ui';
+import { Compass, Sparkles, Search, MapPin, Clock, Calendar, Plus, Loader2, Shuffle, ArrowRight } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated/places/discover')({
   component: DiscoverPage,
@@ -66,20 +48,11 @@ const DiscoverPage = () => {
   const createPlace = useMutation(api.places.create);
   const addToBucketList = useMutation(api.bucketList.add);
 
-  const categories = [
-    'landmark',
-    'museum',
-    'restaurant',
-    'nature',
-    'beach',
-    'mountain',
-    'historical',
-    'entertainment',
-  ];
+  const categories = ['landmark', 'museum', 'restaurant', 'nature', 'beach', 'mountain', 'historical', 'entertainment'];
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
-      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
+      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category],
     );
   };
 
@@ -324,9 +297,7 @@ const DiscoverPage = () => {
                     <div className="flex items-start justify-between gap-4 mb-2">
                       <div>
                         <h3 className="text-lg font-semibold text-foreground">{rec.name}</h3>
-                        <p className="text-sm text-muted">
-                          {[rec.city, rec.country].filter(Boolean).join(', ')}
-                        </p>
+                        <p className="text-sm text-muted">{[rec.city, rec.country].filter(Boolean).join(', ')}</p>
                       </div>
                       <Button
                         size="sm"
@@ -334,11 +305,7 @@ const DiscoverPage = () => {
                         onClick={() => handleAddPlace(rec)}
                         disabled={addingPlace === rec.name}
                         leftIcon={
-                          addingPlace === rec.name ? (
-                            <Loader2 size={14} className="animate-spin" />
-                          ) : (
-                            <Plus size={14} />
-                          )
+                          addingPlace === rec.name ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />
                         }
                       >
                         Add

@@ -27,25 +27,12 @@ function getInitials(name: string): string {
 }
 
 function getBackgroundColor(name: string): string {
-  const colors = [
-    'bg-primary',
-    'bg-secondary',
-    'bg-accent',
-    'bg-info',
-    'bg-success',
-  ];
+  const colors = ['bg-primary', 'bg-secondary', 'bg-accent', 'bg-info', 'bg-success'];
   const index = name.charCodeAt(0) % colors.length;
   return colors[index];
 }
 
-export function Avatar({
-  src,
-  alt,
-  size = 'md',
-  fallback,
-  className = '',
-  ...props
-}: AvatarProps) {
+export function Avatar({ src, alt, size = 'md', fallback, className = '', ...props }: AvatarProps) {
   const initials = fallback || getInitials(alt);
   const bgColor = getBackgroundColor(alt);
 
