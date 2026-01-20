@@ -17,6 +17,23 @@ export default defineSchema({
     ),
     createdAt: v.number(),
     updatedAt: v.number(),
+    bio: v.optional(v.string()),
+    travelStyles: v.optional(v.array(v.string())),
+    languages: v.optional(v.array(v.string())),
+    homeLocation: v.optional(v.string()),
+    coverPhotoId: v.optional(v.id('_storage')),
+    profileVisibility: v.optional(
+      v.union(v.literal('public'), v.literal('friends'), v.literal('private'))
+    ),
+    role: v.optional(
+      v.union(
+        v.literal('free'),
+        v.literal('pro'),
+        v.literal('moderator'),
+        v.literal('admin')
+      )
+    ),
+    roleUpdatedAt: v.optional(v.number()),
   })
     .index('by_auth_id', ['authUserId'])
     .index('by_email', ['email']),
@@ -167,4 +184,41 @@ export default defineSchema({
     .index('by_trip', ['tripId'])
     .index('by_journal_entry', ['journalEntryId'])
     .index('by_place', ['placeId']),
+
+  follows: defineTable({
+    followerId: v.id('users'),
+    followingId: v.id('users'),
+    createdAt: v.number(),
+  })
+    .index('by_follower', ['followerId'])
+    .index('by_following', ['followingId'])
+    .index('by_pair', ['followerId', 'followingId']),
+
+  activityFeed: defineTable({
+    userId: v.id('users'),
+    type: v.union(
+      v.literal('trip_created'),
+      v.literal('place_visited'),
+      v.literal('journal_posted'),
+      v.literal('place_added')
+    ),
+    referenceId: v.string(),
+    metadata: v.optional(v.any()),
+    createdAt: v.number(),
+  })
+    .index('by_user', ['userId'])
+    .index('by_created', ['createdAt'])
+    .index('by_user_and_created', ['userId', 'createdAt']),
+
+  sharedTrips: defineTable({
+    tripId: v.id('trips'),
+    shareCode: v.string(),
+    isPublic: v.boolean(),
+    customSlug: v.optional(v.string()),
+    viewCount: v.number(),
+    createdAt: v.number(),
+  })
+    .index('by_trip', ['tripId'])
+    .index('by_code', ['shareCode'])
+    .index('by_slug', ['customSlug']),
 });
