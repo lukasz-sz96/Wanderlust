@@ -62,7 +62,8 @@ services:
       dockerfile: Dockerfile
       args:
         - VITE_CONVEX_URL=${VITE_CONVEX_URL:-http://localhost:3210}
-    image: wanderlust:latest
+    # Alternative: Use pre-built image (only works if Convex runs at localhost:3210)
+    # image: ghcr.io/lukasz-sz96/wanderlust:main
     container_name: wanderlust
     restart: unless-stopped
     ports:

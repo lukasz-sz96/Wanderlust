@@ -147,6 +147,70 @@ npm run deploy:self-hosted
 | Convex Dashboard | http://localhost:6791 | Database management UI |
 | Convex API | http://localhost:3210 | Backend API |
 
+### Unraid Deployment
+
+Deploy Wanderlust on Unraid using Docker Compose.
+
+#### 1. Clone Repository
+
+```bash
+cd /mnt/user/appdata
+git clone https://github.com/lukasz-sz96/wanderlust.git
+cd wanderlust
+```
+
+#### 2. Configure Environment
+
+```bash
+cat > .env << 'EOF'
+VITE_CONVEX_URL=http://<UNRAID_IP>:3210
+SITE_URL=http://<UNRAID_IP>:3000
+BETTER_AUTH_SECRET=<32-character-secret>
+EOF
+```
+
+Replace `<UNRAID_IP>` with your Unraid server's IP address.
+
+#### 3. Build and Start Services
+
+```bash
+cd /mnt/user/appdata/wanderlust
+docker compose up -d --build
+```
+
+The `--build` flag ensures the app is built with your custom `VITE_CONVEX_URL`.
+
+#### 3. Generate Admin Key
+
+```bash
+docker compose exec convex-backend ./generate_admin_key.sh
+```
+
+Add the generated key to your `.env` file as `CONVEX_SELF_HOSTED_ADMIN_KEY`.
+
+#### 4. Deploy Convex Functions
+
+From a machine with Node.js installed:
+
+```bash
+git clone https://github.com/lukasz-sz96/wanderlust.git
+cd wanderlust
+npm install
+CONVEX_SELF_HOSTED_URL=http://<UNRAID_IP>:3210 \
+CONVEX_SELF_HOSTED_ADMIN_KEY=<generated-key> \
+npx convex deploy
+```
+
+#### Optional Environment Variables
+
+Add these to your `.env` file to enable additional features:
+
+```bash
+OPENROUTER_API_KEY=sk-or-...        # AI recommendations
+VITE_STADIA_API_KEY=...             # Custom map tiles
+VITE_MAPILLARY_ACCESS_TOKEN=...     # Street-level imagery
+```
+
 ---
 
 ## Environment Variables
